@@ -97,6 +97,15 @@ body.scaring #hud{opacity:.25}
 #arrow{position:fixed;left:50%;top:calc(50% - 130px);transform:translateX(-50%);display:grid;justify-items:center;font-family:var(--f-osd);font-size:22px;color:var(--exit);text-shadow:0 0 10px rgba(40,255,120,.8)}
 #arrow-i{font-size:58px;line-height:1}
 #hatTag{color:var(--sodium)}
+.hm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;max-width:760px;margin-bottom:14px}
+.hm-ent{background:var(--shade);border:1px solid rgba(243,238,223,.18);padding:7px 9px;text-align:left;cursor:pointer;display:grid;gap:2px}
+.hm-ent b{font-size:14px;font-weight:700}.hm-ent i{font-size:12px;font-style:normal;color:var(--osd-dim)}
+.hm-ent:hover{border-color:var(--osd-dim)}.hm-ent.on{border-color:var(--sodium);background:rgba(232,199,90,.14)}.hm-ent.on b{color:var(--sodium)}
+.hm-names{font-size:15px;margin:6px 0;color:var(--osd)}
+.hb{max-width:780px;width:min(94vw,780px)}.hb h2{font-family:var(--f-osd);font-size:46px;margin:0 0 4px;color:var(--sodium)}
+.hb-row{display:flex;justify-content:space-between;gap:16px;padding:5px 0;border-bottom:1px solid rgba(243,238,223,.16);font-size:17px}.hb-row span{letter-spacing:.14em;color:var(--sodium)}.hb-row.won b{color:var(--exit)}
+.hb-next{margin:12px 0 6px;font-size:14px;color:var(--osd-dim)}
+.mu-card .mu-play{font-size:20px;padding:6px 12px 5px;align-self:start}
 #taskTag{color:#ffb0c8}
 
 /* overlays */
@@ -381,6 +390,8 @@ kbd{font-family:var(--f-osd);font-size:19px;color:var(--sodium)}
     <button class="tab" data-tab="ents" role="tab" aria-selected="false">Entities</button>
     <button class="tab" data-tab="runs" role="tab" aria-selected="false">Speedruns</button>
     <button class="tab" data-tab="mp" role="tab" aria-selected="false">Multiplayer</button>
+    <button class="tab" data-tab="haunt" role="tab" aria-selected="false">Haunt</button>
+    <button class="tab" data-tab="museum" role="tab" aria-selected="false">Museum</button>
     <button class="tab" data-tab="keys" role="tab" aria-selected="false">Controls</button>
   </nav>
   <div class="pane" id="pane-play" role="tabpanel">
@@ -408,6 +419,8 @@ kbd{font-family:var(--f-osd);font-size:19px;color:var(--sodium)}
     <p class="panep">The timer runs from the moment you enter a level until you escape it. Paused time does not count; deaths do. Times are saved with your progress.</p>
   </div>
   <div class="pane" id="pane-mp" role="tabpanel" hidden><div id="mpBox"></div></div>
+  <div class="pane" id="pane-haunt" role="tabpanel" hidden><div id="hauntBox"></div></div>
+  <div class="pane" id="pane-museum" role="tabpanel" hidden><p class="panep">Every jumpscare you have met, on request, with the sound on. Meet an entity to unlock its exhibit.</p><div id="museumBox" class="bestiary"></div></div>
   <div class="pane" id="pane-keys" role="tabpanel" hidden>
     <div class="keys-list two">
       <kbd>WASD</kbd><span>Walk</span>
@@ -422,11 +435,13 @@ kbd{font-family:var(--f-osd);font-size:19px;color:var(--sodium)}
       <kbd>Space</kbd><span>Hold your breath</span>
       <kbd>0–9</kbd><span>Type codes</span>
       <kbd>T</kbd><span>Chat in multiplayer</span>
+      <kbd>Q</kbd><span>Your power, in Haunt mode</span>
       <kbd>Esc</kbd><span>Pause</span>
     </div>
   </div>
 </section>
 
+<section class="overlay" id="hauntBoard" hidden><div class="panel hb"><h2 id="hbTitle"></h2><p id="hbMsg"></p><div id="hbScores"></div><div id="hbPick"></div><p id="hbWait" class="dim"></p><div class="acts"><button class="btn" type="button" id="hbAgain" hidden>Play again</button><button class="ghost" type="button" id="hbLeave">Leave the match</button></div></div></section>
 <section class="overlay" id="pause" hidden>
   <div class="panel">
     <h2>PAUSE ❚❚</h2>
@@ -912,6 +927,133 @@ async function mpJoin(code, lv, sd) {
   return '';
 }
 
+/* ---------- Haunt mode: one player is an entity, everyone else runs, and the map is picked at random. First to 3 wins. ----------
+   It keeps its own room, which stays connected while each round's map is rebuilt. Whoever joined first runs the clock;
+   if they leave, the next player takes over from what they last announced. */
+const HAUNT_ROUND = 80, HAUNT_HIDE = 7, HAUNT_TARGET = 3, HAUNT_MAPS = [0, 1, 2];
+const HAUNTERS = {
+  stillman: { name: 'The Stillman', sp: 8.2, kind: 'still', power: 'Only moves when nobody is looking', blurb: 'Very fast, but you freeze while any runner has you in view.' },
+  grinner: { name: 'Grinner', sp: 5.1, kind: 'dark', power: 'Lights out', blurb: 'Drop a blinding dark over every runner near you.' },
+  hound: { name: 'Static Hound', sp: 5.0, kind: 'dash', power: 'Pounce', blurb: 'A short burst of speed nobody can outrun.' },
+  confetti: { name: 'Mr. Confetti', sp: 5.0, kind: 'trap', power: 'Party trap', blurb: 'Leave a trap that holds whoever steps in it.' },
+  knock: { name: 'Knock-Knock', sp: 4.9, kind: 'blink', power: 'New door', blurb: 'Step through a door and come out much closer.' },
+  echo: { name: 'The Echo', sp: 5.0, kind: 'blink', power: 'Over here', blurb: 'Vanish and reappear close to the nearest runner.' },
+  snack: { name: 'Snackbot', sp: 4.8, kind: 'dash', power: 'Charge', blurb: 'Rush forward, faster than a sprint.' },
+  manager: { name: 'The Manager', sp: 5.0, kind: 'dark', power: 'Breaker', blurb: 'Kill the lights around every runner close to you.' },
+  mimic: { name: 'Crate Mimic', sp: 4.9, kind: 'trap', power: 'Hungry crate', blurb: 'Leave a trap that bites and holds whoever steps in it.' },
+  moth: { name: 'The Lampmoth', sp: 5.2, kind: 'dark', power: 'Dust cloud', blurb: 'Choke the air around you with dust.' },
+  attendant: { name: 'The Attendant', sp: 4.9, kind: 'reveal', power: 'Security cameras', blurb: 'See every runner through the walls for a few seconds.' },
+  exhaust: { name: 'Exhaust', sp: 4.9, kind: 'dark', power: 'Smog', blurb: 'Fill the air around every nearby runner with smoke.' },
+  copycat: { name: 'Copycat', sp: 5.0, kind: 'blink', power: 'Mirror step', blurb: 'Reappear close to the nearest runner.' },
+  valet: { name: 'The Valet', sp: 5.1, kind: 'dash', power: 'High beams', blurb: 'Floor it for a moment.' },
+  lifeguard: { name: 'The Lifeguard', sp: 5.0, kind: 'reveal', power: 'Spotlight', blurb: 'See every runner through the walls for a few seconds.' },
+  floatie: { name: 'Floatie', sp: 4.9, kind: 'dash', power: 'Bounce', blurb: 'Bounce forward at terrible speed.' },
+  drain: { name: 'The Drain', sp: 4.7, kind: 'pull', power: 'Whirlpool', blurb: 'Drag every nearby runner toward you.' },
+  hopscotch: { name: 'Hopscotch', sp: 5.0, kind: 'trap', power: 'Chalk square', blurb: 'Draw a square that holds whoever steps on it.' },
+  lurker: { name: 'The Lurker', sp: 5.1, kind: 'blink', power: 'Through the lockers', blurb: 'Come out much closer to the nearest runner.' },
+  tide: { name: 'The Tide', sp: 4.8, kind: 'pull', power: 'Drawback', blurb: 'The water runs back to you, and takes the runners with it.' },
+  undertow: { name: 'The Undertow', sp: 4.7, kind: 'pull', power: 'The deep', blurb: 'Haul every nearby runner toward you.', s: 0.5 },
+  sun: { name: 'Mister Noon', sp: 4.9, kind: 'reveal', power: 'High noon', blurb: 'Nowhere is in shadow for a few seconds.' },
+  moon: { name: 'The Night-Light', sp: 4.9, kind: 'reveal', power: 'Open the eye', blurb: 'See every runner through the walls for a few seconds.' },
+  clown: { name: 'Pockets', sp: 5.0, kind: 'dash', power: 'Pop', blurb: 'Spring forward on your neck.' },
+  balloon: { name: 'The Balloon Man', sp: 5.0, kind: 'trap', power: 'Balloon', blurb: 'Leave a balloon that holds whoever touches it.' },
+  ring: { name: 'Ring-a-Round', sp: 4.8, kind: 'pull', power: 'Hold hands', blurb: 'Pull every nearby runner into the ring.' },
+  swing: { name: 'The Pusher', sp: 5.0, kind: 'pull', power: 'Long arms', blurb: 'Reach out and drag every nearby runner closer.' },
+  comeplay: { name: 'Come-Play', sp: 4.8, kind: 'pull', power: 'The tune', blurb: 'Their feet start walking to you on their own.' },
+};
+const HAUNT_CD = { dash: 9, blink: 14, reveal: 15, dark: 15, pull: 14, trap: 7, still: 0 };
+const hmFresh = () => ({ st: 'lobby', r: 0, lv: -1, sd: 0, hu: '', ent: 'stillman', ph: 'load', left: 0, sc: {}, msg: '', win: [], i: 0, names: {} });
+const HM = { on: false, room: null, code: '', uid: Math.random().toString(36).slice(2, 10), ht: 0, pick: 'stillman', bots: [], s: hmFresh(), seenR: -1, me: { rd: -1, ca: -1, p: null, lk: 0, tr: [], pw: null }, list: [], isHost: false, wasHost: false, phEnd: 0, timer: 0, ui: null, onState: null, err: '' };
+try { const p0 = localStorage.getItem('bfn-haunt-pick'); if (HAUNTERS[p0]) HM.pick = p0; } catch (e) {}
+function hmPickSet(id) { if (!HAUNTERS[id]) return; HM.pick = id; try { localStorage.setItem('bfn-haunt-pick', id); } catch (e) {} }
+function hmList() {
+  const out = [{ u: HM.uid, n: mpName(), c: safeColor(ACCT.color), pick: HM.pick, ht: HM.ht, rd: HM.me.rd, ca: HM.me.ca, p: HM.me.p, lk: HM.me.lk, tr: HM.me.tr, pw: HM.me.pw, me: true }];
+  for (const b of HM.bots) out.push(b);
+  if (HM.room) for (const p of HM.room.peers()) {
+    if (p.isMe || p.sameTab) continue;
+    const pr = p.presence || {}; if (typeof pr.hu !== 'string' || !/^[a-z0-9]{4,12}$/.test(pr.hu) || pr.hu === HM.uid) continue;
+    out.push({ u: pr.hu, n: cleanText(pr.n, 16) || 'Wanderer', c: safeColor(pr.c), pick: HAUNTERS[pr.pick] ? pr.pick : 'stillman', ht: +pr.ht || 0, rd: typeof pr.rd === 'number' ? pr.rd : -1, ca: typeof pr.ca === 'number' ? pr.ca : -1, p: Array.isArray(pr.p) && pr.p.length >= 3 ? pr.p.map((v) => +v || 0) : null, lk: pr.lk ? 1 : 0, tr: Array.isArray(pr.tr) ? pr.tr.slice(0, 8).map((v) => +v || 0) : [], pw: pr.pw && typeof pr.pw === 'object' ? pr.pw : null, hs: pr.hs || null });
+  }
+  return out.sort((a, b) => (a.ht - b.ht) || (a.u < b.u ? -1 : 1));
+}
+function hmAdopt(hs) {
+  if (!hs || typeof hs !== 'object') return;
+  const names = {}; if (hs.names && typeof hs.names === 'object') for (const [k, v] of Object.entries(hs.names)) names[k] = cleanText(v, 16);
+  const sc = {}; if (hs.sc && typeof hs.sc === 'object') for (const [k, v] of Object.entries(hs.sc)) sc[k] = +v || 0;
+  HM.s = { st: ['lobby', 'round', 'board', 'over'].includes(hs.st) ? hs.st : 'lobby', r: hs.r | 0, lv: HAUNT_MAPS.includes(hs.lv) ? hs.lv : 0, sd: hs.sd | 0, hu: String(hs.hu || ''), ent: HAUNTERS[hs.ent] ? hs.ent : 'stillman', ph: ['load', 'hide', 'hunt'].includes(hs.ph) ? hs.ph : 'load', left: +hs.left || 0, sc, msg: cleanText(hs.msg, 160), win: Array.isArray(hs.win) ? hs.win.map(String) : [], i: hs.i | 0, names };
+}
+function hmNextRound() {
+  const s = HM.s, list = hmList();
+  if (list.length < 2) { s.st = 'lobby'; s.msg = 'Everyone else left.'; return; }
+  const h = list[(s.i | 0) % list.length]; s.i = (s.i | 0) + 1;
+  if (h.bot) { const ids = Object.keys(HAUNTERS); h.pick = ids[Math.floor(Math.random() * ids.length)]; }
+  const maps = HAUNT_MAPS.filter((l) => l !== s.lv);
+  s.r = (s.r | 0) + 1; s.st = 'round'; s.ph = 'load'; s.hu = h.u; s.ent = h.pick; s.lv = maps[Math.floor(Math.random() * maps.length)]; s.sd = (Math.random() * 2 ** 31) | 0; s.msg = ''; s.win = []; s.left = 0;
+  s.names = {}; for (const p of list) s.names[p.u] = p.n;
+  HM.phEnd = Date.now() + 15000;
+}
+function hmAward(winners, msg) {
+  const s = HM.s; for (const u of winners) s.sc[u] = (s.sc[u] || 0) + 1;
+  s.msg = msg; s.win = winners; s.ph = 'hunt';
+  s.st = Object.values(s.sc).some((v) => v >= HAUNT_TARGET) ? 'over' : 'board'; HM.phEnd = Date.now() + 9000;
+}
+function hmHostLogic(list) {
+  const s = HM.s, now = Date.now(), name = (u) => s.names[u] || (list.find((p) => p.u === u) || {}).n || 'Someone';
+  if (s.st === 'round') {
+    const runners = list.filter((p) => p.u !== s.hu);
+    if (!runners.length || !list.some((p) => p.u === s.hu)) { hmAward([], 'Somebody left, so nobody scores that round.'); return; }
+    if (s.ph === 'load') { if (list.every((p) => p.bot || p.rd === s.r) || now > HM.phEnd) { s.ph = 'hide'; HM.phEnd = now + HAUNT_HIDE * 1000; } }
+    else if (s.ph === 'hide') { if (now > HM.phEnd) { s.ph = 'hunt'; HM.phEnd = now + HAUNT_ROUND * 1000; } }
+    else {
+      const free = runners.filter((p) => p.ca !== s.r);
+      if (!free.length) hmAward([s.hu], `${name(s.hu)} caught everyone.`);
+      else if (now > HM.phEnd) hmAward(free.map((p) => p.u), free.length === 1 ? `${name(free[0].u)} survived.` : `${free.map((p) => name(p.u)).join(' and ')} survived.`);
+    }
+    s.left = Math.max(0, (HM.phEnd - now) / 1000);
+  } else if (s.st === 'board') { s.left = Math.max(0, (HM.phEnd - now) / 1000); if (now > HM.phEnd) hmNextRound(); }
+}
+function hmPublish() {
+  if (!HM.room) return;
+  const m = HM.me;
+  HM.room.presence({ hu: HM.uid, n: mpName(), c: safeColor(ACCT.color), pick: HM.pick, ht: HM.ht, rd: m.rd, ca: m.ca, p: m.p, lk: m.lk, tr: m.tr, pw: m.pw, hs: HM.isHost ? HM.s : null }).catch(() => {});
+}
+function hauntBoot() {
+  const s = HM.s;
+  if (teardown) teardown(); teardown = null;
+  boot({ level: s.lv, seed: s.sd, haunt: true, gateOpen: true, autostart: true, audio: true });
+}
+function hmTick() {
+  if (!HM.on) return;
+  const list = hmList(); HM.list = list;
+  const host = list[0]; HM.isHost = !!host && host.u === HM.uid;
+  if (HM.isHost) { if (!HM.wasHost) HM.phEnd = Date.now() + (HM.s.left || 0) * 1000; hmHostLogic(list); }
+  else if (host && host.hs) hmAdopt(host.hs);
+  HM.wasHost = HM.isHost;
+  hmPublish();
+  const s = HM.s;
+  if (s.st === 'round' && s.r !== HM.seenR) { HM.seenR = s.r; Object.assign(HM.me, { rd: -1, ca: -1, lk: 0, tr: [], pw: null }); hauntBoot(); return; }
+  if (HM.onState) HM.onState();
+  if (HM.ui) HM.ui();
+}
+async function hmEnter(code, bots) {
+  HM.err = '';
+  HM.bots = []; HM.room = null; HM.code = code; HM.ht = Date.now(); HM.s = hmFresh(); HM.seenR = -1; HM.me = { rd: -1, ca: -1, p: null, lk: 0, tr: [], pw: null };
+  if (bots) {
+    const ids = Object.keys(HAUNTERS); ['Mara', 'Tobin'].forEach((n, i) => HM.bots.push({ u: 'bot' + i, n: n + ' (bot)', c: i ? '#ffb0c8' : '#7fe3ff', pick: ids[Math.floor(Math.random() * ids.length)], ht: 9e15 + i, rd: -1, ca: -1, p: null, lk: 0, tr: [], pw: null, bot: true }));
+  } else {
+    if (!MP.room) { HM.err = 'Online play is not available here. Try practice against bots.'; return false; }
+    try { HM.room = await MP.room.join('h-' + code); } catch (e) { HM.err = e && e.code === 'relay_unreachable' ? 'Could not reach the multiplayer servers. Check your internet connection.' : 'Could not reach that room. Try again.'; return false; }
+    HM.room.onPeers(() => {}, () => {});
+  }
+  HM.on = true; HM.list = hmList(); clearInterval(HM.timer); HM.timer = setInterval(hmTick, 100);
+  return true;
+}
+function hauntLeave() {
+  clearInterval(HM.timer); HM.timer = 0; HM.on = false; HM.bots = []; HM.s = hmFresh(); HM.seenR = -1; HM.isHost = HM.wasHost = false; HM.list = [];
+  const r = HM.room; HM.room = null; HM.code = ''; if (r) r.leave().catch(() => {});
+}
+function hmRematch() { const s = HM.s; s.sc = {}; s.win = []; hmNextRound(); }
+
 function continueRun() {
   const run = ACCT.run && ACCT.run.active ? JSON.parse(JSON.stringify(ACCT.run)) : null;
   if (!run) return;
@@ -921,7 +1063,7 @@ function continueRun() {
 
 function boot(saved) {
 saved = saved || {};
-const LEVEL = saved.level === 2 ? 2 : saved.level === 1 ? 1 : 0;
+const LEVEL = saved.level === 2 ? 2 : saved.level === 1 ? 1 : 0, HAUNT = !!saved.haunt, HA = { role: '', ents: new Map(), traps: new Map(), cd: 0, dash: 0, reveal: 0, stuck: 0, pullT: 0, darkT: 0, ghost: false, pwN: 0, pwSeen: -1, pwDone: -1, pwSim: 0, count: 0, look: false, board: '' };
 const AC_ = new AbortController();
 const listen = (t, ev, fn, opt) => t.addEventListener(ev, fn, Object.assign({ signal: AC_.signal }, opt && typeof opt === 'object' ? opt : {}));
 let alive = true, rafId = 0;
@@ -1980,6 +2122,7 @@ function musicUpdate(dt) {
   const t = now();
   let mode = state === 'title' ? 'title' : 'explore';
   if (state === 'playing' && active && !active.downed) mode = music.on ? 'party' : CHASE_IDS.has(active.id) ? 'chase' : active.id === 'knock' || active.id === 'wow' ? 'listen' : 'danger';
+  if (HAUNT && state === 'playing' && hauntDread() > 0.35) mode = 'chase';
   if (scareS) mode = 'scare';
   if (mode !== MU.mode) {
     MU.mode = mode;
@@ -3359,6 +3502,7 @@ function dreadTick(dt) {
   let k = 0;
   if (ch && ch.g && !ch.done && !ch.downed && ch.g.visible !== false && ch.g.parent) k = ch.id === 'knock' ? 0 : ch.id === 'mimic' ? 0.45 : clamp(1 - distP(ch.g) / 11, 0, 1); // no heartbeat over a rhythm test, and a steady one for the crates so it cannot give the mimic away
   if (LEVEL === 2 && !ch && CP && !CP.dead) k = Math.max(k, CP.k * 0.9);
+  if (HAUNT) k = hauntDread();
   dread = lerp(dread, k, 1 - Math.exp(-dt * 3));
   dreadBeat -= dt;
   if (dread > 0.08 && dreadBeat <= 0) {
@@ -4251,6 +4395,7 @@ const lightOn = () => P.light && P.bat > 0 && !(P.bat < 12 && Math.sin(time * 23
 const items = [], interact = [];
 let itemSerial = 0;
 function placeItem(type, t, extra = {}) {
+  if (HAUNT) return null;
   const id = itemSerial++;
   if (t == null || picked.has(id)) return null;
   const x = tc(t % W) + rand(-0.3, 0.3), z = tc((t / W) | 0) + rand(-0.3, 0.3);
@@ -4562,7 +4707,7 @@ function setupPlayground() {
   spreadPick(allOpen.filter(plain), 6, 10, taken).forEach((t) => placeItem('fizz', t));
   // and the thing that does not need calling
   const far = allOpen.filter((t) => spawnField[t] > 34), start = far.length ? far[Math.floor(R() * far.length)] : allOpen[0];
-  if (status.comeplay < 3) {
+  if (status.comeplay < 3 && !HAUNT) {
     const g = buildComePlay(); g.position.set(tc(start % W), 0, tc((start / W) | 0)); scene.add(g);
     CP = { g, px: g.position.x, pz: g.position.z, ph: 0, goal: null, mode: 'roam', k: 0, noteT: 0, noteI: 0, sayT: 4, dead: false, cd: 0, lost: 0, net: null };
   }
@@ -4722,7 +4867,7 @@ function wowWorld(dt) {
     if (P.shoutT !== WOW.shout && time - P.shoutT < 0.4) { WOW.shout = P.shoutT; WOW.win = 0; WOW.step = 0; WOW.decals.forEach((m) => { m.visible = false; }); later(0.9, () => { if (!active && state === 'playing') startChallenge('wow'); }); }
   }
 }
-if (LEVEL === 2) { setupPlayground(); setupWow(); }
+if (LEVEL === 2) { setupPlayground(); if (!HAUNT) setupWow(); }
 function docSector(sec) { return ENTS.filter((e) => e.sector === sec && !e.boss && status[e.id] === 3).length; }
 function recent(list, secs) { const keep = list.filter((t) => time - t < secs); keep.push(time); list.length = 0; list.push(...keep); return keep.length; }
 function searchCrate(c) {
@@ -5053,6 +5198,7 @@ function toggleLight() {
   P.light = !P.light; sfx.click();
 }
 function shout() {
+  if (HAUNT && HA.role === 'hunter') return hauntPower();
   if (time - P.shoutT < 0.9) return;
   P.shoutT = time; sfx.shout(); toast(wowWord() ? '“WOW.”' : '“HELLO?”', 'say', 1.6);
   const t = tileAt(P.x, P.z);
@@ -5122,6 +5268,7 @@ function resetRituals() { ritual.back = ritual.sprint = ritual.dark = 0; R1.moth
    ========================================================= */
 const CH = {};
 function startChallenge(id, key, pose) {
+  if (HAUNT) return false;
   if (active || state !== 'playing' || status[id] === 3) return false;
   const k = key || coopKey(), own = { x: P.x, z: P.z, yaw: P.yaw };
   // a teammate's summon is built exactly as they built it: their seed, from where they stood, facing the way they faced
@@ -6819,7 +6966,44 @@ CH.wow = () => {
   const addOp = (c, op) => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: op, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, side: THREE.DoubleSide });
   const beams = [], trails = [], bolts = [], fx = [], tc2 = new THREE.Color();
   let got = 0, hits = 0, inv0 = 0, atkT = 4.6, cycle = 0, rise = 0, letterA = null, ending = 0, arpT = 0, arpI = 0, spawnT = 0, sayT = 0;
-  const hit = (n, why) => { if (inv0 > 0 || ch.done) return; inv0 = 1.0; hits++; P.shake = 0.9; hiss(0.3, 0.4, { type: 'highpass', f: 2200, f2: 700 }); if (hits >= MAXH) return caught(ch, 45, 'You looked right at it. It looked back.'); damage(n, why); };
+  // if you ever made friends with the duck, it has been waiting for this
+  const duck = (progress.seen.quackers || 0) >= 3 || quackers ? { st: 'wait', t: 0, g: null, fireT: 6, shield: true, shieldT: 0, y: 0, vy: 0, beam: null, beamT: 0, mats: [], flip: 0 } : null;
+  function duckIn() {
+    const g = buildDuck(1.25); duck.g = g; if (quackers) { scene.remove(quackers.g); quackers = null; }
+    g.traverse((o) => { if (o.material && o.material.uniforms && o.material.uniforms.c1) duck.mats.push(o.material); });
+    const red = new THREE.MeshBasicMaterial({ color: 0xff2a2a, fog: false }), lens = [-1, 1].map((k) => mesh(new THREE.TorusGeometry(0.045, 0.009, 6, 16), red, k * 0.062, 0.475, 0.262)); lens.forEach((m) => g.add(m));
+    g.add(mesh(new THREE.BoxGeometry(0.04, 0.008, 0.008), red, 0, 0.48, 0.264));
+    const f2 = fwdVec(); g.position.set(P.x + f2.x * 2.2 - f2.z, 24, P.z + f2.z * 2.2 + f2.x); scene.add(g); duck.st = 'fall'; duck.y = 24; duck.vy = -6;
+    tone(1800, 1.3, 0.14, { type: 'sine', f2: 300, a: 0.02 });
+    toast('Something small and yellow is falling out of the hole in the ceiling. It is wearing very small glasses.', 'good', 6);
+  }
+  function duckTick(dt) {
+    if (duck.st === 'wait') { duck.t += dt; if (rise >= 1 && duck.t > 5.2) duckIn(); return; }
+    const g = duck.g; tc2.setHSL((time * 0.35) % 1, 1, 0.55); duck.mats.forEach((m, i) => { m.uniforms.c1.value.setHSL((time * 0.35 + i * 0.1) % 1, 1, 0.55); m.uniforms.c2.value.setHSL((time * 0.35 + i * 0.1 + 0.08) % 1, 1, 0.5); });
+    if (g.userData.anim) g.userData.anim(time);
+    if (duck.st === 'fall') {
+      duck.vy -= 16 * dt; duck.y += duck.vy * dt; g.position.y = Math.max(0, duck.y); g.rotation.x += dt * 11;
+      if (duck.y <= 0) { duck.st = 'fight'; g.rotation.x = 0; sfx.quack(); later(0.2, sfx.quack); confettiBurst(g.position.x, 0.5, g.position.z, 50, 2); bigText('QUACK', '#ffe14d', 1.4); P.shake = 0.3; ring(g.position.x, g.position.z, 0.4, 5, 0.5, 0xffe14d); toast('The giant face looks down. For a moment it stops smiling.', 'good', 5); u.flare(0); atkT += 2.5; }
+      return;
+    }
+    // it waddles along beside you and is not impressed
+    const f2 = fwdVec(), tx = P.x - f2.x * 1.1 + f2.z * 0.7, tz = P.z - f2.z * 1.1 - f2.x * 0.7, d = Math.hypot(tx - g.position.x, tz - g.position.z);
+    if (d > 12) { g.position.x = tx; g.position.z = tz; resolve(g.position, 0.2); } else if (d > 0.3) moveCircle(g.position, (tx - g.position.x) / d * Math.min(d * 3, 7.5) * dt, (tz - g.position.z) / d * Math.min(d * 3, 7.5) * dt, 0.2);
+    if (duck.flip > 0) { duck.flip -= dt; g.position.y = Math.sin((1 - duck.flip / 1.1) * Math.PI) * 3.4; g.rotation.x += dt * 12; if (duck.flip <= 0) { g.rotation.x = 0; g.position.y = 0; sfx.quack(); } }
+    else { g.position.y = d > 0.4 ? Math.abs(Math.sin(time * 9)) * 0.12 : 0; faceTo(g, u.rig.g.getWorldPosition(_a).x, _a.z, 0.2); }
+    if (!duck.shield) { duck.shieldT -= dt; if (duck.shieldT <= 0) duck.shield = true; }
+    // every few seconds, a very small laser. It should not work. It works.
+    duck.fireT -= dt;
+    if (duck.beam) { duck.beamT -= dt; u.rig.g.getWorldPosition(_b); g.getWorldPosition(_a); _a.y += 0.5; _d.subVectors(_b, _a); const len = _d.length(); duck.beam.position.copy(_a); duck.beam.quaternion.setFromUnitVectors(UPV, _d.normalize()); duck.beam.scale.set(0.05, len, 0.05); if (duck.beamT <= 0) { scene.remove(duck.beam); duck.beam = null; } }
+    if (duck.fireT <= 0 && duck.flip <= 0 && ending <= 0) {
+      duck.fireT = rand(6.5, 9); sfx.quack(); tone(1500, 0.3, 0.1, { type: 'square', f2: 700 });
+      duck.beam = new THREE.Mesh(beamGeo, beamMat); duck.beam.frustumCulled = false; scene.add(duck.beam); duck.beamT = 0.5;
+      // it gets the big one in the eye: whatever it was winding up is cancelled, and it has to blink
+      beams.forEach((b) => { if (!b.m) scene.remove(b.st); }); for (let i = beams.length - 1; i >= 0; i--) if (!beams[i].m) beams.splice(i, 1);
+      atkT = Math.max(atkT, 2.6); u.flare(0); u.fig.material.uniforms.tilt.value = 0.2; toast(['Pew.', 'It flinches. Your duck did that.', 'The enormous eye waters.', 'Quack.'][Math.floor(rand(0, 4))], 'say', 2);
+    }
+  }
+  const hit = (n, why) => { if (inv0 > 0 || ch.done) return; if (duck && duck.st === 'fight' && duck.shield) { duck.shield = false; duck.shieldT = 18; duck.flip = 1.1; inv0 = 1.2; sfx.quack(); bigText('QUACKERS TOOK THAT', '#ffe14d', 1.2); return; } inv0 = 1.0; hits++; P.shake = 0.9; hiss(0.3, 0.4, { type: 'highpass', f: 2200, f2: 700 }); if (hits >= MAXH) return caught(ch, 45, 'You looked right at it. It looked back.'); damage(n, why); };
   const ring = (x, z, r0, r1, dur, col, op = 0.8) => { const m = new THREE.Mesh(ringGeo, addOp(col, op)); m.position.set(x, 0.05, z); m.scale.setScalar(r0); scene.add(m); fx.push({ m, t: 0, dur, r0, r1, op }); };
   const scorch = (x, z, h0) => { const m = new THREE.Mesh(discGeo, addOp(tc2.setHSL(h0 % 1, 1, 0.55).getHex(), 0.65)); m.position.set(x, 0.04, z); m.scale.setScalar(0.85); scene.add(m); trails.push({ m, t: 1.1 }); };
   function strip(ax, az, bx, bz, w) { const m = new THREE.Mesh(stripGeo, addOp(0xffffff, 0.2)), dx = bx - ax, dz = bz - az; m.scale.set(Math.hypot(dx, dz), 1, w); m.position.set((ax + bx) / 2, 0.05, (az + bz) / 2); m.rotation.y = -Math.atan2(dz, dx); scene.add(m); return m; }
@@ -6873,6 +7057,7 @@ CH.wow = () => {
     sub: () => (ending > 0 ? 'It is only a picture now.' : orb.visible ? `${NAMES[got]} is ${dirWords(orb.position.x, orb.position.z)} · ${7 - got} left · hits ${hits}/${MAXH}` : `It is rising · hits ${hits}/${MAXH}`),
     update(dt) {
       inv0 -= dt; rise = Math.min(1, rise + dt / 3.4);
+      if (duck) duckTick(dt);
       if (rise < 1) g.position.y = -22 * (1 - rise * rise * (3 - 2 * rise));
       else g.position.y = Math.sin(time * 0.8) * 0.15;
       if (P.shake < 0.25 && rise < 1) P.shake = 0.25;
@@ -6888,7 +7073,7 @@ CH.wow = () => {
       for (let i = trails.length - 1; i >= 0; i--) { const e = trails[i]; e.t -= dt; e.m.material.opacity = 0.6 * Math.max(0, e.t / 1.1); if (e.t <= 0) { scene.remove(e.m); e.m.material.dispose(); trails.splice(i, 1); } }
       if (ending > 0) {
         ending -= dt; u.flare(0); u.aura.material.opacity *= 1 - dt; g.position.y -= dt * 1.2; sky.material.uniforms.fade.value = clamp(ending / 3.2, 0, 1);
-        if (ending <= 0) { P.hp = 100; inv.wowBeam = true; succeed(ch, 'WOW. It goes back into the floor, still grinning. Your flashlight feels warm, and it will not run out now.'); }
+        if (ending <= 0) { P.hp = 100; inv.wowBeam = true; if (duck && duck.g) { sfx.quack(); later(0.25, sfx.quack); bigText('QUACK', '#ffe14d', 2); confettiBurst(duck.g.position.x, 0.6, duck.g.position.z, 160, 3.4); quackers = { g: duck.g, quackT: 0 }; duck.kept = true; } succeed(ch, duck && duck.g ? 'WOW. All seven colours went somewhere, and they went into the duck. It seems fine about it. Your flashlight will not run out now.' : 'WOW. It goes back into the floor, still grinning. Your flashlight feels warm, and it will not run out now.'); }
         return;
       }
       if (rise < 1) return;
@@ -6949,6 +7134,7 @@ CH.wow = () => {
       tintOverride = null; if (ceil) ceil.visible = true; panelMesh.visible = true; scene.remove(sky); scene.remove(orb);
       beams.forEach((b) => { scene.remove(b.st); if (b.m) scene.remove(b.m); }); trails.forEach((e) => scene.remove(e.m)); bolts.forEach((b) => scene.remove(b.m)); fx.forEach((e) => scene.remove(e.m));
       if (letterA) { scene.remove(letterA.shadow); scene.remove(letterA.l.m); }
+      if (duck) { if (duck.beam) scene.remove(duck.beam); if (duck.g && !duck.kept) { const dg = duck.g; dg.rotation.x = 0; dg.position.y = 0; quackers = { g: dg, quackT: 0 }; } }
       tween(1.4, (k) => { g.position.y = -k * 16; }, () => scene.remove(g));
     },
   };
@@ -6991,7 +7177,7 @@ function requestLock(gesture = true) {
   let handled = false;
   const fail = () => {
     if (handled) return; handled = true; pendingFail = null;
-    if (gesture && ++lockFails >= 2) fallbackLook(); else if (!overlay) pause(true);
+    if (HAUNT) { hintOnce('hauntClick', 'Click the game to look around.', 'say'); return; } if (gesture && ++lockFails >= 2) fallbackLook(); else if (!overlay) pause(true);
   };
   pendingFail = fail;
   try { const p = canvas.requestPointerLock(); if (p && p.catch) p.catch(fail); } catch (e) { fail(); }
@@ -7022,6 +7208,7 @@ listen(window, 'keydown', (e) => {
   const c = e.code;
   if (['Tab', 'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(c)) e.preventDefault();
   if (state === 'title') { if (c === 'Enter') tryStart(); return; }
+  if (overlay === 'haunt') return;
   if (overlay === 'vend') {
     if (c === 'Escape') return closeOverlay();
     if (c === 'Enter') return vendPress('VEND');
@@ -7040,6 +7227,7 @@ listen(window, 'keydown', (e) => {
   if (c === 'KeyE') doInteract();
   else if (c === 'KeyF') toggleLight();
   else if (c === 'KeyV') shout();
+  else if (c === 'KeyQ' && HAUNT) hauntPower();
   else if (c === 'KeyC') P.crouch = !P.crouch;
   else if (c === 'KeyT' && MP.game) { e.preventDefault(); openChat(); }
   else if (c === 'KeyJ' || c === 'Tab' || c === 'KeyM') openJournal();
@@ -7137,6 +7325,7 @@ listen(el('winMenu'), 'click', () => switchLevel(LEVEL, false));
 listen(el('deadMenu'), 'click', () => switchLevel(LEVEL, false));
 let quitArm = 0;
 listen(el('quitBtn'), 'click', () => {
+  if (HAUNT) { hauntLeave(); switchLevel(0, false); return; }
   if (performance.now() - quitArm < 4000) { switchLevel(LEVEL, false); return; }
   quitArm = performance.now(); el('quitBtn').textContent = 'Click again to quit (your run is saved)';
   setTimeout(() => { if (alive) el('quitBtn').textContent = 'Quit to main menu'; }, 4000);
@@ -7165,11 +7354,11 @@ function startGame() {
   if (state !== 'title') return;
   audioInit();
   state = 'playing';
-  if (!saved.P) { P.yaw = 0; P.pitch = -0.45; }
+  if (!saved.P && !HAUNT) { P.yaw = 0; P.pitch = -0.45; }
   el('title').hidden = true; H_.hud.hidden = false;
   if (matchMedia('(pointer: coarse)').matches) enableTouch();
   requestLock();
-  later(0.6, () => toast(noteRead[0] ? `Back on Level ${LEVEL}. Your journal is where you left it [J].` : `There is a note on the ${LEVEL === 1 ? 'concrete' : 'floor'} in front of you. Look down and press E to read it.`, '', 6));
+  if (!HAUNT) later(0.6, () => toast(noteRead[0] ? `Back on Level ${LEVEL}. Your journal is where you left it [J].` : `There is a note on the ${LEVEL === 1 ? 'concrete' : 'floor'} in front of you. Look down and press E to read it.`, '', 6));
 }
 
 /* =========================================================
@@ -7192,7 +7381,7 @@ function updatePlayer(dt) {
   const sprinting = wantSprint && !P.exhausted && P.st > 0 && m > 0.2;
   if (sprinting) { P.st -= 9 * dt; P.stCd = 1; if (P.st <= 0) { P.st = 0; P.exhausted = true; toast('Out of breath.', '', 2); } }
   else { P.stCd -= dt; if (P.stCd <= 0) P.st = Math.min(100, P.st + 15 * dt); if (P.exhausted && P.st >= 35) P.exhausted = false; }
-  let sp = P.crouch ? 1.7 : sprinting ? 6.0 : 3.3; if (f < -0.1 && !sprinting) sp *= 0.8;
+  let sp = P.crouch ? 1.7 : sprinting ? 6.0 : 3.3; if (HAUNT) sp = hauntSp(sp, sprinting); if (f < -0.1 && !sprinting) sp *= 0.8;
   const sy = Math.sin(P.yaw), cy = Math.cos(P.yaw);
   const tx = (-sy * f + cy * s) * sp, tz = (-cy * f - sy * s) * sp, k = 1 - Math.exp(-dt * 11);
   P.vx += (tx - P.vx) * k; P.vz += (tz - P.vz) * k;
@@ -7234,6 +7423,7 @@ function updateCamera(dt) {
   U.camPos.value.copy(camera.position);
 }
 function updateFocus() {
+  if (HAUNT) { focus = null; return; }
   focus = null;
   if (active && active.onInteract) return;
   let best = 0;
@@ -7263,6 +7453,7 @@ function revealAround() {
   }
 }
 function onNewTile(t) {
+  if (HAUNT) return;
   revealAround();
   if (LEVEL === 1) { onNewTile1(t); return; }
   if (LEVEL === 2) { onNewTile2(t); return; }
@@ -7329,7 +7520,7 @@ function update(dt) {
   if (active && !active.done && !active.downed) { const r0 = Math.random; if (active.rng) Math.random = active.rng; try { active.update(dt); } finally { Math.random = r0; } }
   coopEntitySync(dt);
   if (active && active.g && !active.done && !active.downed) animEntity(active.g, dt);
-  mpTick(dt); coopTick(); exitTick(); dreadTick(dt);
+  mpTick(dt); coopTick(); exitTick(); dreadTick(dt); if (HAUNT) hauntTick(dt);
   updateQuackers(dt);
   updateWorldFx(dt);
   updateFocus();
@@ -7342,7 +7533,7 @@ function updateHUD(dt) {
   H_.batfill.style.width = (P.bat * 0.9).toFixed(0) + '%'; H_.batt.classList.toggle('low', P.bat < 20);
   setText(H_.batpct, Math.ceil(P.bat) + '%');
   setText(H_.lighttag, P.bat <= 0 ? 'LIGHT DEAD [2]' : P.light ? 'LIGHT ON [F]' : 'LIGHT OFF [F]');
-  setText(H_.doc, `DOCUMENTED ${documented()}/${TOTAL}`);
+  setText(H_.doc, HAUNT ? hauntScoreText() : `DOCUMENTED ${documented()}/${TOTAL}`);
   H_.hatTag.hidden = !inv.hatWorn;
   const pt = Math.floor(playTime), tcs = `${String(Math.floor(pt / 3600)).padStart(2, '0')}:${String(Math.floor(pt / 60) % 60).padStart(2, '0')}:${String(pt % 60).padStart(2, '0')}`;
   setText(H_.tc, tcs);
@@ -7389,7 +7580,9 @@ const runsFor = (lv) => progress.runs.filter((r) => r.lv === lv).sort((a, b) => 
 const bestText = (lv) => { const r = runsFor(lv)[0]; return r ? `Best ${fmtTime(r.t)}` : 'No time yet'; };
 function showTab(name) {
   document.querySelectorAll('#title .tab').forEach((b) => { const on = b.dataset.tab === name; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
-  ['play', 'ents', 'runs', 'mp', 'keys'].forEach((n) => { el('pane-' + n).hidden = n !== name; });
+  ['play', 'ents', 'runs', 'mp', 'haunt', 'museum', 'keys'].forEach((n) => { el('pane-' + n).hidden = n !== name; });
+  if (name === 'haunt') renderHaunt();
+  if (name === 'museum') renderMuseum();
   if (name === 'mp') renderMp();
   if (name === 'ents') renderBestiary();
   if (name === 'runs') renderRuns();
@@ -7822,9 +8015,294 @@ function renderMp() {
 }
 MP.listeners.add(renderMp);
 
+/* ---------- Haunt mode on this map ---------- */
+function hauntFix(g, id) {
+  const u = g.userData; u.voice = id;
+  if (id === 'snack') { u.legs.forEach((l) => { l.visible = true; }); u.eyes.forEach((e) => { e.visible = true; }); u.body.position.y = 1.335; }
+  return g;
+}
+function hauntBuild(id) {
+  if (!TX.crate) { const c = cvs(128, 128), x = c.getContext('2d'); x.fillStyle = '#8a6a3c'; x.fillRect(0, 0, 128, 128); x.fillStyle = '#6e5230'; x.fillRect(0, 0, 128, 10); x.fillRect(0, 118, 128, 10); x.fillRect(0, 0, 10, 128); x.fillRect(118, 0, 10, 128); TX.crate = tex(c); }
+  return hauntFix(id === 'drain' ? buildDrowned() : id === 'comeplay' ? buildComePlay() : GHOST[id](), id);
+}
+function hauntModel(id) {
+  const g = hauntBuild(id), u = g.userData, h = HAUNTERS[id];
+  if (h.s) g.scale.setScalar(h.s);
+  if (id === 'moth') u.hover = 1.4;
+  if (id === 'floatie') { u.ring.rotation.x = 0; u.ring.position.y = 0.86; }
+  if (id === 'ring') u.dolls.forEach((d, i) => { const a = (i / u.dolls.length) * TAU; d.position.set(Math.sin(a) * 1.5, 0, Math.cos(a) * 1.5); d.rotation.y = a + Math.PI; });
+  if (id === 'moon' && u.setEyes) u.setEyes(1);
+  if (id === 'mimic' && u.showInside) u.showInside(false);
+  return g;
+}
+function hauntInit() {
+  const s = HM.s, rng = mulberry32(keyHash(HM.uid + ':' + s.r)), pick = (a) => a[Math.floor(rng() * a.length)];
+  HA.role = s.hu === HM.uid ? 'hunter' : 'run';
+  if (LEVEL === 1) openGate(true);
+  const far = allOpen.filter((t) => spawnField[t] >= 30 && spawnField[t] <= 58), near = allOpen.filter((t) => spawnField[t] >= 3 && spawnField[t] <= 14);
+  const t = HA.role === 'hunter' ? pick(far.length ? far : allOpen) : pick(near.length ? near : allOpen);
+  P.x = tc(t % W); P.z = tc((t / W) | 0); P.yaw = rng() * TAU; P.pitch = 0; P.hp = 100; P.bat = 100; P.st = 100; P.light = true; lastTile = -1;
+  for (const b of HM.bots) { const bt = b.u === s.hu ? pick(far.length ? far : allOpen) : pick(near.length ? near : allOpen); b.pos = { x: tc(bt % W), z: tc((bt / W) | 0) }; b.ca = -1; b.rd = s.r; b.goal = null; b.goalT = 0; b.stuck = 0; b.ph = 0; b.tripped = new Set(); b.p = [b.pos.x, b.pos.z, 0, 2]; }
+  HM.me.rd = s.r; HM.me.p = [+P.x.toFixed(2), +P.z.toFixed(2), +P.yaw.toFixed(2), 2];
+  HM.onState = hauntState;
+  if (HA.role === 'hunter') tintOverride = [1, 0.8, 0.78];
+}
+function hauntSp(sp, sprinting) {
+  if (HA.role === 'hunter') { P.st = 100; const h = HAUNTERS[HM.s.ent]; return HA.dash > 0 ? 9.4 : h.sp; }
+  if (HA.ghost) { P.st = 100; return sprinting ? 7 : 4.5; }
+  return sp;
+}
+const hauntHunter = () => { const s = HM.s; return s.hu === HM.uid ? null : HA.ents.get(s.hu) || null; };
+function hauntDread() {
+  if (HA.role !== 'run' || HA.ghost) return 0;
+  const h = hauntHunter(); return h && !h.first ? clamp(1 - Math.hypot(h.x - P.x, h.z - P.z) / 24, 0, 1) : 0;
+}
+function hauntNearest() {
+  const s = HM.s; let best = null, bd = 1e9;
+  for (const [u, o] of HA.ents) { if (u === s.hu || o.first || o.out) continue; const d = Math.hypot(o.x - P.x, o.z - P.z); if (d < bd) { bd = d; best = o; } }
+  return best;
+}
+function hauntPower() {
+  const s = HM.s, h = HAUNTERS[s.ent];
+  if (HA.role !== 'hunter' || s.st !== 'round' || s.ph !== 'hunt' || HA.cd > 0 || h.kind === 'still' || scareS) return;
+  HA.cd = HAUNT_CD[h.kind]; HA.pwN++; sfx.stinger(); bigText(h.power.toUpperCase(), '#ff9a86', 0.9);
+  if (h.kind === 'dash') { HA.dash = 1.5; P.shake = 0.3; }
+  else if (h.kind === 'blink') {
+    const o = hauntNearest(); if (!o) return; const d = Math.hypot(o.x - P.x, o.z - P.z) || 1, go = Math.min(13, Math.max(0, d - 3.5));
+    for (let k = go; k >= 0; k -= 0.5) { const x = P.x + (o.x - P.x) / d * k, z = P.z + (o.z - P.z) / d * k; if (!isSolid(tileX(x), tileX(z))) { P.x = x; P.z = z; P.vx = P.vz = 0; sfx.zap(); break; } }
+  } else if (h.kind === 'reveal') HA.reveal = 5.5;
+  else if (h.kind === 'trap') { const tr = HM.me.tr.slice(0, 6); tr.unshift(+P.x.toFixed(1), +P.z.toFixed(1)); HM.me.tr = tr.slice(0, 6); }
+  HM.me.pw = { k: h.kind, t: HA.pwN, x: +P.x.toFixed(1), z: +P.z.toFixed(1) };
+}
+// what the hunter's power does at this end
+function hauntHear(hp, o) {
+  const pw = hp.pw;
+  if (pw && typeof pw.t === 'number' && pw.t !== HA.pwSeen) {
+    HA.pwSeen = pw.t; const d = Math.hypot((+pw.x || 0) - P.x, (+pw.z || 0) - P.z);
+    if (pw.k === 'pull' && d < 20) { HA.pullT = 3; toast('You are being dragged toward it. SPRINT!', 'bad', 3); sfx.stinger(); }
+    else if (pw.k === 'dark' && d < 24) { HA.darkT = 6; smogTarget = 1; toast('The air closes in around you.', 'bad', 3); }
+    else if (pw.k === 'reveal') { toast('It can see you through the walls.', 'bad', 3); sfx.stinger(); }
+    else if (pw.k === 'blink') { sfx.zap(); toast('Something just moved a long way, very quickly.', 'bad', 2.4); }
+  }
+  // traps: one mark per pair of numbers. They only show up close.
+  const tr = hp.tr || [];
+  for (let i = 0; i + 1 < tr.length; i += 2) {
+    const key = tr[i] + ':' + tr[i + 1]; let m = HA.traps.get(key);
+    if (!m) { m = mesh(new THREE.RingGeometry(0.5, 0.82, 22).rotateX(-Math.PI / 2), basic(0xff5a40, { transparent: true, opacity: 0, depthWrite: false, fog: false, side: THREE.DoubleSide }), tr[i], 0.04, tr[i + 1]); scene.add(m); HA.traps.set(key, m); m.userData.tripped = false; }
+    const d = Math.hypot(tr[i] - P.x, tr[i + 1] - P.z); m.material.opacity = m.userData.tripped ? 0 : clamp(1 - d / 7, 0, 0.75);
+    if (!m.userData.tripped && !HA.ghost && d < 0.85) { m.userData.tripped = true; HA.stuck = 1.7; sfx.thunk(); P.shake = 0.5; bigText('STUCK', '#ff5a40', 1); }
+  }
+}
+function hauntBots(dt) {
+  if (!HM.bots.length) return;
+  const s = HM.s, hu = s.hu, hunterBot = HM.bots.find((b) => b.u === hu), hx = hunterBot ? hunterBot.pos.x : P.x, hz = hunterBot ? hunterBot.pos.z : P.z;
+  for (const b of HM.bots) {
+    if (!b.pos || b.ca === s.r) continue;
+    b.stuck = Math.max(0, (b.stuck || 0) - dt); const bx0 = b.pos.x, bz0 = b.pos.z;
+    if (b.u === hu) {
+      if (s.ph !== 'hunt') continue;
+      let tx = P.x, tz = P.z, best = HA.ghost ? 1e9 : Math.hypot(P.x - b.pos.x, P.z - b.pos.z);
+      for (const q of HM.bots) { if (q === b || q.ca === s.r) continue; const d = Math.hypot(q.pos.x - b.pos.x, q.pos.z - b.pos.z); if (d < best) { best = d; tx = q.pos.x; tz = q.pos.z; if (d < 1.35) q.ca = s.r; } }
+      const h = HAUNTERS[s.ent]; let sp = Math.min(5.15, h.sp * 0.92);
+      if (h.kind === 'still') { const seen = !HA.ghost && los(P.x, P.z, b.pos.x, b.pos.z) && inView(b.pos.x, 1.4, b.pos.z, 0.85); sp = seen ? 0 : 6.2; }
+      steer(b.pos, tx, tz, sp, dt, 0.32);
+    } else {
+      if (s.ph === 'load' || b.stuck > 0) continue;
+      const d = Math.hypot(b.pos.x - hx, b.pos.z - hz);
+      if (!b.goal || time > b.goalT || Math.hypot(b.goal.x - b.pos.x, b.goal.z - b.pos.z) < 1) { let bg = null, bv = -1; for (let i = 0; i < 7; i++) { const t = allOpen[Math.floor(Math.random() * allOpen.length)], x = tc(t % W), z = tc((t / W) | 0), v = Math.hypot(x - hx, z - hz) - Math.hypot(x - b.pos.x, z - b.pos.z) * 0.4; if (v > bv) { bv = v; bg = { x, z }; } } b.goal = bg; b.goalT = time + rand(2.4, 4.5); }
+      steer(b.pos, b.goal.x, b.goal.z, d < 15 ? 4.7 : 2.6, dt, 0.32);
+      if (HA.role === 'hunter' && s.ph === 'hunt' && d < 1.35 && !hunterBot) { b.ca = s.r; sfx.stinger(); }
+      const tr = HM.me.tr; if (HA.role === 'hunter') for (let i = 0; i + 1 < tr.length; i += 2) { const key = tr[i] + ':' + tr[i + 1]; if (!b.tripped.has(key) && Math.hypot(tr[i] - b.pos.x, tr[i + 1] - b.pos.z) < 0.85) { b.tripped.add(key); b.stuck = 1.7; } }
+      if (HA.pwSim > 0 && d < 20) { const k = 3.2 * dt / (d || 1); b.pos.x += (hx - b.pos.x) * k; b.pos.z += (hz - b.pos.z) * k; }
+    }
+    const mx = b.pos.x - bx0, mz = b.pos.z - bz0; const yaw = Math.hypot(mx, mz) > 0.001 ? Math.atan2(-mx, -mz) : (b.p ? b.p[2] : 0);
+    b.p = [b.pos.x, b.pos.z, yaw, 2];
+  }
+}
+function hauntEnts(dt) {
+  const s = HM.s, k = 1 - Math.exp(-dt * 11), seen = new Set(), meHunter = HA.role === 'hunter';
+  for (const p of HM.list) {
+    if (p.me) continue; seen.add(p.u);
+    let o = HA.ents.get(p.u);
+    if (!o) {
+      const isH = p.u === s.hu; let g;
+      try { g = isH ? hauntModel(s.ent) : buildAvatar(p.c); } catch (e) { console.error(e); continue; }
+      if (!isH) { const tag = labelSprite(p.n, p.c); tag.position.y = 2.05; g.add(tag); }
+      scene.add(g); o = { g, isH, name: p.n, x: 0, z: 0, yaw: 0, tx: 0, tz: 0, tyaw: 0, first: true, ph: 0, out: false, mark: null, flags: 0 }; HA.ents.set(p.u, o);
+    }
+    if (p.p) { o.tx = p.p[0]; o.tz = p.p[1]; o.tyaw = p.p[2]; o.flags = p.p[3] | 0; if (o.first) { o.x = o.tx; o.z = o.tz; o.yaw = o.tyaw; o.first = false; } }
+    const px = o.x, pz = o.z; o.x += (o.tx - o.x) * k; o.z += (o.tz - o.z) * k; o.yaw = angLerp(o.yaw, o.tyaw, k);
+    const u = o.g.userData, sp = Math.hypot(o.x - px, o.z - pz) / Math.max(dt, 0.001);
+    o.g.position.set(o.x, u.hover || 0, o.z); o.g.rotation.y = o.yaw + Math.PI; o.ph += dt * sp * 2.2;
+    const out = p.ca === s.r;
+    if (out && !o.out && !o.isH) { o.out = true; if (meHunter) { bigText(`GOT ${o.name.toUpperCase()}`, '#ff9a86', 1.2); sfx.stinger(); } else toast(`${o.name} was caught.`, 'bad', 3); }
+    o.g.visible = !o.first && !o.out;
+    if (o.isH) {
+      walkAnim(o.g, o.ph, sp); animEntity(o.g, dt);
+      if (u.wings) u.wings.forEach((w, i) => { w.rotation.z = (i ? -1 : 1) * (0.2 + Math.sin(time * 26) * 0.5); });
+      if (u.ring && s.ent === 'floatie') u.ring.rotation.z = -o.ph;
+      if (u.rays && !u.spin) u.spin = 0.4;
+    } else {
+      const crouch = o.flags & 1, lit = !!(o.flags & 2); u.body.scale.y = lerp(u.body.scale.y, crouch ? 0.62 : 1, k); u.beam.visible = lit; u.glow.visible = lit;
+      // only the hunter's power shows runners through walls
+      if (!o.mark) { o.mark = glowSprite(0xff4030, 1.7, 0); o.mark.material.depthTest = false; o.mark.renderOrder = 8; o.mark.position.y = 1.2; o.g.add(o.mark); }
+      o.mark.material.opacity = meHunter && HA.reveal > 0 ? 0.9 : 0;
+    }
+    if (o.isH && !meHunter) hauntHear(p, o);
+  }
+  for (const [u, o] of HA.ents) if (!seen.has(u)) { scene.remove(o.g); HA.ents.delete(u); }
+}
+function hauntCaught(o) {
+  const s = HM.s; HM.me.ca = s.r; HA.ghost = true; HA.stuck = 0; HA.pullT = 0; P.lockMove = false;
+  if ((progress.seen[s.ent] || 0) < 2) { progress.seen[s.ent] = 2; saveProgress(); }
+  const g = o.g; g.userData.voice = s.ent; hmPublish();
+  startScare(g, 1.6, () => { toast('You are out this round. You can still walk around and watch.', 'bad', 5); if (smogTarget) smogTarget = 0; });
+}
+function hauntTick(dt) {
+  const s = HM.s;
+  if (s.st !== 'round') { HM.me.p = [+P.x.toFixed(2), +P.z.toFixed(2), +P.yaw.toFixed(2), (P.crouch ? 1 : 0) | (lightOn() ? 2 : 0)]; hauntEnts(dt); return; }
+  P.bat = 100; HA.cd = Math.max(0, HA.cd - dt); HA.dash = Math.max(0, HA.dash - dt); HA.reveal = Math.max(0, HA.reveal - dt); HA.stuck = Math.max(0, HA.stuck - dt);
+  hauntBots(dt); hauntEnts(dt);
+  const meHunter = HA.role === 'hunter', ph = s.ph, h = HAUNTERS[s.ent];
+  if (HM.me.pw && meHunter && HM.me.pw.k === 'pull' && HM.me.pw.t !== HA.pwDone) { HA.pwDone = HM.me.pw.t; HA.pwSim = 3; }
+  HA.pwSim = Math.max(0, (HA.pwSim || 0) - dt);
+  let lock = ph === 'load' || (meHunter && ph === 'hide') || HA.stuck > 0;
+  HA.look = false;
+  if (meHunter && ph === 'hunt' && h.kind === 'still') {
+    for (const p of HM.list) { if (p.me || p.ca === s.r) continue; const o = HA.ents.get(p.u); if (!o || o.first) continue; if (p.bot ? los(o.x, o.z, P.x, P.z) && Math.hypot(o.x - P.x, o.z - P.z) < 13 : p.lk) { HA.look = true; break; } }
+    if (HA.look) lock = true;
+  }
+  if (HA.ghost) lock = false;
+  P.lockMove = lock;
+  canvas.style.filter = meHunter && (ph === 'hide' || ph === 'load') ? 'brightness(0.04)' : '';
+  if (meHunter && ph === 'hide') { const c = Math.ceil(s.left); if (c !== HA.count) { HA.count = c; bigText(`COUNT ${c}`, '#ff5a40', 0.8); } }
+  if (!meHunter && ph === 'hide') { const c = Math.ceil(s.left); if (c !== HA.count) { HA.count = c; bigText(`RUN ${c}`, '#e8c75a', 0.8); } }
+  if (!meHunter && ph === 'hunt' && HA.count !== -1) { HA.count = -1; bigText('IT IS LOOKING', '#ff5a40', 1.2); sfx.stinger(); }
+  if (meHunter && ph === 'hunt' && HA.count !== -1) { HA.count = -1; bigText('GO', '#ff5a40', 1); sfx.stinger(); }
+  if (!meHunter && !HA.ghost) {
+    const o = hauntHunter();
+    HM.me.lk = o && !o.first && inView(o.x, 1.4, o.z, 0.9) && los(P.x, P.z, o.x, o.z) && Math.hypot(o.x - P.x, o.z - P.z) < 34 ? 1 : 0;
+    if (o && !o.first) {
+      if (HA.pullT > 0) { HA.pullT -= dt; const d = Math.hypot(o.x - P.x, o.z - P.z) || 1; P.ex += (o.x - P.x) / d * 3.6; P.ez += (o.z - P.z) / d * 3.6; }
+      if (HA.darkT > 0) { HA.darkT -= dt; if (HA.darkT <= 0) smogTarget = 0; }
+      if (ph === 'hunt' && Math.hypot(o.x - P.x, o.z - P.z) < 1.35) { hauntCaught(o); return; }
+    }
+  } else HM.me.lk = 0;
+  HM.me.p = [+P.x.toFixed(2), +P.z.toFixed(2), +P.yaw.toFixed(2), (P.crouch ? 1 : 0) | (lightOn() ? 2 : 0)];
+  hauntHud();
+}
+function hauntHud() {
+  const s = HM.s, h = HAUNTERS[s.ent], meHunter = HA.role === 'hunter', left = Math.ceil(s.left), name = h.name.toUpperCase();
+  H_.banner.hidden = false; document.body.classList.add('has-banner'); H_.arrow.hidden = true;
+  setText(H_.bnName, meHunter ? `YOU ARE ${name}` : HA.ghost ? 'YOU WERE CAUGHT' : `${name} IS HUNTING`);
+  H_.bnBar.style.width = (s.ph === 'hunt' ? clamp(1 - s.left / HAUNT_ROUND, 0, 1) * 100 : 0).toFixed(1) + '%';
+  if (s.ph === 'load') { setText(H_.bnObj, 'Waiting for everyone to arrive.'); setHTML(H_.bnSub, ''); return; }
+  if (meHunter) {
+    setText(H_.bnObj, s.ph === 'hide' ? 'Eyes shut. They are running.' : `Catch everyone before the time runs out. ${left}s`);
+    const n = hauntNearest(), pw = h.kind === 'still' ? (HA.look ? '<b>THEY ARE LOOKING AT YOU. You cannot move.</b>' : 'You can only move while nobody is looking.') : HA.cd > 0 ? `${h.power} in ${Math.ceil(HA.cd)}s` : `<b>[Q]</b> ${h.power} is ready`;
+    setHTML(H_.bnSub, `${n ? `Nearest ${dirWords(n.x, n.z)} · ` : ''}${pw}`);
+  } else {
+    setText(H_.bnObj, HA.ghost ? 'You are out this round. Watch the others.' : s.ph === 'hide' ? 'RUN. It starts looking in a moment.' : `Stay away from it. ${left}s left`);
+    const o = hauntHunter(), d = o && !o.first ? Math.hypot(o.x - P.x, o.z - P.z) : 99;
+    setHTML(H_.bnSub, HA.stuck > 0 ? '<b>You are stuck!</b>' : HA.ghost ? '' : d < 9 ? '<b>It is very close.</b>' : d < 22 ? 'It is close.' : 'It is somewhere out there.');
+  }
+}
+function hauntScoreText() { const s = HM.s; return `ROUND ${s.r} · YOU ${s.sc[HM.uid] || 0}/${HAUNT_TARGET}`; }
+// the scoreboard between rounds
+function hauntState() {
+  const s = HM.s; if (!alive) return;
+  if (s.st === 'round') HA.board = '';
+  if ((s.st === 'board' || s.st === 'over') && !scareS && state === 'playing') {
+    if (HA.board !== s.st) {
+      HA.board = s.st; overlay = 'haunt'; uiCursor = true; P.lockMove = false; if (document.pointerLockElement) document.exitPointerLock();
+      H_.banner.hidden = true; canvas.style.filter = ''; smogTarget = 0; el('hauntBoard').hidden = false;
+      el('hbTitle').textContent = s.st === 'over' ? (s.win.includes(HM.uid) ? 'YOU WIN' : `${(s.names[s.win[0]] || 'Someone').toUpperCase()} WINS`) : 'ROUND OVER';
+      el('hbPick').innerHTML = s.st === 'board' ? `<p class="hb-next">Your entity, if you are next:</p><div class="hm-grid">${hauntGrid()}</div>` : '';
+    }
+    el('hbMsg').textContent = s.msg || '';
+    const rows = Object.entries(s.names).sort((a, b) => (s.sc[b[0]] || 0) - (s.sc[a[0]] || 0));
+    el('hbScores').innerHTML = rows.map(([u, n]) => `<div class="hb-row${s.win.includes(u) ? ' won' : ''}"><b>${escHtml(n)}${u === HM.uid ? ' (you)' : ''}</b><span>${'■'.repeat(s.sc[u] || 0)}${'□'.repeat(Math.max(0, HAUNT_TARGET - (s.sc[u] || 0)))}</span></div>`).join('');
+    el('hbWait').textContent = s.st === 'board' ? `Next round in ${Math.ceil(s.left)}…` : HM.isHost ? '' : 'Waiting for the host to start another match.';
+    el('hbAgain').hidden = !(s.st === 'over' && HM.isHost);
+  }
+}
+const hauntGrid = () => Object.entries(HAUNTERS).map(([id, h]) => `<button type="button" class="hm-ent${HM.pick === id ? ' on' : ''}" data-pick="${id}" title="${escHtml(h.blurb)}"><b>${escHtml(h.name)}</b><i>${escHtml(h.power)}</i></button>`).join('');
+function renderHaunt() {
+  const box = el('hauntBox'); if (!box) return;
+  if (!el('hmRules')) box.innerHTML = `<p class="panep" id="hmRules"><b>Haunt Mode.</b> One of you is the entity and everyone else runs, on a map picked at random. Catch them all and you score. Survive the clock and you score. Everyone takes a turn as the hunter, and the first to ${HAUNT_TARGET} wins.</p><div id="hmCtl"></div><h3 class="mp-list-h">Pick your entity</h3><p class="panep" id="hmBlurb"></p><div class="hm-grid" id="hmGrid"></div>`;
+  const ctl = el('hmCtl'), key = HM.on ? 'on' : 'off';
+  if (ctl.dataset.k !== key) {
+    ctl.dataset.k = key;
+    ctl.innerHTML = HM.on
+      ? `<div class="mp-game"><div><b>Room ${escHtml(HM.code.toUpperCase())}</b><span id="hmCount"></span></div><button class="btn" type="button" id="hmStart">Start the match</button><button class="ghost" type="button" id="hmLeave">Leave</button></div><div class="hm-names" id="hmNames"></div><p class="panep" id="hmWait"></p>`
+      : `<form id="hmForm" class="mp-form" autocomplete="off"><div class="mp-row"><label for="hmNick">Your name</label><input id="hmNick" maxlength="16" spellcheck="false"></div><div class="mp-row mp-host"><button class="btn" type="button" id="hmHost">Host a match</button><button class="ghost" type="button" id="hmBots">Practice against bots</button></div><div class="mp-row"><label for="hmCode">Join with a code</label><input id="hmCode" maxlength="6" placeholder="K7Q2" spellcheck="false"><button class="ghost" type="submit">Join</button></div><div class="acct-err" id="hmErr" role="alert"></div></form>`;
+    if (el('hmNick')) el('hmNick').value = mpName();
+  }
+  if (el('hmErr')) el('hmErr').textContent = HM.err || '';
+  if (HM.on) {
+    const list = HM.list;
+    el('hmCount').textContent = `${list.length} in the room`;
+    const nm = list.map((p) => `${p.n}${p.me ? ' (you)' : ''}`).join(' · '); if (el('hmNames').textContent !== nm) el('hmNames').textContent = nm;
+    el('hmStart').hidden = !HM.isHost; el('hmStart').disabled = list.length < 2;
+    el('hmWait').textContent = !HM.isHost ? 'Waiting for the host to start.' : list.length < 2 ? 'Tell your friends the room code. They go to Haunt on the main menu and type it in.' : '';
+  }
+  const g = el('hmGrid'), h = HAUNTERS[HM.pick];
+  if (g.dataset.p !== HM.pick) { g.dataset.p = HM.pick; g.innerHTML = hauntGrid(); el('hmBlurb').innerHTML = `<b>${escHtml(h.name)}.</b> ${escHtml(h.blurb)}`; }
+}
+function hauntNick() { const n = el('hmNick'); if (n) { MP.nick = cleanText(n.value, 16); try { localStorage.setItem('bfn-nick', MP.nick); } catch (e) {} } }
+function hauntNewCode() { let c = ''; while (c.length < 4) c += 'abcdefghjkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 31)]; return c; }
+listen(el('hauntBox'), 'click', async (e) => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.pick) { hmPickSet(t.dataset.pick); renderHaunt(); return; }
+  if (t.id === 'hmHost') { hauntNick(); await hmEnter(hauntNewCode(), false); renderHaunt(); }
+  else if (t.id === 'hmBots') { hauntNick(); await hmEnter('solo', true); renderHaunt(); hmTick(); hmNextRound(); hmTick(); }
+  else if (t.id === 'hmStart') { if (HM.isHost && HM.list.length >= 2) { hmNextRound(); hmTick(); } }
+  else if (t.id === 'hmLeave') { hauntLeave(); renderHaunt(); }
+});
+listen(el('hauntBox'), 'submit', async (e) => {
+  e.preventDefault(); hauntNick();
+  const code = String(el('hmCode').value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!/^[a-z0-9]{4,8}$/.test(code)) { HM.err = 'Room codes are 4 letters or numbers.'; renderHaunt(); return; }
+  await hmEnter(code, false); renderHaunt();
+});
+listen(el('hauntBoard'), 'click', (e) => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.pick) { hmPickSet(t.dataset.pick); el('hbPick').querySelectorAll('.hm-ent').forEach((b) => b.classList.toggle('on', b.dataset.pick === HM.pick)); }
+  if (t.id === 'hbAgain' && HM.isHost) { hmRematch(); hmTick(); }
+  if (t.id === 'hbLeave') { hauntLeave(); switchLevel(0, false); }
+});
+/* ---------- the Scare Museum: every jumpscare you have met, on request ---------- */
+const MUSEUM_CAP = { stillman: 'A slideshow, in silence. It is closer each time.', grinner: 'Nothing but teeth in the dark.', hound: 'No signal.', confetti: 'It was full of something.', knock: 'All of them, and they pull.', echo: 'And the one behind it, and the one behind that.', snack: 'Thank you.', manager: 'The only light in the world.', mimic: 'Down into the rings.', moth: 'It lands on your face.', attendant: 'Invalid.', exhaust: 'You cannot breathe.', copycat: 'Which one are you?', valet: 'High beams, coming fast.', lifeguard: 'You are under. It takes its time.', floatie: 'Stripes and vinyl.', drain: 'The whole room goes down the plughole.', hopscotch: 'Your turn.', lurker: 'You are in the locker.', tide: 'A wall of water, and somebody in it.', undertow: 'One by one, its eyes open.', sun: 'It keeps on smiling.', moon: 'One eye, until there is nothing else.', clown: 'Pop.', balloon: 'It just keeps getting bigger.', ring: 'Hold hands.', swing: 'On the way back, it pushes.', comeplay: 'You are it.', wow: 'Wow.' };
+function renderMuseum() {
+  const box = el('museumBox'); if (!box) return;
+  wowLoad();
+  const groups = [{ title: 'Level 0 · The Yellow Rooms', list: ENTS0 }, { title: 'Level 1 · Garage & Poolrooms', list: ENTS1 }, { title: 'Level 2 · The Playground', list: ENTS2 }];
+  let html = '', total = 0, open = 0;
+  for (const gp of groups) {
+    const list = gp.list.filter((e) => MUSEUM_CAP[e.id]);
+    html += `<div class="bhead"><span>${gp.title}</span></div>`;
+    for (const e of list) {
+      total++; const on = (progress.seen[e.id] || 0) >= 2 || (ENTS.includes(e) && status[e.id] >= 2); if (on) open++;
+      html += on ? `<div class="beast s3 mu-card"><h3>${escHtml(e.name)}</h3><button class="btn mu-play" type="button" data-scare="${e.id}">▶ Play</button><p class="lorep">${escHtml(MUSEUM_CAP[e.id])}</p></div>`
+        : `<div class="beast s0 mu-card"><h3>${e.secret ? '✦ ???' : '???'}</h3><span class="chip c0">Locked</span><p class="dimp">${e.secret ? 'Not everything here comes when it is called.' : 'Meet it to unlock this one.'}</p></div>`;
+    }
+  }
+  box.innerHTML = `<div class="bhead top"><span>On display</span><span>${open}/${total} unlocked</span></div>${html}`;
+}
+function museumPlay(id) {
+  if (state !== 'title' || scareS || !MUSEUM_CAP[id]) return;
+  audioInit(); if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume();
+  let g; try { g = id === 'drain' ? new THREE.Group() : hauntBuild(id); } catch (e) { console.error(e); return; }
+  g.userData.voice = id; g.position.set(P.x, 0, P.z); scene.add(g);
+  el('title').hidden = true;
+  startScare(g, 1.6, () => { scene.remove(g); disposeKit(g); el('title').hidden = false; showTab('museum'); });
+}
+listen(el('museumBox'), 'click', (e) => { const t = e.target.closest('button'); if (t && t.dataset.scare) museumPlay(t.dataset.scare); });
+
 /* ---------- account box, Continue, and what goes into a save ---------- */
 let autoSaveAt = 0, startArm = 0;
 function runSnapshot() {
+  if (HAUNT) return undefined;
   if (state === 'won') return null;
   if (state !== 'playing' && state !== 'dead') return undefined;
   const alive = state === 'playing';
@@ -7894,7 +8372,7 @@ if (saved.seed && !saved.resumed && state === 'title') el('startBtn').textConten
 
 // debugging handle for testing in the console
 window.__bfn = { kit: { buildStillman, buildGrinner, buildHound, buildConfetti, buildKnockDoor, buildEcho, buildVending, buildManager, buildDuck, buildCrate, buildMoth, buildAttendant, buildSmog, buildCopy, buildValet, buildLifeguard, buildFloatie, buildChalkKid, buildLurker, buildTideSpirit, buildUndertow, buildDrowned, buildSun, buildMoon, buildPockets, buildBalloonMan, buildPaperRing, buildPusher, buildComePlay, buildWow, wowSky, poseStillman, fleshMat, eyeMat, THREE }, scareNow: () => active && caught(active, 1, 'Caught.'), darkTile: () => { for (let t = 0; t < N; t++) if (dark[t] && Lr[t] < 0.25 && reachable(t) && !solid[t]) return [t % W, (t / W) | 0]; return null; }, dbg: () => ({ mode: MU.mode, dread, A }), l2: () => ({ CP, R2, F, inv, popI, swingProp, interact, WOW, wowSpot, status }), audioTest: (id, dur = 1.3) => { audioInit(); if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); const bus = scareScream(id, dur); return { ctx: A.ctx, bus }; }, scareInfo: () => scareS && { t: scareS.t, drop: scareS.drop, dur: scareS.dur, hit: scareS.hit, cut: scareS.cut }, goLevel: (lv) => switchLevel(lv, true), start: (id) => startChallenge(id), win: () => active && succeed(active, null), coop: () => ({ auth: coop.auth, gen: coop.gen, me: coop.me, entSeq: coop.ent && coop.ent.seq, active: active && active.id, downed: !!(active && active.downed), key: active && active.key, exit: !!exitObj, ex: exitObj && [exitObj.x, exitObj.z], gate: gateOpen, j: journalCode(), notes: noteCode(), hp: P.hp, state, banner: H_.bnObj.textContent, toasts: [...H_.toasts.children].map((t) => t.textContent) }), give: () => { inv.coins += 5; inv.fizz += 3; inv.battery += 3; inv.hat = true; inv.duck = true; }, doc: (id) => { status[id] = 3; }, tp: (x, y) => { P.x = tc(x); P.z = tc(y); }, set: (o) => Object.assign(P, o), keys, state: () => ({ state, paused, overlay, active: active && active.id, scare: !!scareS, status: Object.assign({}, status), inv: Object.assign({}, inv), hp: P.hp, x: P.x, z: P.z }),
-  ch: () => active, step: (n = 60, dt = 1 / 60) => { for (let i = 0; i < n; i++) if (state === 'playing' && !paused && !overlay) { if (scareS) { time += dt; updateScare(dt); } else update(dt); updateHUD(dt); } renderFrame(); },
+  ch: () => active, step: (n = 60, dt = 1 / 60) => { for (let i = 0; i < n; i++) if (state === 'playing' && (!paused || HAUNT) && !overlay) { if (scareS) { time += dt; updateScare(dt); } else update(dt); updateHUD(dt); } renderFrame(); },
   ent: () => active && active.g ? { x: active.g.position.x, z: active.g.position.z, d: distP(active.g) } : null, face: () => { if (active && active.g) P.yaw = Math.atan2(-(active.g.position.x - P.x), -(active.g.position.z - P.z)); }, info: () => ({ P: { x: P.x, z: P.z, hp: P.hp }, active: active && active.id, F, documented: documented() }) };
 
 /* =========================================================
@@ -7907,10 +8385,11 @@ function frame(nowT) {
   rafId = requestAnimationFrame(frame);
   if ((seenT -= 1 / 60) <= 0) { seenT = 1; syncSeen(); }
   const dt = Math.min(0.05, Math.max(0.001, (nowT - last) / 1000)); last = nowT;
-  if (state === 'title') {
+  if (state === 'title' && scareS) { time += dt; updateScare(dt); updateWorldFx(dt); }
+  else if (state === 'title') {
     P.yaw += dt * 0.08; P.pitch = Math.sin(nowT / 4000) * 0.05; time += dt;
     updateCamera(dt); updateWorldFx(dt);
-  } else if (state === 'playing' && !paused && !overlay) {
+  } else if (state === 'playing' && (!paused || HAUNT) && !overlay) {
     if (scareS) { time += dt; updateScare(dt); updateWorldFx(dt); }
     else update(dt);
     updateHUD(dt);
@@ -7922,10 +8401,11 @@ updateCamera(0.016);
 kitPrecompile();
 revealAround();
 rafId = requestAnimationFrame(frame);
-Object.assign(window.__bfn, { level: LEVEL, gate: () => openGate(), progress, menu: () => switchLevel(LEVEL, false), end: (ok) => active && endChallenge(active, !!ok, null), hp: () => { P.hp = 100; }, three: { scene, camera, renderer, U }, duck: () => buildDuck(1.6), time: () => time, seed, others: () => [...others.values()].map((o) => ({ name: o.name, x: +o.x.toFixed(2), z: +o.z.toFixed(2), ent: o.entId, visible: o.g.visible, bubble: !!o.bubble })) });
+Object.assign(window.__bfn, { hm: HM, ha: HA, hmNextRound, hmTick, museumPlay, hauntPower, hauntModel, haunters: HAUNTERS, scareTick: (dt = 1 / 45) => { if (scareS) { time += dt; updateScare(dt); } renderFrame(); }, level: LEVEL, gate: () => openGate(), progress, menu: () => switchLevel(LEVEL, false), end: (ok) => active && endChallenge(active, !!ok, null), hp: () => { P.hp = 100; }, three: { scene, camera, renderer, U }, duck: () => buildDuck(1.6), time: () => time, seed, others: () => [...others.values()].map((o) => ({ name: o.name, x: +o.x.toFixed(2), z: +o.z.toFixed(2), ent: o.entId, visible: o.g.visible, bubble: !!o.bubble })) });
 
 // Leaving this level: stop the loop and every listener, free the GPU, and put the menu back.
 teardown = () => {
+  HM.ui = null; HM.onState = null;
   scareFxDispose();
   if (state === 'playing' || state === 'dead') requestSave(true);
   ACCT.snapshot = null; ACCT.listeners.delete(renderAccount);
@@ -7939,11 +8419,13 @@ teardown = () => {
   if (document.pointerLockElement) document.exitPointerLock();
   try { renderer.dispose(); renderer.forceContextLoss(); } catch (e) {}
   canvas.replaceWith(canvas.cloneNode(false));
-  ['pause', 'journal', 'note', 'vend', 'dead', 'win', 'touch', 'hud', 'banner', 'arrow', 'codepad', 'slats'].forEach((id) => { const e = document.getElementById(id); if (e) e.hidden = true; });
+  ['pause', 'journal', 'note', 'vend', 'dead', 'win', 'touch', 'hud', 'banner', 'arrow', 'codepad', 'slats', 'hauntBoard'].forEach((id) => { const e = document.getElementById(id); if (e) e.hidden = true; });
   el('title').hidden = false; H_.toasts.innerHTML = ''; setBlink(false);
   H_.hurt.style.opacity = 0; H_.big.style.opacity = 0; canvas.style.filter = ''; el('scare').hidden = true; document.body.classList.remove('scaring'); el('fx-noise').style.opacity = ''; el('flash').style.opacity = 0; el('quitBtn').textContent = 'Quit to main menu';
   document.body.classList.remove('has-banner');
 };
+if (HAUNT) hauntInit();
+else HM.ui = () => { if (!el('pane-haunt').hidden) renderHaunt(); };
 mpStart();
 if (saved.autostart) startGame();
 else if (saved.audio) audioInit();
