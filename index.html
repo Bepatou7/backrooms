@@ -296,7 +296,7 @@ kbd{font-family:var(--f-osd);font-size:19px;color:var(--sodium)}
 .setting{display:grid;grid-template-columns:120px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:14px}
 .setting input[type=range]{width:100%;accent-color:var(--sodium)}
 .setting select{font:inherit;background:#15130e;color:var(--osd);border:1px solid var(--osd-dim);padding:4px 6px}
-.setting output{font-family:var(--f-osd);font-size:20px;text-align:right}
+.admin-row{grid-template-columns:120px minmax(0,1fr) auto}.admin-row[hidden],.admin-panel[hidden]{display:none}.admin-row input{font:inherit;width:100%;box-sizing:border-box;background:#15130e;color:var(--osd);border:1px solid var(--osd-dim);padding:4px 6px}.admin-panel{display:grid;gap:6px;font-size:13px;color:var(--osd-dim)}.admin-msg{min-height:0;margin:0;font-size:13px;color:#ff8a7a}.admin-msg:empty{display:none}.setting output{font-family:var(--f-osd);font-size:20px;text-align:right}
 
 /* touch */
 #touch{position:fixed;inset:0;pointer-events:none}
@@ -452,6 +452,9 @@ kbd{font-family:var(--f-osd);font-size:19px;color:var(--sodium)}
     <div class="setting"><label for="mus">Music</label><input type="range" id="mus" min="0" max="1" step="0.05"><output id="musO"></output></div>
     <div class="setting"><label for="calm">Reduce flashing</label><input type="checkbox" id="calm"><span></span></div>
     <div class="setting"><label for="qual">Picture</label><select id="qual"><option value="0">Low (fast)</option><option value="1">Medium</option><option value="2">High</option></select><span></span></div>
+    <form class="setting admin-row" id="adminForm" autocomplete="off"><label for="adminCode">Admin</label><input id="adminCode" type="text" inputmode="numeric" maxlength="4" placeholder="Code" autocomplete="off" spellcheck="false"><button class="ghost" type="submit">Go</button></form>
+    <div class="admin-panel" id="adminPanel" hidden><button class="btn" id="adminJack" type="button">Spawn Jack bossfight</button><span>Pockets and the jack-in-the-boxes. Anyone playing with you on this level gets pulled in too.</span></div>
+    <p class="admin-msg" id="adminMsg" role="status"></p>
     <div class="row-btns">
       <button class="btn" id="resumeBtn">Resume</button>
       <button class="ghost" id="pauseJournal">Journal</button>
@@ -753,6 +756,7 @@ if (!progress.seen || typeof progress.seen !== 'object') progress.seen = {};
 if (!Array.isArray(progress.runs)) progress.runs = [];
 const saveProgress = () => { try { localStorage.setItem('bfn-progress', JSON.stringify(progress)); } catch (e) {} };
 let teardown = null;
+let adminOpen = false, adminPending = null;
 function switchLevel(level, autostart) { if (teardown) teardown(); teardown = null; boot({ level, autostart, audio: true }); }
 
 /* ---------- accounts: progress saved to the player's Claude account ----------
@@ -4956,7 +4960,7 @@ const NOTES1 = [
 const ENTS2 = [
   { id: 'sun', name: 'Mister Noon', danger: 3, ritual: 'Stand in the Sun Yard and stare straight up for five seconds.', survive: 'Keep to the parasols for 32 seconds. Its heat burns you out in the open, and the parasols keep moving.', lore: 'Someone drew a sun in the corner of the page, the way you are taught to, and it never went down.' },
   { id: 'moon', name: 'The Night-Light', danger: 3, ritual: 'Stand still in the dark Nursery with your flashlight off for six seconds.', survive: 'Collect the four fallen stars. When its eye opens, do not be looking at it.', lore: 'It is only there so you will not be afraid of the dark. It would like you to stop looking at it now.' },
-  { id: 'clown', name: 'Pockets', danger: 3, ritual: 'Honk the horn on the little clown car three times.', survive: 'Hold [E] on the jack-in-the-boxes to keep them wound for 38 seconds. Three pops and it has you.', lore: 'Every one of its pockets has somebody in it. They are very quiet. They are saving it for the show.' },
+  { id: 'clown', name: 'Pockets', danger: 3, ritual: 'Honk the horn on the little clown car three times.', survive: 'Hold [E] on the jack-in-the-boxes to keep them wound for 38 seconds. Three pops and it has you. Playing together, you all share the same boxes, so split up.', lore: 'Every one of its pockets has somebody in it. They are very quiet. They are saving it for the show.' },
   { id: 'balloon', name: 'The Balloon Man', danger: 3, ritual: 'Pop three balloons at the party table.', survive: 'Look at the balloons and press [E] to pop ten of them before four of them reach you.', lore: 'He has one for everyone. They all have somebody\'s face, and they are all still inflating.' },
   { id: 'ring', name: 'Ring-a-Round', danger: 4, ritual: 'Walk three full circles around the maypole.', survive: 'A ring of paper dolls closes in on you. Slip out through the glowing gap before it shuts. Three times.', lore: 'They were cut from one folded sheet, so they cannot let go of each other. They would like you to hold on too.' },
   { id: 'swing', name: 'The Pusher', danger: 3, ritual: 'Push the empty swing five times.', survive: 'Press [E] each time the swing comes back to you. Six good pushes. Three bad ones and it reaches past the swing.', lore: 'It is very patient. It has been pushing that swing since before anyone was on it.' },
@@ -6102,16 +6106,16 @@ function resetRituals() { ritual.back = ritual.sprint = ritual.dark = 0; R1.moth
    Challenges
    ========================================================= */
 const CH = {};
-function startChallenge(id, key, pose) {
+function startChallenge(id, key, pose, force) {
   if (HAUNT) return false;
-  if (active || state !== 'playing' || status[id] === 3) return false;
+  if (active || state !== 'playing' || (status[id] === 3 && !force)) return false;
   const k = key || coopKey(), own = { x: P.x, z: P.z, yaw: P.yaw };
   // a teammate's summon is built exactly as they built it: their seed, from where they stood, facing the way they faced
   if (pose) { P.x = pose.x; P.z = pose.z; P.yaw = pose.yaw; updatePlayerField(); }
   let ch = null;
   try { ch = seededRun(k, () => CH[id]()); } finally { if (pose) { P.x = own.x; P.z = own.z; P.yaw = own.yaw; updatePlayerField(); } }
   if (!ch) return false;
-  ch.id = id; ch.done = false; ch.key = k; ch.spawn = pose || own; ch.rng = mulberry32(keyHash(k + 'u')); coop.seen.add(k); active = ch;
+  ch.id = id; ch.done = false; ch.admin = !!force; ch.key = k; ch.spawn = pose || own; ch.rng = mulberry32(keyHash(k + 'u')); coop.seen.add(k); active = ch;
   coopReset(!pose);
   if (status[id] < 2) status[id] = 2;
   sfx.stinger();
@@ -7624,9 +7628,18 @@ CH.clown = () => {
   const boxes = [];
   for (let i = 0; i < 4; i++) { const sp = findSpot({ minD: 3.5, maxD: 12, filter: (t) => boxes.every((b) => Math.hypot(b.x - tc(t % W), b.z - tc((t / W) | 0)) > 4) }) || findSpot({ minD: 3, maxD: 14 }); if (!sp) continue; const b = buildJackBox(); b.position.set(sp.x, 0, sp.z); scene.add(b); boxes.push({ g: b, x: sp.x, z: sp.z, wind: rand(0.6, 1) }); }
   const LEN = 38, TUNE = [523, 659, 622, 784, 523, 587, 494, 659];
-  let left = LEN, pops = 0, nT = 0, ni = 0, px = s0.x, pz = s0.z, ph = 0;
-  toast('A tinny tune starts up from several places at once. Keep the boxes wound. Hold [E] on them.', 'bad', 5);
+  // everybody in the fight shares these boxes. Whoever is driving Pockets keeps the count and the clock, anyone can wind any box,
+  // and everyone else follows along and guesses in between. A pop hits the whole team.
+  let left = LEN, pops = 0, nT = 0, ni = 0, px = s0.x, pz = s0.z, ph = 0, popBox = 0, popHeard = 0, popWhere = 0;
+  toast(`A tinny tune starts up from several places at once. Keep the boxes wound. Hold [E] on them.${others.size ? ' You all share the same boxes, so split up.' : ''}`, 'bad', 5);
   const worst = () => boxes.slice().sort((a, b) => a.wind - b.wind)[0];
+  const holdMask = () => { if (ch.done || ch.downed || !(keys.KeyE || touch.use)) return 0; let m = 0; boxes.forEach((b, i) => { if (Math.hypot(b.x - P.x, b.z - P.z) < 1.9) m |= 1 << i; }); return m; };
+  const pop = (b) => {
+    b.wind = 1; pops++; popBox = boxes.indexOf(b); sfx.boing(); sfx.horn(); b.g.userData.lid.rotation.x = -1.8; later(1, () => { b.g.userData.lid.rotation.x = 0; });
+    confettiBurst(b.x, 1, b.z, 26, 1.3); g.position.set(b.x, 0, b.z); px = b.x; pz = b.z; bigText('POP!', '#ff8a7a', 0.7);
+    if (pops >= 3) return caught(ch, 32, 'Pockets found room for you.');
+    damage(14, 'Pockets got you with the spring.');
+  };
   const ch = {
     g, scareY: 2.2,
     obj: 'Hold [E] on the jack-in-the-boxes to keep them wound. Do not let one run down.',
@@ -7635,19 +7648,15 @@ CH.clown = () => {
     update(dt) {
       left -= dt; nT -= dt;
       if (nT <= 0) { nT = 0.3; tone(TUNE[ni++ % TUNE.length], 0.26, 0.05, { type: 'triangle' }); }
-      const holding = keys.KeyE || touch.use, rate = 1 / (12.5 - (1 - left / LEN) * 4.5);
-      for (const b of boxes) {
-        const near = Math.hypot(b.x - P.x, b.z - P.z) < 1.9;
-        b.wind = clamp(b.wind + (holding && near ? dt / 1.1 : -dt * rate), 0, 1);
-        b.g.userData.crank.rotation.x += dt * (holding && near ? 12 : 1.5);
+      while (pops < popHeard) { const b = boxes[popWhere] || boxes[0]; if (!b) break; pop(b); if (ch.done) return; }
+      const mask = holdMask(), rate = 1 / (12.5 - (1 - left / LEN) * 4.5);
+      for (const [i, b] of boxes.entries()) {
+        const wound = ((mask >> i) & 1) === 1 || b.team > time;
+        b.wind = clamp(b.wind + (wound ? dt / 1.1 : -dt * rate), 0, 1);
+        b.g.userData.crank.rotation.x += dt * (wound ? 12 : 1.5);
         b.g.userData.glow.material.opacity = b.wind < 0.3 ? 0.5 + Math.sin(time * 14) * 0.4 : 0.25;
         b.g.position.x = b.x + (b.wind < 0.2 ? Math.sin(time * 60) * 0.012 : 0);
-        if (b.wind <= 0) {
-          b.wind = 1; pops++; sfx.boing(); sfx.horn(); b.g.userData.lid.rotation.x = -1.8; later(1, () => { b.g.userData.lid.rotation.x = 0; });
-          confettiBurst(b.x, 1, b.z, 26, 1.3); g.position.set(b.x, 0, b.z); px = b.x; pz = b.z; bigText('POP!', '#ff8a7a', 0.7);
-          if (pops >= 3) return caught(ch, 32, 'Pockets found room for you.');
-          damage(14, 'Pockets got you with the spring.'); if (ch.done) return;
-        }
+        if (b.wind <= 0 && coop.auth) { pop(b); if (ch.done) return; }
       }
       steer(g.position, P.x, P.z, 1.35, dt, 0.35);
       const mx = g.position.x - px, mz = g.position.z - pz, sp = Math.hypot(mx, mz) / dt; px = g.position.x; pz = g.position.z;
@@ -7657,6 +7666,16 @@ CH.clown = () => {
       if (left <= 0) succeed(ch, 'All the boxes shut at once. The music stops. Pockets folds itself up and is gone.');
     },
     onInteract() { return true; },
+    shareGet: () => [coop.auth && !ch.done && !ch.downed ? 1 : 0, +left.toFixed(1), pops, popBox, holdMask(), ...boxes.map((b) => +b.wind.toFixed(2))],
+    shareSet(x) {
+      if (!Array.isArray(x)) return;
+      const m = x[4] | 0; boxes.forEach((b, i) => { if ((m >> i) & 1) b.team = time + 0.3; });
+      const np = Math.min(x[2] | 0, 3); if (np > popHeard) { popHeard = np; popWhere = x[3] | 0; }
+      if (x[0] !== 1 || coop.auth) return;
+      const l = +x[1]; if (l >= 0 && l <= LEN) left = l;
+      boxes.forEach((b, i) => { const w = +x[5 + i]; if (w >= 0 && w <= 1) b.wind = w; });
+    },
+    t: () => ({ boxes, left, pops, auth: coop.auth, setLeft: (v) => { left = v; } }),
     cleanup() { boxes.forEach((b) => removeLater(b.g)); removeLater(g); },
   };
   return ch;
@@ -8364,6 +8383,17 @@ listen(el('acct'), 'submit', async (e) => {
 });
 listen(el('title'), 'pointerdown', () => audioInit());
 listen(el('resumeBtn'), 'click', () => { pause(false); requestLock(); });
+const adminSay = (m) => { el('adminMsg').textContent = m; };
+const adminShow = () => { el('adminForm').hidden = adminOpen; el('adminPanel').hidden = !adminOpen; };
+adminShow(); adminSay('');
+listen(el('adminForm'), 'submit', (e) => { e.preventDefault(); const inp = el('adminCode'), ok = inp.value.trim() === '1010'; inp.value = ''; adminOpen = ok; adminShow(); adminSay(ok ? '' : 'Wrong code.'); });
+listen(el('adminJack'), 'click', () => {
+  if (HAUNT) return adminSay('Not in VS Mode.');
+  if (active || scareS) return adminSay('Finish this fight first.');
+  adminPending = 'clown'; adminSay('');
+  if (LEVEL !== 2) { if (MP.game) mpMove(2, 0); else switchLevel(2, true); return; }
+  pause(false); requestLock();
+});
 listen(el('pauseJournal'), 'click', () => { pause(false); openJournal(); });
 listen(el('closeJournal'), 'click', closeOverlay);
 listen(el('note'), 'click', closeOverlay);
@@ -8571,6 +8601,7 @@ function update(dt) {
   if (t !== lastTile) { lastTile = t; onNewTile(t); }
   updatePlayerField();
   runTimers(dt);
+  if (adminPending && LEVEL === 2 && !HAUNT && !active && !scareS && !overlay && state === 'playing') { const id = adminPending; adminPending = null; if (!startChallenge(id, undefined, undefined, true)) toast('Pockets could not find a way to you here. Move somewhere more open and try again.', 'bad', 5); }
   if (active && !active.done && !active.downed) { const r0 = Math.random; if (active.rng) Math.random = active.rng; try { active.update(dt); } finally { Math.random = r0; } }
   coopEntitySync(dt);
   if (active && active.g && !active.done && !active.downed) animEntity(active.g, dt);
@@ -8823,7 +8854,7 @@ function mpSend(extra) {
     patch.e = [ac.id, +g.position.x.toFixed(3), +g.position.y.toFixed(3), +g.position.z.toFixed(3), +g.rotation.y.toFixed(3), g.visible ? 1 : 0, +g.scale.x.toFixed(3), ac.poseN | 0, coop.seq, ...ex];
   } else patch.e = null;
   const dc = documented(); if (dc !== lastSentDoc) { patch.d = dc; patch.dl = lastDocId || null; lastSentDoc = dc; }
-  patch.f = active && active.key && CH[active.id] ? [active.id, active.key, active.downed ? 2 : 0, holding ? coop.myGen : 0, coop.handTo || '', active.spawn.x, active.spawn.z, active.spawn.yaw, active.seeing ? 1 : 0] : null;
+  patch.f = active && active.key && CH[active.id] ? [active.id, active.key, active.downed ? 2 : 0, holding ? coop.myGen : 0, coop.handTo || '', active.spawn.x, active.spawn.z, active.spawn.yaw, active.seeing ? 1 : 0, active.admin ? 1 : 0] : null;
   patch.x = active && active.shareGet ? active.shareGet() : null;
   patch.j = journalCode(); patch.nr = noteCode();
   if (LEVEL === 3 && !HAUNT) { patch.tk = inv.reels | 0; const net = []; if (cpDriver()) { const c3 = M94.ch; net.push(c3 ? +c3.g.position.x.toFixed(2) : 0, c3 ? +c3.g.position.z.toFixed(2) : 0, c3 ? +c3.g.rotation.y.toFixed(2) : 0); for (const r of M94.rm) net.push(+r.g.position.x.toFixed(2), +r.g.position.z.toFixed(2), +r.g.rotation.y.toFixed(2)); } patch.rm = net.length ? net : null; }
@@ -8885,12 +8916,12 @@ function coopSummon(o) {
   if (!f || f[2] !== 0 || coop.seen.has(f[1]) || state !== 'playing' || o.first) return;
   coop.seen.add(f[1]);
   const id = f[0], name = ENT[id].name;
-  if (status[id] === 3) return;
+  if (status[id] === 3 && !f[9]) return;
   if (active || scareS) { toast(`${o.name} summoned ${name}, but you are busy with your own.`, 'bad', 5); return; }
   const far = Math.hypot(o.tx - P.x, o.tz - P.z) > 4;
   if (far) pullTo(o);
   const pose = typeof f[5] === 'number' && typeof f[6] === 'number' && typeof f[7] === 'number' ? { x: f[5], z: f[6], yaw: f[7] } : { x: o.tx, z: o.tz, yaw: o.tyaw };
-  if (startChallenge(id, f[1], pose)) toast(`${o.name} summoned ${name}. There is one of it, and it hunts whoever is closest${far ? '. It pulled you to them' : ''}. Only one of you has to survive.`, 'bad', 6);
+  if (startChallenge(id, f[1], pose, !!f[9])) toast(`${o.name} summoned ${name}. There is one of it, and it hunts whoever is closest${far ? '. It pulled you to them' : ''}. Only one of you has to survive.`, 'bad', 6);
   else toast(`${o.name} summoned ${name}, but it could not reach you here.`, 'bad', 5);
 }
 function pullTo(o) {
