@@ -453,7 +453,7 @@ kbd{font-family:var(--f-osd);font-size:19px;color:var(--sodium)}
     <div class="setting"><label for="calm">Reduce flashing</label><input type="checkbox" id="calm"><span></span></div>
     <div class="setting"><label for="qual">Picture</label><select id="qual"><option value="0">Low (fast)</option><option value="1">Medium</option><option value="2">High</option></select><span></span></div>
     <form class="setting admin-row" id="adminForm" autocomplete="off"><label for="adminCode">Admin</label><input id="adminCode" type="text" inputmode="numeric" maxlength="4" placeholder="Code" autocomplete="off" spellcheck="false"><button class="ghost" type="submit">Go</button></form>
-    <div class="admin-panel" id="adminPanel" hidden><button class="btn" id="adminJack" type="button">Spawn Jack bossfight</button><span>Pockets and the jack-in-the-boxes. Anyone playing with you on this level gets pulled in too.</span></div>
+    <div class="admin-panel" id="adminPanel" hidden><button class="btn" id="adminJack" type="button">Spawn Jack bossfight</button><span>WOW, the rainbow boss. Anyone playing with you on this level gets pulled in too.</span></div>
     <p class="admin-msg" id="adminMsg" role="status"></p>
     <div class="row-btns">
       <button class="btn" id="resumeBtn">Resume</button>
@@ -8390,7 +8390,7 @@ listen(el('adminForm'), 'submit', (e) => { e.preventDefault(); const inp = el('a
 listen(el('adminJack'), 'click', () => {
   if (HAUNT) return adminSay('Not in VS Mode.');
   if (active || scareS) return adminSay('Finish this fight first.');
-  adminPending = 'clown'; adminSay('');
+  adminPending = 'wow'; adminSay('');
   if (LEVEL !== 2) { if (MP.game) mpMove(2, 0); else switchLevel(2, true); return; }
   pause(false); requestLock();
 });
@@ -8601,7 +8601,7 @@ function update(dt) {
   if (t !== lastTile) { lastTile = t; onNewTile(t); }
   updatePlayerField();
   runTimers(dt);
-  if (adminPending && LEVEL === 2 && !HAUNT && !active && !scareS && !overlay && state === 'playing') { const id = adminPending; adminPending = null; if (!startChallenge(id, undefined, undefined, true)) toast('Pockets could not find a way to you here. Move somewhere more open and try again.', 'bad', 5); }
+  if (adminPending && LEVEL === 2 && !HAUNT && !active && !scareS && !overlay && state === 'playing') { const id = adminPending; adminPending = null; if (!startChallenge(id, undefined, undefined, true)) toast('It could not find a way to you here. Move somewhere more open and try again.', 'bad', 5); }
   if (active && !active.done && !active.downed) { const r0 = Math.random; if (active.rng) Math.random = active.rng; try { active.update(dt); } finally { Math.random = r0; } }
   coopEntitySync(dt);
   if (active && active.g && !active.done && !active.downed) animEntity(active.g, dt);
