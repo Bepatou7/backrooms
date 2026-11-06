@@ -3850,38 +3850,49 @@ function dirDarkTile() {
   for (const t of allOpen) { if (!dark[t]) continue; const x = tc(t % W), z = tc((t / W) | 0), d = Math.hypot(x - P.x, z - P.z); if (d < bd) { bd = d; best = { x, z }; } }
   return best;
 }
+function dirBreather() {
+  DIR.phase = 'breather'; DIR.t = DIR.len = rand(14, 20) * uiDiff().dir; DIR.miss = 0;
+}
 function dirTick(dt) {
   if (HAUNT) return;
-  if (!cpDriver()) { if (DIR.net) { DIR.phase = DIR.net[0]; DIR.v = DIR.net[1]; } return; }
+  const n = DIR.net, nowR = performance.now(), wasAway = nowR - (DIR.lastTick || 0) > 1500; DIR.lastTick = nowR;
+  const copy = () => { DIR.phase = n[0]; DIR.v = n[1]; if (n[2] != null) { DIR.t = n[2]; DIR.len = n[3]; } };
+  if (!cpDriver()) { if (n) copy(); DIR.fresh = false; DIR.driving = false; return; }
+  // we only pick up somebody else's meter at the moment we take over. After that it is ours
+  if ((!DIR.driving || wasAway) && DIR.fresh && n) copy();
+  DIR.fresh = false; DIR.driving = true;
   if (TUT.on) { DIR.phase = 'quiet'; DIR.v = 0; return; }
   if (active || scareS || RM.mode === 'chase') { DIR.phase = 'encounter'; DIR.v = 1; DIR.busy = true; DIR.waitDark = false; return; }
-  if (DIR.busy) { DIR.busy = false; DIR.phase = 'breather'; DIR.t = rand(28, 42) * uiDiff().dir; DIR.len = DIR.t; }
+  if (DIR.busy) { DIR.busy = false; dirBreather(); }
   const pend = dirNext();
   DIR.t -= dt;
   if (DIR.phase === 'quiet') {
-    DIR.v = Math.min(0.35, DIR.v + (dt * 0.35) / Math.max(DIR.len, 1));
+    DIR.v = Math.min(0.5, DIR.v + (dt * 0.5) / Math.max(DIR.len, 1));
     if (DIR.t <= 0) { DIR.phase = 'rising'; DIR.t = DIR.len = 16; uiCap(['The lights start humming louder.', 'The air down here is getting thick.', 'Somewhere, the music has gone wrong.'][LEVEL]); tone(58, 3.2, 0.1, { type: 'sawtooth', f2: 46 }); }
   } else if (DIR.phase === 'rising') {
-    DIR.v = lerp(0.35, 1, 1 - clamp(DIR.t / DIR.len, 0, 1));
+    DIR.v = lerp(0.5, 1, 1 - clamp(DIR.t / DIR.len, 0, 1));
     if (DIR.t < 8 && !DIR.warned) { DIR.warned = true; uiCap('Something is coming.'); tone(44, 2.4, 0.14, { type: 'sawtooth', f2: 62 }); }
     if (DIR.t <= 0) {
       DIR.warned = false; let ok = false;
       for (const e of dirList()) { if (startChallenge(e.id)) { ok = true; break; } }
-      // nothing left that turns up on its own: whatever is roaming comes for you instead
-      if (!ok && !pend) {
-        const sent = dirSendRoaming();
+      if (ok) { DIR.miss = 0; DIR.waitDark = false; return; }
+      DIR.miss = (DIR.miss | 0) + 1;
+      DIR.waitDark = !!pend && pend.id === 'grinner';
+      // nothing can turn up where you are, or nothing is left to: whatever is roaming comes for you instead. It never just sits here
+      if (!pend || DIR.miss >= (DIR.waitDark ? 7 : 3)) {
+        const sent = dirSendRoaming(); DIR.waitDark = false;
         if (active || RM.mode === 'chase') return;
         if (!sent) uiCap(['It passes. Whatever it was, it went somewhere else.', 'It passes. The air clears, a little.', 'It passes. The music goes back to normal.'][LEVEL]);
-        DIR.phase = 'breather'; DIR.t = DIR.len = rand(28, 42) * uiDiff().dir;
+        dirBreather();
         return;
       }
-      DIR.waitDark = !ok && pend.id === 'grinner';
-      if (!ok) { DIR.t = 3; if (DIR.waitDark && !DIR.toldDark) { DIR.toldDark = true; uiCap('Something is waiting for you in the dark.'); } }
+      DIR.t = 3; if (DIR.waitDark && !DIR.toldDark) { DIR.toldDark = true; uiCap('Something is waiting for you in the dark.'); }
     }
   } else {
+    // the bar drains the whole way through a breather, so you can always see it moving
     DIR.phase = DIR.t > 0 ? 'breather' : 'quiet';
-    DIR.v = Math.max(0, DIR.v - dt * 0.12);
-    if (DIR.t <= 0) { DIR.t = DIR.len = rand(30, 48) * uiDiff().dir; }
+    DIR.v = DIR.t > 0 ? clamp(DIR.t / Math.max(DIR.len, 1), 0, 1) : 0;
+    if (DIR.t <= 0) DIR.t = DIR.len = rand(24, 34) * uiDiff().dir;
   }
 }
 function dirSendRoaming() {
@@ -4009,7 +4020,7 @@ function uiHud(dt) {
     el('dBar').style.width = (DIR.v * 100).toFixed(0) + '%';
     box.className = DIR.phase === 'rising' ? 'rising' : DIR.phase === 'encounter' ? 'encounter' : '';
   }
-  el('dreadEdge').style.opacity = active ? 0 : (clamp((DIR.v - 0.4) / 0.6, 0, 1) * 0.55).toFixed(2);
+  el('dreadEdge').style.opacity = active || DIR.phase === 'breather' ? 0 : (clamp((DIR.v - 0.4) / 0.6, 0, 1) * 0.55).toFixed(2);
   let near = null, nd = 17;
   for (const r of uiRoamList()) { const d = Math.hypot(r.g.position.x - P.x, r.g.position.z - P.z); if (d < nd) { nd = d; near = r; } }
   const al = el('rmAlert');
@@ -6099,7 +6110,7 @@ function setupPlayground() {
   setupPlayDressing();
 }
 const COME_PLAY_TUNE = [659, 587, 494, 587, 523, 440, 494, 392];
-function cpDriver() { const me = coopMe(); if (!me) return true; for (const o of others.values()) if (o.peer < me) return false; return true; }
+function cpDriver() { const me = coopMe(); if (!me) return true; const now = performance.now(); for (const o of others.values()) if (o.peer < me && now - (o.heard || 0) < 3000) return false; return true; }
 function cpTick(dt) {
   if (!CP || CP.dead) return;
   const g = CP.g, u = g.userData;
@@ -9493,12 +9504,13 @@ function upsertOther(p) {
     o.tag = labelSprite(name, color); o.tag.position.y = 2.05; o.g.add(o.tag); scene.add(o.g); others.set(p.peer, o);
     toast(`${name} is here.`, 'good', 4);
   }
+  if (pr.hb !== o.hb) { o.hb = pr.hb; o.heard = performance.now(); }
   if (name !== o.name) { o.name = name; o.g.remove(o.tag); o.tag = labelSprite(name, color); o.tag.position.y = 2.05; o.g.add(o.tag); }
   if (Array.isArray(pr.p) && pr.p.length >= 4) {
     o.tx = +pr.p[0] || 0; o.tz = +pr.p[1] || 0; o.tyaw = +pr.p[2] || 0; o.flags = pr.p[3] | 0;
     if (o.first) { o.x = o.tx; o.z = o.tz; o.yaw = o.tyaw; o.first = false; }
   }
-  if (Array.isArray(pr.dr) && typeof pr.dr[0] === 'string') DIR.net = [pr.dr[0], +pr.dr[1] || 0];
+  if (Array.isArray(pr.dr) && typeof pr.dr[0] === 'string') { DIR.net = [pr.dr[0], +pr.dr[1] || 0, pr.dr[2] == null ? null : +pr.dr[2] || 0, +pr.dr[3] || 1]; DIR.fresh = true; }
   if (LEVEL < 2 && Array.isArray(pr.rm)) RM.net = pr.rm.map((v) => +v || 0);
   if (LEVEL === 2) { const m = (pr.tk | 0) & 15; for (let b = 0; b < 4; b++) if ((m >> b) & 1) setTask(b); if (CP && Array.isArray(pr.rm)) CP.net = { x: +pr.rm[0] || 0, z: +pr.rm[1] || 0 }; }
   o.f = validFight(pr.f);
@@ -9559,8 +9571,8 @@ function mpSend(extra) {
   const dc = documented(); if (dc !== lastSentDoc) { patch.d = dc; patch.dl = lastDocId || null; lastSentDoc = dc; }
   patch.f = active && active.key && CH[active.id] ? [active.id, active.key, active.downed ? 2 : 0, holding ? coop.myGen : 0, coop.handTo || '', active.spawn.x, active.spawn.z, active.spawn.yaw, active.seeing ? 1 : 0, active.admin ? 1 : 0] : null;
   patch.x = active && active.shareGet ? active.shareGet() : null;
-  patch.j = journalCode(); patch.nr = noteCode();
-  if (!HAUNT && LEVEL < 3 && cpDriver()) patch.dr = [DIR.phase, +DIR.v.toFixed(2)];
+  patch.j = journalCode(); patch.nr = noteCode(); patch.hb = coop.hb = ((coop.hb | 0) + 1) % 4096;
+  if (!HAUNT && LEVEL < 3 && cpDriver()) patch.dr = [DIR.phase, +DIR.v.toFixed(2), +(+DIR.t || 0).toFixed(1), +(+DIR.len || 1).toFixed(1)];
   if (!HAUNT && LEVEL < 2 && RM.g && cpDriver()) patch.rm = [+RM.g.position.x.toFixed(2), +RM.g.position.z.toFixed(2), +RM.g.rotation.y.toFixed(2), RM.mode === 'chase' ? 1 : 0];
   if (LEVEL === 2) { patch.tk = inv.tasks | 0; patch.rm = CP && !CP.dead && cpDriver() ? [+CP.g.position.x.toFixed(2), +CP.g.position.z.toFixed(2)] : null; }
   MP.game.presence(patch).catch(() => {});
@@ -10363,7 +10375,7 @@ updateCamera(0.016);
 kitPrecompile();
 revealAround();
 rafId = requestAnimationFrame(frame);
-Object.assign(window.__bfn, { hm: HM, ha: HA, lockMove: () => P.lockMove, isSolid, openTiles: () => allOpen.length, itemCount: () => items.filter((i) => i.alive).length, hmNextRound, hmTick, museumPlay, hauntPower, hauntModel, haunters: HAUNTERS, scareTick: (dt = 1 / 45) => { if (scareS) { time += dt; updateScare(dt); } renderFrame(); }, level: LEVEL, gate: () => openGate(), progress, menu: () => switchLevel(LEVEL, false), end: (ok) => active && endChallenge(active, !!ok, null), hp: () => { P.hp = 100; }, three: { scene, camera, renderer, U }, duck: () => buildDuck(1.6), time: () => time, seed, others: () => [...others.values()].map((o) => ({ name: o.name, x: +o.x.toFixed(2), z: +o.z.toFixed(2), ent: o.entId, visible: o.g.visible, bubble: !!o.bubble })) });
+Object.assign(window.__bfn, { hm: HM, ha: HA, lockMove: () => P.lockMove, cpDriver, others, isSolid, openTiles: () => allOpen.length, itemCount: () => items.filter((i) => i.alive).length, hmNextRound, hmTick, museumPlay, hauntPower, hauntModel, haunters: HAUNTERS, scareTick: (dt = 1 / 45) => { if (scareS) { time += dt; updateScare(dt); } renderFrame(); }, level: LEVEL, gate: () => openGate(), progress, menu: () => switchLevel(LEVEL, false), end: (ok) => active && endChallenge(active, !!ok, null), hp: () => { P.hp = 100; }, three: { scene, camera, renderer, U }, duck: () => buildDuck(1.6), time: () => time, seed, others: () => [...others.values()].map((o) => ({ name: o.name, x: +o.x.toFixed(2), z: +o.z.toFixed(2), ent: o.entId, visible: o.g.visible, bubble: !!o.bubble })) });
 
 // Leaving this level: stop the loop and every listener, free the GPU, and put the menu back.
 teardown = () => {
