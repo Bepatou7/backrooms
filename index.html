@@ -1487,7 +1487,7 @@ const KIND = {};
 'hound lifeguard comeplay'.split(' ').forEach((k) => { KIND[k] = 'roaming'; });
 'stillman grinner moth exhaust tide balloon ring'.split(' ').forEach((k) => { KIND[k] = 'time'; });
 const KIND_INFO = { ritual: { name: 'Ritual', cls: 'k-ritual', what: 'You call this one' }, roaming: { name: 'Roaming', cls: 'k-roam', what: 'Always out there' }, time: { name: 'Time-based', cls: 'k-time', what: 'Comes to you when Dread fills' } };
-const KIND_TXT = { stillman: 'Nothing. When Dread fills, it is simply standing behind you.', grinner: 'Nothing. When Dread fills, the lights go and something smiles.', moth: 'Nothing. When Dread fills, something big comes for your flashlight.', exhaust: 'Nothing. When Dread fills, the garage starts to fill with smog.', tide: 'Nothing. When Dread fills, the water starts to rise.', balloon: 'Nothing. When Dread fills, a shape at the far end lifts a handful of strings.', ring: 'Nothing. When Dread fills, paper starts rustling all around you.', hound: 'Nothing. It is already walking around. Sprinting makes it hear you.', lifeguard: 'Nothing. It is already patrolling the Poolrooms. Do not run.' };
+const KIND_TXT = { stillman: 'Nothing. When Dread fills, it is simply standing behind you.', grinner: 'Nothing. When Dread fills, the lights go and something smiles.', moth: 'Nothing. When Dread fills, something big comes for your flashlight.', exhaust: 'Nothing. When Dread fills, the garage starts to fill with smog.', tide: 'Nothing. When Dread fills, the water starts to rise.', balloon: 'Nothing. When Dread fills, a shape at the far end lifts a handful of strings.', ring: 'Nothing. When Dread fills, paper starts rustling all around you.', hound: 'Nothing. It is already walking around. Sprinting makes it hear you, and a full Dread meter sends it after you.', lifeguard: 'Nothing. It is already patrolling the Poolrooms. Do not run. A full Dread meter sends it after you.' };
 const NOTE_TXT = { stillman: "When it goes quiet and then the lights start humming louder, turn around. There was a man standing behind me the first time.\n\nHe doesn't move while you look at him. He moves when you blink. Keep looking, and he gives up.", grinner: "When the dread builds and the lights die, something starts smiling at you.\n\nDo NOT shine your light on it. Don't run either. Walk back out to where the lights work.", hound: "There's a dog-shaped hole in the picture walking these halls. It's always out there. It can't see, but sprinting is loud.\n\nIf it hears you, crouch [C], keep it slow, keep it quiet. After half a minute it forgets about you.", moth: "It goes quiet, then something with wings like car doors comes for your flashlight.\n\nThere's always a bug zapper nearby. Lead it in with your beam.", exhaust: "Sometimes the garage just fills with smog. You'll feel it coming.\n\nRun between the green vents to breathe. Crouch; the smoke rises.", lifeguard: "The Lifeguard walks the Poolrooms. It is always there. The NO RUNNING signs mean it.\n\nIf it catches you running, it climbs its chair. Get its whistle without crossing the searchlight. Walls block it.", tide: "The fountain water rises on its own when it feels like it. You'll feel it dragging at your feet first.\n\nWaves roll out from it. Stand on the raised tiles when they pass. Sometimes there's a gap in the wave, and you can see the lane it's going to leave.", balloon: "Sooner or later a man comes selling balloons. They have faces on the back.\n\nHe sends more and more. Pop them: look right at them and press E. Ten seemed to be enough for him.", ring: "When it goes quiet here, listen for paper. They hold hands and come in slowly.\n\nThere's one gap, and it moves. The dolls will shove you back if you go anywhere else. Watch for the green." };
 const FLASH_NONE = new Set('knock tide drain exhaust snack mimic echo wow hopscotch attendant swing floatie'.split(' '));
 const FLASH_TXT = { moth: 'It loves the light. Use your beam to lead it instead.' };
@@ -3707,10 +3707,9 @@ function dirTick(dt) {
   if (HAUNT) return;
   if (!cpDriver()) { if (DIR.net) { DIR.phase = DIR.net[0]; DIR.v = DIR.net[1]; } return; }
   if (TUT.on) { DIR.phase = 'quiet'; DIR.v = 0; return; }
-  if (active || scareS) { DIR.phase = 'encounter'; DIR.v = 1; DIR.busy = true; DIR.waitDark = false; return; }
+  if (active || scareS || RM.mode === 'chase') { DIR.phase = 'encounter'; DIR.v = 1; DIR.busy = true; DIR.waitDark = false; return; }
   if (DIR.busy) { DIR.busy = false; DIR.phase = 'breather'; DIR.t = rand(28, 42) * uiDiff().dir; DIR.len = DIR.t; }
   const pend = dirNext();
-  if (!pend) { DIR.phase = DIR.phase === 'breather' && DIR.t > 0 ? 'breather' : 'quiet'; DIR.t -= dt; DIR.v = Math.max(0, DIR.v - dt * 0.08); return; }
   DIR.t -= dt;
   if (DIR.phase === 'quiet') {
     DIR.v = Math.min(0.35, DIR.v + (dt * 0.35) / Math.max(DIR.len, 1));
@@ -3721,6 +3720,14 @@ function dirTick(dt) {
     if (DIR.t <= 0) {
       DIR.warned = false; let ok = false;
       for (const e of dirList()) { if (startChallenge(e.id)) { ok = true; break; } }
+      // nothing left that turns up on its own: whatever is roaming comes for you instead
+      if (!ok && !pend) {
+        const sent = dirSendRoaming();
+        if (active || RM.mode === 'chase') return;
+        if (!sent) uiCap(['It passes. Whatever it was, it went somewhere else.', 'It passes. The air clears, a little.', 'It passes. The music goes back to normal.'][LEVEL]);
+        DIR.phase = 'breather'; DIR.t = DIR.len = rand(28, 42) * uiDiff().dir;
+        return;
+      }
       DIR.waitDark = !ok && pend.id === 'grinner';
       if (!ok) { DIR.t = 3; if (DIR.waitDark && !DIR.toldDark) { DIR.toldDark = true; uiCap('Something is waiting for you in the dark.'); } }
     }
@@ -3729,6 +3736,21 @@ function dirTick(dt) {
     DIR.v = Math.max(0, DIR.v - dt * 0.12);
     if (DIR.t <= 0) { DIR.t = DIR.len = rand(30, 48) * uiDiff().dir; }
   }
+}
+function dirSendRoaming() {
+  if (LEVEL === 2) {
+    if (!CP || CP.dead) return false;
+    CP.goal = { x: P.x, z: P.z }; CP.mode = 'stalk'; CP.lost = 20; CP.cd = 0;
+    uiCap('Somewhere, a tune starts up. It is coming your way.');
+    return true;
+  }
+  if (!RM.g || RM.off || (RM.side && tileX(P.x) <= RM.side)) return false;
+  if (status[RM.id] < 3) { if (!startChallenge(RM.id)) return false; RM.cd = 30; return true; }
+  const on = (t) => !RM.side || t % W > RM.side, s = findSpot({ minD: 14, maxD: 20, avoidLOS: true, filter: on }) || findSpot({ minD: 12, maxD: 24, filter: on });
+  if (s) { RM.g.position.set(s.x, 0, s.z); RM.px = s.x; RM.pz = s.z; }
+  RM.mode = 'chase'; RM.t = 14; RM.lost = -8;
+  toast(`${ENT[RM.id].name} has picked up your trail. Keep moving.`, 'bad', 4);
+  return true;
 }
 function rmInit() {
   if (RM.g || RM.off) return;
