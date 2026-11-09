@@ -685,7 +685,68 @@ body.touch .tool,body.touch .tool-sep{display:none}
 .ac-nudge{display:block;margin:0 0 10px;padding:8px 12px;min-height:44px;background:rgba(11,10,7,.78);border:1px solid #6b6450;border-radius:4px;color:#e8e2ce;font:inherit;font-size:15px;text-align:left;cursor:pointer}
 .ac-nudge b{color:var(--sodium)}.ac-nudge:hover{border-color:var(--sodium)}
 .ac-nudge[hidden]{display:none}
-
+#jbarF,#bFilters,.ls-panel .ls-cats{display:none}
+/* cards: one material per rarity, an arched art window, and an inner frame line */
+.cr-common{--bg:#e9e0c5;--ink:#2a2418;--sub:#5f553d;--edge:#b3a680;--in:rgba(42,36,24,.32);--win:#d8cca7;--ic:#3a3020;--gem:#7a6c4c;--c:#e9e0c5}
+.cr-rare{--bg:#0f2340;--ink:#e8f1ff;--sub:#a9c4e6;--edge:#5aa8ff;--in:rgba(140,200,255,.32);--win:#173761;--ic:#a6d4ff;--gem:#7cc0ff;--c:#7cc0ff;--gl:rgba(120,190,255,.8)}
+.cr-legendary{--bg:#17110a;--ink:#f7e8c4;--sub:#d3b77c;--edge:#e8b34b;--in:rgba(232,179,75,.6);--win:#271c0b;--ic:#ffd36a;--gem:#ffcc55;--c:#ffcc55;--gl:rgba(255,200,90,.85)}
+.cr-godly{--bg:#130d1c;--ink:#fff1f7;--sub:#dcc3ea;--edge:#ff7ac6;--in:rgba(255,255,255,.3);--win:#1e1530;--ic:#fff;--gem:#ff8fd0;--c:#ff8fd0;--gl:rgba(255,120,200,.95)}
+.cr-entity{--bg:#0a110a;--ink:#e2ffd6;--sub:#9fd08a;--edge:#8cff5a;--in:rgba(140,255,90,.32);--win:#0f1f0f;--ic:#b6ff8a;--gem:#8cff5a;--c:#8cff5a}
+.ucard{position:relative;box-sizing:border-box;width:216px;min-height:330px;padding:14px 14px 12px;border-radius:14px;display:flex;flex-direction:column;gap:8px;background:var(--bg);color:var(--ink);border:2px solid var(--edge);font-family:Barlow,system-ui,sans-serif;text-align:center}
+.ucard::before{content:"";position:absolute;inset:6px;border:1px solid var(--in);border-radius:9px;pointer-events:none}
+.ucard.cr-common{border-width:1px}
+.ucard.cr-rare{box-shadow:0 0 22px rgba(90,168,255,.22)}
+.ucard.cr-legendary{box-shadow:0 0 30px rgba(232,179,75,.3)}
+.ucard.cr-entity{box-shadow:0 0 24px rgba(140,255,90,.2)}
+.ucard.cr-godly{border:3px solid transparent;background:linear-gradient(var(--bg),var(--bg)) padding-box,conic-gradient(from 210deg,#ff7ac6,#7af0ff,#fff27a,#b48cff,#ff7ac6) border-box;box-shadow:0 0 38px rgba(255,122,198,.4)}
+.uc-top{position:relative;display:flex;justify-content:space-between;align-items:center}
+.uc-no{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;color:var(--sub)}
+.uc-gems{display:flex;gap:4px}.uc-gems i{display:block;width:7px;height:7px;transform:rotate(45deg);box-sizing:border-box;border:1px solid var(--in)}.uc-gems i.on{background:var(--gem);border-color:var(--gem)}
+.uc-win{position:relative;height:118px;border-radius:999px 999px 8px 8px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--win)}
+.uc-win svg{width:68px;height:68px;fill:none;stroke:var(--ic);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px var(--gl,transparent))}
+.uc-win img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) sepia(1) hue-rotate(52deg) saturate(2.4) contrast(1.12) brightness(.92)}
+.cr-entity .uc-win::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,transparent 0 2px,rgba(0,0,0,.32) 2px 3px)}
+.uc-name{position:relative;margin-top:2px;font-family:var(--f-osd);font-weight:600;font-size:24px;line-height:1;letter-spacing:.03em;text-transform:uppercase}
+.uc-rule{display:block;height:1px;margin:0 24px;background:var(--in)}
+.uc-text{position:relative;font-size:14px;line-height:1.38;font-weight:500}
+.cr-entity .uc-text{color:#c4ff9a}
+.uc-bad{position:relative;margin-top:-4px;font-size:14px;line-height:1.38;font-weight:500;color:#ff8f80}
+.uc-foot{position:relative;margin-top:auto;font-family:var(--f-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--sub)}
+.uc-count{position:absolute;right:10px;bottom:30px;font-family:var(--f-mono);font-size:11px;padding:1px 6px;border-radius:3px;background:var(--sub);color:var(--bg)}
+.uc-on{position:absolute;left:50%;top:-10px;transform:translateX(-50%);font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:3px;background:#f1ead6;color:#0b0a07;white-space:nowrap}
+.ucard.sm{width:auto;min-height:268px;padding:11px 11px 10px;gap:6px;border-radius:12px}.ucard.sm::before{inset:5px;border-radius:8px}
+.ucard.sm .uc-win{height:84px}.ucard.sm .uc-win svg{width:46px;height:46px}.ucard.sm .uc-name{font-size:19px}.ucard.sm .uc-text,.ucard.sm .uc-bad{font-size:12.5px}.ucard.sm .uc-no{font-size:10px}.ucard.sm .uc-foot{font-size:9px}
+.ucbtn{display:block;width:100%;padding:0;margin:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;border-radius:12px}
+.ucbtn:hover .ucard{transform:translateY(-3px)}.ucbtn .ucard{transition:transform .15s}
+.ucbtn:focus-visible{outline:2px solid #f1ead6;outline-offset:3px}
+.ucbtn[aria-pressed="true"] .ucard{outline:2px solid #f1ead6;outline-offset:3px}
+.ucards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;margin:10px 0 18px}
+.uc-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:8px 0 6px}
+.uc-slot{min-height:268px;box-sizing:border-box;border:1px dashed #5c5644;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8a8270}
+.uc-slot svg{width:22px;height:22px;fill:none;stroke:#8a8270;stroke-width:1.5;stroke-linecap:round}
+.uc-back{min-height:268px;box-sizing:border-box;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:repeating-linear-gradient(135deg,#15130e 0 6px,#1b1812 6px 12px);border:1px solid color-mix(in srgb,var(--edge) 45%,#15130e)}
+.uc-back b{font-family:var(--f-osd);font-size:44px;line-height:1;color:var(--edge)}.uc-back span{font-family:var(--f-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#8a8270}
+.uc-head{display:flex;align-items:baseline;gap:12px;margin-top:6px}.uc-head .shop-h{margin:0}.uc-head span{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--osd-dim)}
+.uc-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.uc-tab{min-height:36px;padding:0 14px;border-radius:999px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:transparent;color:#d8d1bc;border:1px solid #5c5644}
+.uc-tab.on{background:#f1ead6;color:#0b0a07;border-color:#f1ead6}
+.shop-h{font-family:var(--f-osd);font-weight:600;font-size:24px;margin:20px 0 2px;color:#f1ead6}
+.shop-note{color:var(--osd-dim);font-size:15px;line-height:1.45;margin:4px 0 10px}.shop-note.good{color:#9fe0a8}.shop-note:empty{display:none}
+#shopOv .shop-panel{max-height:88vh;overflow:auto;box-sizing:border-box;width:min(1040px,94vw)}
+/* the cards you have on, top right */
+#cardBox{position:fixed;right:max(24px,env(safe-area-inset-right,0px));top:calc(24px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:5px;padding:9px 12px;background:var(--panel);border-radius:4px;z-index:5}
+#cardBox[hidden],#cardPop[hidden]{display:none}
+#cardBox .cb-l{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--osd-dim);margin-right:5px}
+#cardBox i{display:block;width:12px;height:18px;border-radius:3px;background:var(--bg);border:1.5px solid var(--edge);box-sizing:border-box}
+#cardBox i.cb-empty{background:none;border:1px dashed #5c5644}
+#cardPop{position:fixed;right:max(24px,env(safe-area-inset-right,0px));top:calc(80px + env(safe-area-inset-top,0px));z-index:30;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
+#cardPop .cp-h{font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--osd-dim);background:var(--panel);padding:4px 8px;border-radius:3px}
+#cardPop.show .ucard{animation:cpIn .5s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes cpIn{from{opacity:0;transform:translateY(-14px) rotate(-4deg) scale(.86)}to{opacity:1;transform:none}}
+body.in-tut #cardBox{display:none}
+@media (prefers-reduced-motion:reduce){#cardPop.show .ucard{animation:none}.ucbtn .ucard{transition:none}}
+@media (max-width:760px){.uc-slots{grid-template-columns:repeat(3,minmax(0,1fr))}.ucards{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px}}
+@media (max-width:700px){#cardPop{top:calc(60px + env(safe-area-inset-top,0px))}#cardPop .ucard{width:176px;min-height:0;padding:10px;gap:6px}#cardPop .uc-win{height:72px}#cardPop .uc-win svg{width:44px;height:44px}#cardPop .uc-name{font-size:19px}#cardPop .uc-text,#cardPop .uc-bad{font-size:12.5px}#cardBox{right:12px;top:calc(12px + env(safe-area-inset-top,0px));padding:6px 9px}}
 </style>
 
 <canvas id="c" tabindex="-1" aria-label="Level 0, first-person view"></canvas>
@@ -695,7 +756,6 @@ body.touch .tool,body.touch .tool-sep{display:none}
 <div id="fx-track"></div>
 <div class="fx" id="hurt"></div>
 <div class="fx" id="flash"></div>
-<div class="fx" id="dreadEdge"></div>
 <div class="fx" id="scare" hidden></div>
 <div class="fx" id="blink"><div class="lid top"></div><div class="lid bot"></div></div>
 
@@ -708,8 +768,9 @@ body.touch .tool,body.touch .tool-sep{display:none}
     <span id="saveTag"></span>
   </div>
   <div id="goal"><div class="g-l">YOUR GOAL</div><div class="g-h" id="gHead"></div><div class="g-r"><div class="g-b"><i id="gBar"></i></div><span id="gCnt"></span></div><div class="g-n" id="gNext"></div></div>
-  <div id="dreadBox"><div class="d-t"><span class="d-l">DREAD</span><span class="d-p" id="dName">Quiet</span></div><div class="d-b"><i id="dBar"></i></div></div>
   <div id="rmAlert" hidden></div>
+  <div id="cardBox" hidden></div>
+  <div id="cardPop" hidden aria-live="polite"></div>
   <div id="intro" hidden></div>
   <div id="result" hidden></div>
   <div id="tut" hidden><div id="tutSteps"></div><div id="tutCard"><div id="tutKey"></div><div><h3 id="tutH"></h3><p id="tutP"></p></div></div><div id="tutSkip">Press K to skip the tutorial</div></div>
@@ -745,7 +806,7 @@ body.touch .tool,body.touch .tool-sep{display:none}
     <button class="slot" id="s3" data-slot="3"><span class="k">3</span><span id="s3t">HAT</span></button>
     <button class="slot" id="s4" data-slot="4"><span class="k">4</span><span id="s4t">DUCK</span></button>
   </div>
-  <div class="osd" id="coins">¢0</div>
+  <div class="osd" id="coins">0 tokens</div>
 </div>
 
 <div id="codepad" hidden aria-label="Code keypad">
@@ -775,7 +836,7 @@ body.touch .tool,body.touch .tool-sep{display:none}
     <button class="tab" data-tab="mp" role="tab" aria-selected="false">With friends</button>
     <button class="tab" data-tab="museum" role="tab" aria-selected="false">Scare museum</button>
     <button class="tab" data-tab="runs" role="tab" aria-selected="false">Records</button>
-    <button class="tab" data-tab="ups" role="tab" aria-selected="false">Upgrades</button>
+    <button class="tab" data-tab="ups" role="tab" aria-selected="false">Cards</button>
     <button class="tab" data-tab="acct" role="tab" aria-selected="false">Account</button>
     <button class="tab" data-tab="keys" role="tab" aria-selected="false">Settings</button>
   </nav>
@@ -806,7 +867,7 @@ body.touch .tool,body.touch .tool-sep{display:none}
   </div>
   <div class="pane" id="pane-mp" role="tabpanel" hidden><h2 class="pane-h">With friends</h2><div class="mode-bar" role="group" aria-label="Multiplayer mode"><button class="mode on" type="button" data-mode="story" aria-pressed="true"><b>Story Mode</b><i>Play the levels together</i></button><button class="mode" type="button" data-mode="vs" aria-pressed="false"><b>VS Mode</b><i>One of you is the entity. First to 3 wins.</i></button></div><div id="mpBox"></div><div id="hauntBox" hidden></div></div>
   <div class="pane" id="pane-museum" role="tabpanel" hidden><h2 class="pane-h">Scare museum</h2><p class="panep">Every jumpscare you have met, on request, with the sound on. Meet an entity to unlock its exhibit.</p><div id="museumBox" class="bestiary"></div></div>
-  <div class="pane" id="pane-ups" role="tabpanel" hidden><h2 class="pane-h">Upgrades</h2><div id="upsBox"></div></div>
+  <div class="pane" id="pane-ups" role="tabpanel" hidden><h2 class="pane-h">Cards</h2><div id="upsBox"></div></div>
   <div class="pane" id="pane-acct" role="tabpanel" hidden><h2 class="pane-h">Account</h2><div id="acct" class="acct" data-mode="loading" aria-live="polite"><span class="dim">Checking your account…</span></div><div id="acctBox"></div></div>
   <div class="pane" id="pane-keys" role="tabpanel" hidden>
     <h2 class="pane-h">Settings</h2>
@@ -838,7 +899,7 @@ body.touch .tool,body.touch .tool-sep{display:none}
     <div class="row-btns">
       <button class="btn" id="resumeBtn">Resume</button>
       <button class="ghost" id="pauseJournal">Journal</button>
-      <button class="ghost" id="pauseUps" type="button">Upgrades</button>
+      <button class="ghost" id="pauseUps" type="button">Cards</button>
       <button class="ghost" id="quitBtn">Quit to main menu</button>
     </div>
     <div id="setHome"><div id="setRows">
@@ -866,7 +927,7 @@ body.touch .tool,body.touch .tool-sep{display:none}
 </section>
 
 <section class="overlay" id="shopOv" hidden>
-  <div class="panel"><h2>Upgrades</h2><div id="shopBody"></div><div class="row-btns"><button class="btn" id="shopClose" type="button">Done</button></div></div>
+  <div class="panel shop-panel"><h2>Cards</h2><div id="shopBody"></div><div class="row-btns"><button class="btn" id="shopClose" type="button">Done</button></div></div>
 </section>
 
 <section class="overlay lvlsel" id="levelSel" hidden>
@@ -894,7 +955,7 @@ body.touch .tool,body.touch .tool-sep{display:none}
         <h4>Notes found · <span id="jnotes"></span></h4>
         <div class="notes-list" id="notesList"></div>
         <h4>Tips</h4>
-        <p class="small">Ritual entities only come if you call them, and the notes give you clues. Roaming ones are always out there. Time-based ones come when the Dread meter fills. If something catches you, you lose health and carry on. Your Journal and items stay with you.</p>
+        <p class="small">Every entity comes only when you call it with its ritual, and the notes give you clues. The one exception is Come-Play on Level 2, which is always out there. If something catches you, you lose health and carry on. Your Journal and items stay with you.</p>
       </div>
     </div>
     <div class="page">
@@ -1190,13 +1251,14 @@ const LOCAL_RUN = 'bfn-run';
 const readLocalRun = () => { try { return JSON.parse(localStorage.getItem(LOCAL_RUN) || 'null'); } catch (e) { return null; } };
 const writeLocalRun = (r) => { try { if (r) localStorage.setItem(LOCAL_RUN, JSON.stringify(r)); else localStorage.removeItem(LOCAL_RUN); } catch (e) {} };
 const acctChanged = () => ACCT.listeners.forEach((f) => { try { f(); } catch (e) {} });
-const progressDoc = () => JSON.parse(JSON.stringify({ level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {} }));
+const progressDoc = () => JSON.parse(JSON.stringify({ level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {}, cards: progress.cards || {}, equip: progress.equip || [] }));
 const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej({ code: 'timeout' }), ms))]);
 function mergeProgress(p) {
   if (!p) return;
   if (p.level1) progress.level1 = true;
   if (typeof p.cash === 'number' && p.cash > (progress.cash | 0)) progress.cash = p.cash;
-  if (p.ups && typeof p.ups === 'object') { if (!progress.ups) progress.ups = {}; for (const [k, v] of Object.entries(p.ups)) if (typeof v === 'number' && (progress.ups[k] | 0) < v) progress.ups[k] = v; }
+  if (p.cards && typeof p.cards === 'object') { if (!progress.cards || typeof progress.cards !== 'object' || Array.isArray(progress.cards)) progress.cards = {}; for (const [k, v] of Object.entries(p.cards)) if (okKey(k) && typeof v === 'number' && (progress.cards[k] | 0) < v) progress.cards[k] = Math.min(9999, v | 0); }
+  if (Array.isArray(p.equip) && !(Array.isArray(progress.equip) && progress.equip.length)) progress.equip = p.equip.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 5);
   for (const [k, v] of Object.entries(p.seen || {})) if (typeof v === 'number' && (progress.seen[k] || 0) < v) progress.seen[k] = v;
   const have = new Set(progress.runs.map((r) => r.at));
   for (const r of Array.isArray(p.runs) ? p.runs : []) if (r && typeof r.t === 'number' && !have.has(r.at)) { progress.runs.push(r); have.add(r.at); }
@@ -1512,7 +1574,7 @@ const KIND = {};
 'confetti knock echo snack manager quackers mimic attendant copycat valet floatie drain hopscotch lurker undertow sun moon clown swing wow'.split(' ').forEach((k) => { KIND[k] = 'ritual'; });
 'hound lifeguard comeplay'.split(' ').forEach((k) => { KIND[k] = 'roaming'; });
 'stillman grinner moth exhaust tide balloon ring'.split(' ').forEach((k) => { KIND[k] = 'time'; });
-const KIND_INFO = { ritual: { name: 'Ritual', cls: 'k-ritual', what: 'You call this one' }, roaming: { name: 'Roaming', cls: 'k-roam', what: 'Always out there' }, time: { name: 'Time-based', cls: 'k-time', what: 'Comes to you when Dread fills' } };
+const KIND_INFO = { ritual: { name: 'Ritual', cls: 'k-ritual', what: 'You call this one' }, roaming: { name: 'Roaming', cls: 'k-roam', what: 'Always out there' }, time: { name: 'Time-based', cls: 'k-time', what: 'Turns up after a while' } };
 const KIND_TXT = { stillman: 'Nothing. When Dread fills, it is simply standing behind you.', grinner: 'Nothing. When Dread fills, the lights go and something smiles.', moth: 'Nothing. When Dread fills, something big comes for your flashlight.', exhaust: 'Nothing. When Dread fills, the garage starts to fill with smog.', tide: 'Nothing. When Dread fills, the water starts to rise.', balloon: 'Nothing. When Dread fills, a shape at the far end lifts a handful of strings.', ring: 'Nothing. When Dread fills, paper starts rustling all around you.', hound: 'Nothing. It is already walking around. Sprinting makes it hear you, and a full Dread meter sends it after you.', lifeguard: 'Nothing. It is already patrolling the Poolrooms. Do not run. A full Dread meter sends it after you.' };
 const NOTE_TXT = { stillman: "When it goes quiet and then the lights start humming louder, turn around. There was a man standing behind me the first time.\n\nHe doesn't move while you look at him. He moves when you blink. Keep looking, and he gives up.", grinner: "When the dread builds and the lights die, something starts smiling at you.\n\nDo NOT shine your light on it. Don't run either. Walk back out to where the lights work.", hound: "There's a dog-shaped hole in the picture walking these halls. It's always out there. It can't see, but sprinting is loud.\n\nIf it hears you, crouch [C], keep it slow, keep it quiet. After half a minute it forgets about you.", moth: "It goes quiet, then something with wings like car doors comes for your flashlight.\n\nThere's always a bug zapper nearby. Lead it in with your beam.", exhaust: "Sometimes the garage just fills with smog. You'll feel it coming.\n\nRun between the green vents to breathe. Crouch; the smoke rises.", lifeguard: "The Lifeguard walks the Poolrooms. It is always there. The NO RUNNING signs mean it.\n\nIf it catches you running, it climbs its chair. Get its whistle without crossing the searchlight. Walls block it.", tide: "The fountain water rises on its own when it feels like it. You'll feel it dragging at your feet first.\n\nWaves roll out from it. Stand on the raised tiles when they pass. Sometimes there's a gap in the wave, and you can see the lane it's going to leave.", balloon: "Sooner or later a man comes selling balloons. They have faces on the back.\n\nHe sends more and more. Pop them: look right at them and press E. Ten seemed to be enough for him.", ring: "When it goes quiet here, listen for paper. They hold hands and come in slowly.\n\nThere's one gap, and it moves. The dolls will shove you back if you go anywhere else. Watch for the green." };
 const FLASH_NONE = new Set('knock tide drain exhaust snack mimic echo wow hopscotch attendant swing floatie'.split(' '));
@@ -1528,7 +1590,7 @@ const FIGHT_TXT = {
   grinner: 'It will not come while your light is on. Turn it off and let it come. When the teeth go red, light it up [F] or flash it [Q]. Dashing through it counts too. Three times.',
   hound: 'It is blind and hunts by sound. Creep [C] to the three radios and shut them off [hold E]. Each click brings it running. Shout [V] to pull it to you, then creep away.',
   confetti: 'Keep dancing while the music plays. When it stops, get on a mat fast and freeze, without even turning your head. Fewer mats every song. Five songs.',
-  knock: 'Listen for which door knocks. Go to it and copy the rhythm exactly with [E]. More doors each round. When the last one opens on nobody, turn round.',
+  knock: 'The door that knocks jumps and lights up red. Go to it and copy the rhythm exactly with [E]. More doors each round. When the last one opens on nobody, turn round.',
   echo: 'Tag the real one with [E]. It runs away twice. Shout [V] and it answers, but that costs time. The copies answer late, and holding your light on one burns it away.',
   snack: 'Dodge the cans until it runs out of stock. Hide too long and it charges: make it hit a wall. While it is stunned, run in and shake it [E] to empty it faster.',
   manager: 'Run. Follow the arrow to the time clocks and clock out [hold E]. Only then does the EXIT unlock. Save stamina for the long halls. Flash [Q] buys you a moment.',
@@ -1557,7 +1619,7 @@ Object.assign(NOTE_TXT, {
   grinner: "It stays in the dark sectors and it stays away from your light.\n\nThat's the trick. Turn your light off and let it come. When the teeth go red, turn it back on, right in its face. Three times. Don't let your nerve go first.",
   hound: "Three radios, and something walking between them. It can't see. It can hear a pin drop.\n\nCrouch. Shut the radios off. It'll come running at the click, so don't stand there admiring your work.",
   confetti: "Put the hat on and you're at the party. Dance when there's music.\n\nWhen it stops get on a mat, quick, and freeze. There are fewer mats every song. He counts.",
-  knock: "Knock on three doors and something knocks back. More than one door, if you stay.\n\nListen for which one it is, go to it, and knock back the same way. When it opens on nobody, you are not finished.",
+  knock: "Knock on three doors and something knocks back. More than one door, if you stay.\n\nWhichever one is knocking jumps and lights up red. Go to it, and knock back the same way. When it opens on nobody, you are not finished.",
   manager: "Ring the bell when you've documented the rest. He'll see you now.\n\nThe EXIT won't open until you've clocked out. There are two time clocks. Follow the arrow, and don't stop to read this again.",
   attendant: "Press the intercom and it comes out for your ticket.\n\nIt doesn't want numbers typed in. Watch which pay meters light up and in what order, then go and pay them in that order. It follows you while you do it.",
   exhaust: "Honk three times and the air goes bad. Green vents will let you breathe.\n\nWhen the floor goes orange in a strip, a tailpipe is about to blast along it. Don't be standing there.",
@@ -1573,6 +1635,19 @@ Object.assign(NOTE_TXT, {
   balloon: "Pop three at the party table and he comes. He has one for you.\n\nPop them. When his bunch is gone, he's still got a head full of air. Let him come close.",
   ring: "Three circles round the maypole and they hold hands round you.\n\nThe gap's the only way out. Keep moving, they close faster on anyone standing still. They don't like a bright flash.",
   swing: "Push the empty swing and something pushes back. Stay on the mark and push when it reaches you.\n\nIf it glows red, get out of the way. That's not an invitation.",
+});
+// every entity is called by its ritual again: the notes say how
+['stillman', 'grinner', 'hound', 'moth', 'exhaust', 'tide', 'balloon', 'ring', 'lifeguard'].forEach((k) => { KIND[k] = 'ritual'; delete KIND_TXT[k]; });
+Object.assign(NOTE_TXT, {
+  stillman: "Never walk backwards for long. I did it for maybe twelve seconds, watching a hallway, and when I turned around there was a man standing behind me.\n\nHe only moves when you can't see him. There were lamps down there that still worked. Back away with your eyes on him and switch them on.",
+  grinner: "The dark sectors. Turn your flashlight OFF and stand still for a bit. Something starts smiling at you.\n\nLet it come. When the teeth go red, light it up, right in its face. Three times. Don't let your nerve go first.",
+  hound: "Sprinting is loud. Run flat out for ten seconds and the Static Hound hears it.\n\nIt can't see. Crouch, keep it slow, and shut off the radios it listens to. It comes running at every click.",
+  moth: "Pointed my flashlight at the ceiling looking for a vent. Held it there too long.\n\nSomething with wings like car doors came for the light. There's always a bug zapper nearby. Lead it in with your beam, and when it dives, have the beam on the zapper.",
+  exhaust: "DO NOT honk the car horns. Three honks and the garage fills with smog.\n\nRun between the green vents to breathe. Crouch; the smoke rises. When the floor goes orange in a strip, get off it.",
+  lifeguard: "There are NO RUNNING signs in the Poolrooms. They mean it.\n\nRun past one and the Lifeguard climbs its chair. Get its whistle without crossing the searchlight, then run back. It comes after you, chair and all.",
+  tide: "Threw a token in the fountain and made a wish. The water made one too.\n\nWaves roll out from it. Stand on the raised tiles when they pass, or in the lane it leaves open. Later it throws water at you, so be ready to step off and back on.",
+  balloon: "The balloons on the party table have faces on the back. If you pop three, the man who sells them comes to see why.\n\nPop his, all of them. Then his own head is the last one left. Let him get close.",
+  ring: "Walked round the maypole a few times, for something to do. That was a mistake.\n\nThey hold hands and come in slowly. There's one gap, and it moves. Keep moving. A bright flash makes them let go a little.",
 });
 
 /* ---------- accounts that need no sign-in ----------
@@ -1605,7 +1680,7 @@ function profStash(id) {
   try { const s = JSON.parse(localStorage.getItem('bfn-acct-' + id) || 'null'); return s && typeof s === 'object' ? { p: cleanProgress(s.p), r: cleanRun(s.r) } : { p: cleanProgress(null), r: null }; } catch (e) { return { p: cleanProgress(null), r: null }; }
 }
 function profBlank() {
-  progress.seen = {}; progress.runs = []; progress.lastRun = 0; progress.cash = 0; progress.ups = {};
+  progress.seen = {}; progress.runs = []; progress.lastRun = 0; progress.cash = 0; progress.ups = {}; progress.cards = {}; progress.equip = [];
 }
 // put whatever is loaded away under its own name, and fetch someone else's. Only call this with the game torn down
 function profSwap(id) {
@@ -1660,12 +1735,14 @@ const okKey = (k) => /^[a-z][a-z0-9_]{0,23}$/i.test(k) && k !== 'constructor' &&
 const okNum = (v, a, b, d = 0) => (typeof v === 'number' && isFinite(v) ? clamp(v, a, b) : d);
 // a code can come from anywhere, so only the fields and shapes this game writes get through
 function cleanProgress(p) {
-  const out = { level1: true, seen: {}, runs: [], lastRun: 0, cash: 0, ups: {} };
+  const out = { level1: true, seen: {}, runs: [], lastRun: 0, cash: 0, ups: {}, cards: {}, equip: [] };
   if (!p || typeof p !== 'object') return out;
   if (p.seen && typeof p.seen === 'object') for (const [k, v] of Object.entries(p.seen)) if (okKey(k) && typeof v === 'number') out.seen[k] = clamp(v | 0, 0, 3);
   if (Array.isArray(p.runs)) for (const r of p.runs.slice(-80)) { if (!r || typeof r !== 'object' || typeof r.t !== 'number' || !isFinite(r.t) || !(r.lv === 0 || r.lv === 1 || r.lv === 2)) continue; out.runs.push({ lv: r.lv, t: clamp(r.t, 0, 1e7), d: okNum(r.d, 0, 1e5) | 0, at: okNum(r.at, 0, 9e15) }); }
   out.lastRun = okNum(p.lastRun, 0, 9e15); out.cash = okNum(p.cash, 0, 1e6) | 0;
   if (p.ups && typeof p.ups === 'object') for (const [k, v] of Object.entries(p.ups)) if (okKey(k) && typeof v === 'number') out.ups[k] = clamp(v | 0, 0, 10);
+  if (p.cards && typeof p.cards === 'object') for (const [k, v] of Object.entries(p.cards)) if (okKey(k) && typeof v === 'number' && v >= 1) out.cards[k] = clamp(v | 0, 1, 9999);
+  if (Array.isArray(p.equip)) out.equip = p.equip.filter((k) => typeof k === 'string' && okKey(k) && out.cards[k]).slice(0, 5);
   return out;
 }
 function cleanRun(r) {
@@ -1674,12 +1751,14 @@ function cleanRun(r) {
   const finite = (v) => typeof v === 'number' && isFinite(v);
   const out = {
     v: 1, active: true, savedAt: okNum(r.savedAt, 0, 9e15), level: r.level, seed: okNum(r.seed, 0, 2 ** 31) | 0, gateOpen: !!r.gateOpen,
-    picked: Array.isArray(r.picked) ? r.picked.filter((x) => typeof x === 'string' && /^[a-z0-9_:.-]{1,32}$/i.test(x)).slice(0, 400) : [],
+    picked: Array.isArray(r.picked) ? r.picked.filter((x) => (typeof x === 'string' && /^[a-z0-9_:.-]{1,32}$/i.test(x)) || (Number.isInteger(x) && x >= 0 && x < 1e5)).slice(0, 400) : [],
     status: map(r.status, finite), inv: map(r.inv, (v) => finite(v) || typeof v === 'boolean'),
     noteRead: Array.isArray(r.noteRead) ? r.noteRead.slice(0, 40).map((v) => !!v) : [],
     deaths: okNum(r.deaths, 0, 1e5) | 0, playTime: okNum(r.playTime, 0, 1e7), quackers: !!r.quackers, documented: okNum(r.documented, 0, 99) | 0, total: okNum(r.total, 0, 99) | 0, P: null,
   };
   for (const k of Object.keys(out.status)) out.status[k] = clamp(out.status[k] | 0, 0, 3);
+  out.lastUsed = !!r.lastUsed;
+  out.drops = Array.isArray(r.drops) ? r.drops.filter((d) => d && finite(d.x) && finite(d.z) && typeof d.c === 'string' && /^[a-z0-9_]{1,24}$/.test(d.c)).slice(0, 20).map((d) => ({ x: d.x, z: d.z, c: d.c })) : [];
   if (r.P && typeof r.P === 'object' && finite(r.P.x) && finite(r.P.z)) out.P = { x: r.P.x, z: r.P.z, yaw: okNum(r.P.yaw, -1e3, 1e3), pitch: 0, hp: okNum(r.P.hp, 1, 100, 100), bat: okNum(r.P.bat, 0, 100, 100) };
   return out;
 }
@@ -2788,6 +2867,7 @@ function setPan(p, x, y, z) { if (!p) return; if (p.positionX) { p.positionX.val
 function updateListener() {
   if (!A.ctx) return;
   const L = A.ctx.listener, c = camera.position, d = U.camDir.value;
+  if (!Number.isFinite(c.x + c.y + c.z + d.x + d.y + d.z)) return;
   if (L.positionX) { L.positionX.value = c.x; L.positionY.value = c.y; L.positionZ.value = c.z; L.forwardX.value = d.x; L.forwardY.value = d.y; L.forwardZ.value = d.z; L.upX.value = 0; L.upY.value = 1; L.upZ.value = 0; }
   else { L.setPosition(c.x, c.y, c.z); L.setOrientation(d.x, d.y, d.z, 0, 1, 0); }
 }
@@ -3928,14 +4008,14 @@ void main(){ vUv = uv; vec3 p = position; p.z += texture2D(map, uv).g * depth;
   return g;
 }
 function uiUp(id) {
-  return (progress.ups && progress.ups[id]) | 0;
+  return 0;
 }
 function uiDiff() {
   return DIFFS[settings.diff == null ? 1 : settings.diff] || DIFFS[1];
 }
 function uiDmg(n) {
   if (n >= 90) return n;
-  return n * uiDiff().dmg * (1 - uiUp('skin') * 0.1);
+  return n * uiDiff().dmg * runMul('dmg');
 }
 function uiCap(text) {
   if (settings.caps !== false) toast(text, 'say', 3.5);
@@ -3994,8 +4074,8 @@ function uiFightEnd(ch, success, msg) {
   if (id === RM.id) rmAway();
   if (success) {
     const lost = Math.max(0, (ch.hp0 == null ? P.hp : ch.hp0) - P.hp), g = lost <= 0 ? 'S' : lost < 15 ? 'A' : lost < 35 ? 'B' : 'C', rw = ch.admin ? 1 : { S: 8, A: 6, B: 4, C: 3 }[g];
-    inv.coins += rw; UI.retry = null;
-    uiCard(false, id, `You survived ${e.name}`, msg || 'It is in your Journal now.', g, `+${rw} coins · ${documented()} of ${TOTAL} found`, 4.6);
+    UI.retry = null;
+    uiCard(false, id, `You survived ${e.name}`, msg || 'It is in your Journal now.', g, `It dropped a card · ${documented()} of ${TOTAL} found`, 4.6);
   } else if (msg) {
     UI.retry = { id, until: time + 9 };
     uiCard(true, id, msg, `Tip: ${e.survive}`, '', 'Press Enter to try again now', 7);
@@ -4013,8 +4093,8 @@ function uiDash() {
   let f = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0) + touch.my, s = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0) + touch.mx;
   const m = Math.hypot(f, s); if (m < 0.2) { f = 1; s = 0; } else { f /= m; s /= m; }
   const sy = Math.sin(P.yaw), cy = Math.cos(P.yaw);
-  P.kx += (-sy * f + cy * s) * 15; P.kz += (-cy * f - sy * s) * 15;
-  P.st -= 12; P.dashT = time + 0.42; UI.dashN++; UI.dashCd = 3 - uiUp('dash') * 0.6; UI.dashAt = time + UI.dashCd;
+  const dp = 15 * runMul('dashPow'); P.kx += (-sy * f + cy * s) * dp; P.kz += (-cy * f - sy * s) * dp;
+  P.st -= 12; P.dashT = time + 0.42; UI.dashN++; UI.dashCd = 3 * runMul('dashCd'); UI.dashAt = time + UI.dashCd;
   hiss(0.22, 0.14, { type: 'bandpass', f: 900, f2: 300, q: 0.8 }); P.noise = Math.max(P.noise, 0.6);
 }
 function uiFlashTargets() {
@@ -4027,9 +4107,10 @@ function uiFlashTargets() {
 function uiFlash() {
   if (HAUNT) return hauntPower();
   if (P.hidden || time < UI.flashAt) return;
-  if (P.bat < 10) { toast('Not enough battery to flash. Swap one in [2].', 'bad', 2.5); return; }
-  P.bat -= 10; UI.flashN++; UI.flashCd = 8 - uiUp('flash') * 1.5; UI.flashAt = time + UI.flashCd;
-  const dur = 2.5 + uiUp('flash') * 0.75, f = fwdVec();
+  const fc = 10 * runMul('flashCost');
+  if (P.bat < fc) { toast('Not enough battery to flash. Swap one in [2].', 'bad', 2.5); return; }
+  P.bat -= fc; UI.flashN++; UI.flashCd = 8 * runMul('flashCd'); UI.flashAt = time + UI.flashCd;
+  const dur = 2.5 * runMul('stun'), f = fwdVec();
   sfx.click(); hiss(0.18, 0.12, { type: 'highpass', f: 2400 });
   el('flash').animate([{ opacity: settings.calm ? 0.22 : 0.72 }, { opacity: 0 }], { duration: 280 });
   let said = false;
@@ -4062,9 +4143,16 @@ function dirTick(dt) {
   if (HAUNT) return;
   const n = DIR.net, nowR = performance.now(), wasAway = nowR - (DIR.lastTick || 0) > 1500; DIR.lastTick = nowR;
   const copy = () => { DIR.phase = n[0]; DIR.v = n[1]; if (n[2] != null) { DIR.t = n[2]; DIR.len = n[3]; } };
-  if (!cpDriver()) { if (n) copy(); DIR.fresh = false; DIR.driving = false; return; }
-  // we only pick up somebody else's meter at the moment we take over. After that it is ours
-  if ((!DIR.driving || wasAway) && DIR.fresh && n) copy();
+  const recent = n && nowR - (DIR.netAt || 0) < 2500;
+  if (!cpDriver()) {
+    DIR.driving = false; DIR.fresh = false;
+    // you are in a fight of your own: show that, not somebody else's quiet
+    if (active || scareS) { DIR.phase = 'encounter'; DIR.v = 1; return; }
+    if (n) copy();
+    return;
+  }
+  // we only pick up somebody else's meter at the moment we take over, and only if it is current. After that it is ours
+  if ((!DIR.driving || wasAway) && DIR.fresh && recent) copy();
   DIR.fresh = false; DIR.driving = true;
   if (TUT.on) { DIR.phase = 'quiet'; DIR.v = 0; return; }
   if (active || scareS || RM.mode === 'chase') { DIR.phase = 'encounter'; DIR.v = 1; DIR.busy = true; DIR.waitDark = false; return; }
@@ -4124,10 +4212,23 @@ function rmInit() {
 }
 function rmAway() {
   if (!RM.g) return;
-  const a = allOpen.filter((t) => !RM.side || t % W > RM.side), best = a.filter((t) => Math.hypot(tc(t % W) - P.x, tc((t / W) | 0) - P.z) > 30), l = best.length ? best : a;
+  RM.mode = 'patrol'; RM.goal = null; RM.target = ''; RM.cd = Math.max(RM.cd, 25);
+  // only the game that runs it moves it. Everyone else snaps to wherever that game says it went
+  if (!cpDriver()) { RM.snap = true; return; }
+  const a = allOpen.filter((t) => !RM.side || t % W > RM.side), far = (t) => rmTargets().every((q) => Math.hypot(tc(t % W) - q.x, tc((t / W) | 0) - q.z) > 30), best = a.filter(far), l = best.length ? best : a;
   if (!l.length) return;
   const t = l[Math.floor(Math.random() * l.length)];
-  RM.g.position.set(tc(t % W), 0, tc((t / W) | 0)); RM.px = RM.g.position.x; RM.pz = RM.g.position.z; RM.mode = 'patrol'; RM.goal = null; RM.cd = Math.max(RM.cd, 25);
+  RM.g.position.set(tc(t % W), 0, tc((t / W) | 0)); RM.px = RM.g.position.x; RM.pz = RM.g.position.z;
+}
+function rmTargets() {
+  const out = [{ peer: '', x: P.x, z: P.z, sprint: P.sprinting, crouch: P.crouch, hidden: !!P.hidden || TUT.on, out: state !== 'playing' || !!active, name: '' }];
+  for (const o of others.values()) if (!o.first && !o.dead && performance.now() - (o.heard || 0) < 3000) out.push({ peer: o.peer, x: o.tx, z: o.tz, sprint: !!(o.flags & 8), crouch: !!(o.flags & 1), hidden: !!(o.flags & 16), out: !!o.f, name: o.name });
+  return out;
+}
+function rmFighting() {
+  if (active && active.id === RM.id) return true;
+  for (const o of others.values()) if (o.f && o.f[0] === RM.id && o.f[2] === 0) return true;
+  return false;
 }
 function rmGoal() {
   const a = allOpen.filter((t) => !RM.side || t % W > RM.side);
@@ -4140,34 +4241,56 @@ function rmNotice() {
   if (status[RM.id] < 3) {
     RM.cd = startChallenge(RM.id) ? 30 : 5;
   } else {
-    RM.mode = 'chase'; RM.t = 11; RM.lost = 0;
+    RM.mode = 'chase'; RM.t = 11; RM.lost = 0; RM.target = '';
     toast(`${e.name} has noticed you. Get out of its sight.`, 'bad', 4);
   }
+}
+function rmNoticeFor(q) {
+  if (!q.peer) return rmNotice();
+  if (status[RM.id] < 3) { RM.ask = { at: Date.now(), peer: q.peer }; RM.cd = 30; mpSend(); return; }
+  RM.mode = 'chase'; RM.t = 11; RM.lost = 0; RM.target = q.peer; mpSend();
 }
 function rmTick(dt) {
   if (RM.off || HAUNT || LEVEL > 1) return;
   if (!RM.g) { rmInit(); if (!RM.g) return; }
   const g = RM.g, p = g.position, id = RM.id;
-  if (active && active.id === id) { g.visible = false; return; }
+  if (rmFighting()) { g.visible = false; RM.mode = 'patrol'; RM.target = ''; return; }
   g.visible = true;
   RM.cd = Math.max(0, RM.cd - dt);
   if (g.userData.anim) g.userData.anim(time);
   if (scareS || time < RM.stun) return;
   const dP = Math.hypot(P.x - p.x, P.z - p.z);
   if (cpDriver()) {
-    const seen = !P.hidden && !TUT.on && los(p.x, p.z, P.x, P.z), hear = P.sprinting ? 20 : P.crouch ? 3.5 : 8.5;
     if (RM.mode === 'patrol') {
       if (!RM.goal || time > RM.t2 || Math.hypot(RM.goal.x - p.x, RM.goal.z - p.z) < 1.5) rmGoal();
       if (RM.goal) steer(p, RM.goal.x, RM.goal.z, RM.sp, dt, 0.45);
-      if (RM.cd <= 0 && DIR.phase !== 'breather' && !active && !TUT.on && !overlay && dP < hear && (seen || (P.sprinting && dP < 14))) rmNotice();
+      if (RM.cd <= 0 && DIR.phase !== 'breather' && !TUT.on && !overlay) {
+        // it notices whoever it can see or hear first, not just whoever's game is running it
+        let best = null, bd = 1e9;
+        for (const q of rmTargets()) {
+          if (q.hidden || q.out) continue;
+          const d = Math.hypot(q.x - p.x, q.z - p.z), hear = q.sprint ? 20 : q.crouch ? 3.5 : 8.5;
+          if (d < hear && d < bd && (los(p.x, p.z, q.x, q.z) || (q.sprint && d < 14))) { bd = d; best = q; }
+        }
+        if (best) rmNoticeFor(best);
+      }
     } else {
-      RM.t -= dt; RM.lost = seen ? 0 : RM.lost + dt;
-      steer(p, P.x, P.z, 3.5, dt, 0.45);
-      if (RM.t <= 0 || RM.lost > 3) { RM.mode = 'patrol'; RM.cd = 14; RM.goal = null; toast(`${ENT[id].name} has lost interest.`, 'good', 3); }
+      const q = rmTargets().find((t) => t.peer === (RM.target || ''));
+      if (!q || q.out) { RM.mode = 'patrol'; RM.target = ''; RM.cd = 8; }
+      else {
+        RM.t -= dt; RM.lost = !q.hidden && los(p.x, p.z, q.x, q.z) ? 0 : RM.lost + dt;
+        steer(p, q.x, q.z, 3.5, dt, 0.45);
+        if (RM.t <= 0 || RM.lost > 3) { RM.mode = 'patrol'; RM.cd = 14; RM.goal = null; RM.target = ''; toast(`${ENT[id].name} has lost interest.`, 'good', 3); }
+        // it caught a teammate: their game plays the scare, this one sends it away
+        else if (q.peer && Math.hypot(q.x - p.x, q.z - p.z) < 1.15) { RM.mode = 'patrol'; RM.target = ''; later(1.5, rmAway); }
+      }
     }
   } else if (RM.net) {
-    const k = 1 - Math.exp(-dt * 8);
-    p.x = lerp(p.x, RM.net[0], k); p.z = lerp(p.z, RM.net[1], k); RM.mode = RM.net[3] ? 'chase' : 'patrol';
+    const n = RM.net, k = 1 - Math.exp(-dt * 8), far = Math.hypot(n[0] - p.x, n[1] - p.z) > 5;
+    if (far || RM.snap) { p.x = n[0]; p.z = n[1]; RM.px = p.x; RM.pz = p.z; RM.snap = false; }
+    else { p.x = lerp(p.x, n[0], k); p.z = lerp(p.z, n[1], k); }
+    const was = RM.mode; RM.mode = n[3] ? 'chase' : 'patrol';
+    if (RM.mode === 'chase' && was !== 'chase' && RM.netTarget === coopMe()) toast(`${ENT[id].name} has noticed you. Get out of its sight.`, 'bad', 4);
   }
   const mx = p.x - RM.px, mz = p.z - RM.pz, sp = Math.hypot(mx, mz) / Math.max(dt, 0.001); RM.px = p.x; RM.pz = p.z;
   if (sp > 0.1) g.rotation.y = angLerp(g.rotation.y, Math.atan2(mx, mz), 0.15);
@@ -4205,12 +4328,12 @@ function uiGoalText() {
     let b = notes[0], bd = 1e9;
     for (const i of notes) { const d = Math.hypot(i.x - P.x, i.z - P.z); if (d < bd) { bd = d; b = i; } }
     next = `A note: ${dirWords(b.x, b.z)}`;
-  } else next = dirNext() ? 'Keep exploring. Dread will bring the next one.' : 'Try what the notes describe.';
+  } else next = 'Read the notes. They say how to call each one.';
   if (DIR.waitDark && !active) { const d = dirDarkTile(); if (d) next = `Something waits in the dark: ${dirWords(d.x, d.z)}`; }
   return { head, pct, cnt, next };
 }
 function uiHud(dt) {
-  if (HAUNT) { el('goal').hidden = true; el('dreadBox').hidden = true; el('rmAlert').hidden = true; return; }
+  if (HAUNT) { el('goal').hidden = true; el('rmAlert').hidden = true; return; }
   UI.hudT -= dt;
   setText(el('hpnum'), String(Math.max(0, Math.ceil(P.hp))));
   { const w = Math.max(0, UI.dashAt - time) / (UI.dashCd || 1), q = Math.max(0, UI.flashAt - time) / (UI.flashCd || 1); el('tDashCd').style.height = (w * 100).toFixed(0) + '%'; el('tFlashCd').style.height = (q * 100).toFixed(0) + '%'; el('tDash').classList.toggle('off', w > 0 || P.st < 12); el('tFlash').classList.toggle('off', q > 0 || P.bat < 10); }
@@ -4219,13 +4342,6 @@ function uiHud(dt) {
   if (progress.cash !== inv.coins) { progress.cash = inv.coins; saveProgress(); }
   const g = uiGoalText();
   setText(el('gHead'), g.head); el('gBar').style.width = (clamp(g.pct, 0, 1) * 100).toFixed(0) + '%'; setText(el('gCnt'), g.cnt); setHTML(el('gNext'), g.next);
-  const box = el('dreadBox');
-  {
-    setText(el('dName'), { quiet: 'Quiet', rising: 'Rising', encounter: 'Encounter', breather: 'Breather' }[DIR.phase] || 'Quiet');
-    el('dBar').style.width = (DIR.v * 100).toFixed(0) + '%';
-    box.className = DIR.phase === 'rising' ? 'rising' : DIR.phase === 'encounter' ? 'encounter' : '';
-  }
-  el('dreadEdge').style.opacity = active || DIR.phase === 'breather' ? 0 : (clamp((DIR.v - 0.4) / 0.6, 0, 1) * 0.55).toFixed(2);
   let near = null, nd = 17;
   for (const r of uiRoamList()) { const d = Math.hypot(r.g.position.x - P.x, r.g.position.z - P.z); if (d < nd) { nd = d; near = r; } }
   const al = el('rmAlert');
@@ -4234,7 +4350,7 @@ function uiHud(dt) {
 }
 function uiWorld(dt) {
   if (HAUNT) return;
-  dirTick(dt); rmTick(dt); tutTick(dt);
+  tutTick(dt);
 }
 function tutSet(i) {
   TUT.i = i; const s = TUT.steps[i];
@@ -4276,6 +4392,9 @@ function uiTutStart() {
   return true;
 }
 function uiStart() {
+  upsRefund(); cardsRecalc();
+  if (!saved.resumed && !HAUNT) { const b = runAdd('startBatt'), f = runAdd('startFizz'); if (b) inv.battery += b; if (f) inv.fizz += f; }
+  later(0.1, cardsHud);
   if (progress.cash != null) inv.coins = progress.cash | 0;
   DIR.t = DIR.len = 40 * uiDiff().dir;
 }
@@ -4309,24 +4428,17 @@ function uiLevelSel(n) {
   setHTML(el('lsList'), lists.map((l, i) => {
     const c = uiCounts(l), cnt = (k) => l.filter((e) => KIND[e.id] === k).length, run = ACCT.run && ACCT.run.active && ACCT.run.level === i;
     const faces = l.filter((e) => !e.secret).map((e) => { const known = seenOf(e, i) >= 2; return `<img src="${known ? UI_IMG.p[e.id] : uiSilhouette(e.id)}" ${known ? '' : `data-sil="${e.id}"`} alt="" title="${known ? escHtml(e.name) : 'Not met yet'}">`; }).join('');
-    return `<article class="ls-panel" data-ls="${i}" style="background-image:url(${UI_IMG.lv[i]})"><div class="ls-body"><span class="ls-tag">LEVEL ${i}${c.n >= c.of ? ' · ALL FOUND' : ''}</span><h3>${LV_NAMES[i]}</h3><span class="lv-row"><span class="lv-bar"><em style="width:${((c.n / c.of) * 100).toFixed(0)}%"></em></span><span>${c.n} of ${c.of}</span></span><div class="ls-more"><p>${LV_BLURB[i]}</p><div class="ls-faces">${faces}</div><div class="ls-cats">${cats.map((k) => `<span class="ls-cat ${KIND_INFO[k].cls}"><b>${cnt(k)}</b>${KIND_INFO[k].name}</span>`).join('')}</div><div class="ls-go"><button class="btn" type="button" data-go="${i}">${run ? 'New run' : 'Enter level'}</button><div class="ls-best">${bestText(i)}</div></div></div></div></article>`;
+    return `<article class="ls-panel" data-ls="${i}" style="background-image:url(${UI_IMG.lv[i]})"><div class="ls-body"><span class="ls-tag">LEVEL ${i}${c.n >= c.of ? ' · ALL FOUND' : ''}</span><h3>${LV_NAMES[i]}</h3><span class="lv-row"><span class="lv-bar"><em style="width:${((c.n / c.of) * 100).toFixed(0)}%"></em></span><span>${c.n} of ${c.of}</span></span><div class="ls-more"><p>${LV_BLURB[i]}</p><div class="ls-faces">${faces}</div><div class="ls-cats">${cats.filter((k) => cnt(k) > 0).map((k) => `<span class="ls-cat ${KIND_INFO[k].cls}"><b>${cnt(k)}</b>${k === 'ritual' ? 'Summoned' : 'Always out there'}</span>`).join('')}</div><div class="ls-go"><button class="btn" type="button" data-go="${i}">${run ? 'New run' : 'Enter level'}</button><div class="ls-best">${bestText(i)}</div></div></div></div></article>`;
   }).join(''));
   uiLsPick(n);
   el('levelSel').hidden = false;
   [200, 700, 1500].forEach((w) => setTimeout(() => document.querySelectorAll('.ls-faces img[data-sil]').forEach((im) => { const u = UI.sil[im.dataset.sil]; if (u && im.src !== u) im.src = u; }), w));
 }
 function uiShop(cid) {
-  const box = el(cid), ups = progress.ups || {};
-  if (progress.cash != null) inv.coins = progress.cash | 0;
-  setHTML(box, `<p class="shop-bal">You have ${inv.coins} coins</p><div class="shop">${UPS.map((u) => { const lv = ups[u.id] | 0, cost = u.cost[lv], can = cost != null && inv.coins >= cost; return `<div class="shop-item"><h3>${u.name}</h3><p>${u.what}</p><div class="pips">${u.cost.map((c, i) => `<i class="${i < lv ? 'on' : ''}"></i>`).join('')}</div><button type="button" data-up="${u.id}" ${can ? '' : 'disabled'}>${cost == null ? 'Maxed out' : `Buy for ${cost}`}</button></div>`; }).join('')}</div><p class="panep" style="margin-top:12px">Earn coins by surviving fights. The better your grade, the more you get. Upgrades stay with you on every level.</p>`);
+  cardsScreen(cid);
 }
 function uiBuy(id, cid) {
-  const u = UPS.find((x) => x.id === id); if (!u) return;
-  if (!progress.ups) progress.ups = {};
-  const lv = progress.ups[id] | 0, cost = u.cost[lv];
-  if (cost == null || inv.coins < cost) return;
-  inv.coins -= cost; progress.ups[id] = lv + 1; progress.cash = inv.coins; saveProgress(); requestSave(); sfx.chime();
-  uiShop(cid);
+  if (typeof id === 'string' && /^[cf]:/.test(id)) cardsClick(id, cid);
 }
 function uiSyncSet() {
   el('sens').value = settings.sens; el('vol').value = settings.vol; el('mus').value = settings.music; el('qual').value = settings.quality; el('calm').checked = !!settings.calm;
@@ -4389,7 +4501,7 @@ function renderJournal2() {
 }
 function uiJDetail(id) {
   const e = id && ENT[id];
-  if (!e) return `<div class="jd empty"><h3>Three kinds of entity</h3><h4>Ritual</h4><p>You call these. Notes give you clues about what to do. Every boss is one of these, so you choose when to face it.</p><h4>Roaming</h4><p>Always out there. Avoid them, or get ready to run.</p><h4>Time-based</h4><p>They come to you. Watch the Dread meter: when it fills, one arrives. Then you get a breather.</p><p style="margin-top:14px">Pick a card to read more.</p></div>`;
+  if (!e) return `<div class="jd empty"><h3>How they come</h3><h4>You call them</h4><p>Every entity here only comes when you do its ritual. The notes give you clues about what to do, so you choose when to face each one.</p><h4>Except one</h4><p>On Level 2, Come-Play is already walking around, looking for you.</p><p style="margin-top:14px">Pick a card to read more.</p></div>`;
   const s = status[id] | 0, k = uiKind(id), kk = KIND[id];
   if (e.secret && s === 0) return `<div class="jd"><h3>A page is torn out here</h3><p style="margin-top:8px">${e.doodle || 'Someone doodled a little yellow bird in the margin.'}</p>${e.hint ? `<p style="margin-top:8px">${e.hint}</p>` : ''}</div>`;
   let how;
@@ -4697,7 +4809,7 @@ function renderProfiles(msg, bad) {
   const cloud = ACCT.mode === 'cloud', cur = profCur(), total = acTotal();
   const card = (a) => {
     const me = a.id === PROF.cur, st = me ? { p: progress } : profStash(a.id), found = profFound(st.p.seen), coins = st.p.cash | 0;
-    return `<div class="ac-card${me ? ' on' : ''}"><span class="ac-av" style="background:${safeColor(a.color)}">${escHtml((a.name[0] || '?').toUpperCase())}</span><div class="ac-who"><b>${escHtml(a.name)}</b><span>${found} of ${total} found · ${coins} coins${me ? ' · playing now' : ''}</span></div>${me ? '<button class="ghost" type="button" data-ac="rename">Rename</button>' : `<button class="btn" type="button" data-ac="use" data-id="${escHtml(a.id)}">Play as</button><button class="ghost" type="button" data-ac="del" data-id="${escHtml(a.id)}">Delete</button>`}</div>`;
+    return `<div class="ac-card${me ? ' on' : ''}"><span class="ac-av" style="background:${safeColor(a.color)}">${escHtml((a.name[0] || '?').toUpperCase())}</span><div class="ac-who"><b>${escHtml(a.name)}</b><span>${found} of ${total} found · ${Object.keys((st.p && st.p.cards) || {}).length} cards · ${coins} tokens${me ? ' · playing now' : ''}</span></div>${me ? '<button class="ghost" type="button" data-ac="rename">Rename</button>' : `<button class="btn" type="button" data-ac="use" data-id="${escHtml(a.id)}">Play as</button><button class="ghost" type="button" data-ac="del" data-id="${escHtml(a.id)}">Delete</button>`}</div>`;
   };
   const accounts = cloud ? '' : `<h3 class="ac-h">Accounts on this device</h3>${PROF.storage ? '' : '<p class="ac-warn">This browser is blocking saves, so your progress only lasts until you close this tab. Copy your save code before you go.</p>'}<div class="ac-list">${PROF.list.map(card).join('')}</div><form class="ac-form" id="acNew" autocomplete="off"><label for="acNewName">New account</label><div class="ac-row"><input id="acNewName" maxlength="16" spellcheck="false" placeholder="Name"><button class="btn" type="submit">Create</button></div></form><p class="ac-fine">No sign-in, no email and no password. Anyone using this browser can open these accounts.</p>`;
   const file = window.BFN_STANDALONE ? '<button class="ghost" type="button" data-ac="file">Save as a file</button>' : '';
@@ -4738,7 +4850,7 @@ function acCheck(text) {
     UI.acDoc = doc;
     const known = ACCT.mode !== 'cloud' && PROF.list.some((a) => a.id === doc.id), best = doc.p.runs.length, run = doc.r ? ` · a run in progress on Level ${doc.r.level}` : '';
     const what = ACCT.mode === 'cloud' ? 'This adds its progress to your account, keeping the best of both.' : known ? 'You already have this account here. Its progress is added, keeping the best of both.' : 'It becomes a new account on this device. Your other accounts are not touched.';
-    box.innerHTML = `<div class="ac-card on"><span class="ac-av" style="background:${safeColor(doc.color)}">${escHtml((doc.name[0] || '?').toUpperCase())}</span><div class="ac-who"><b>${escHtml(doc.name)}</b><span>${profFound(doc.p.seen)} of ${acTotal()} found · ${doc.p.cash} coins · ${best} best ${best === 1 ? 'time' : 'times'}${run}</span><span>${what}</span></div><button class="btn" type="button" data-ac="apply">Load it</button></div>`;
+    box.innerHTML = `<div class="ac-card on"><span class="ac-av" style="background:${safeColor(doc.color)}">${escHtml((doc.name[0] || '?').toUpperCase())}</span><div class="ac-who"><b>${escHtml(doc.name)}</b><span>${profFound(doc.p.seen)} of ${acTotal()} found · ${Object.keys(doc.p.cards || {}).length} cards · ${doc.p.cash} tokens · ${best} best ${best === 1 ? 'time' : 'times'}${run}</span><span>${what}</span></div><button class="btn" type="button" data-ac="apply">Load it</button></div>`;
   }).catch((e) => {
     UI.acDoc = null;
     box.innerHTML = `<p class="ac-warn" role="alert">${escHtml((e && e.message) || 'That code could not be read.')}</p>`;
@@ -5999,7 +6111,7 @@ const ENTS0 = [
   { id: 'confetti', name: 'Mr. Confetti', danger: 2, ritual: 'Put on the party hat [3].', survive: 'Dance while the music plays. Freeze when it stops, and do not even turn your head. Six songs.', lore: 'Throws the same party every night for guests who never arrive. Gets upset when the guests stop dancing.' },
   { id: 'knock', name: 'Knock-Knock', danger: 2, ritual: 'Knock on three different doors within forty seconds.', survive: 'Listen to its knock, then copy the rhythm exactly with [E]. On the last round a second door opens, and you must look at the door that knocked. Then turn round.', lore: 'A door with no wall. Something on the other side has been practising one knock for a very long time.' },
   { id: 'echo', name: 'The Echo', danger: 3, ritual: 'Shout [V] three times in the Pillar Hall.', survive: 'Tag the real one with [E]. It runs away twice. Shout [V] and it answers, but that costs time. The copies answer late, and your flashlight goes right through them.', lore: 'Small, pale, giggling. It wants to play hide and seek, and it hates losing.' },
-  { id: 'snack', name: 'Snackbot', danger: 3, ritual: 'Enter code D4 at the vending machine with 3 coins.', survive: 'Dodge the cans until it runs out of stock. Hide too long and it charges: make it hit a wall and it spills what it is carrying.', lore: 'Loves its customers. Expresses this with velocity.' },
+  { id: 'snack', name: 'Snackbot', danger: 3, ritual: 'Enter code D4 at the vending machine with 3 tokens.', survive: 'Dodge the cans until it runs out of stock. Hide too long and it charges: make it hit a wall and it spills what it is carrying.', lore: 'Loves its customers. Expresses this with velocity.' },
   { id: 'manager', name: 'The Manager', danger: 5, ritual: 'Document the other seven, then ring the bell at the Front Desk.', survive: 'Run for the EXIT and follow the arrow. Save stamina for the long halls.', lore: 'Wears a fluorescent tube where a head should be. Every light it walks under goes out behind it.' },
   { id: 'quackers', name: 'Quackers', secret: true, danger: 0, ritual: 'Squeak the rubber duck [4] three times quickly.', survive: 'Friendly. Follows you, mends you slowly, and quacks when something is near.', lore: 'The only thing on Level 0 that is happy to see you.' },
 ];
@@ -6011,7 +6123,7 @@ const NOTES0 = [
   { ent: 'confetti', text: "Found a party hat. Wore it. Somebody showed up for the party.\n\nWhen the music plays, DANCE. Keep moving. When the music stops, FREEZE. Don't even turn your head. He counts five songs." },
   { ent: 'knock', text: "Some of these doors don't open. Knock on three different ones, quickly, and something knocks back.\n\nListen to its knock first. Then copy it exactly with [E]. Same number, same rhythm." },
   { ent: 'echo', text: "The big hall full of pillars. Shout [V] three times in there. Something shouts back.\n\nIt wants to play hide and seek. Follow the voice and tag it [E] before time runs out. Headphones help." },
-  { ent: 'snack', text: "The vending machine takes those old coins lying around. There's a secret selection: D4. It costs 3.\n\nIt is NOT a snack. When it starts throwing, keep moving. If you hide it comes for you, in a straight line, and it isn't good at stopping. Put a wall behind you." },
+  { ent: 'snack', text: "The vending machine takes those old tokens lying around. There's a secret selection: D4. It costs 3.\n\nIt is NOT a snack. When it starts throwing, keep moving. If you hide it comes for you, in a straight line, and it isn't good at stopping. Put a wall behind you." },
   { ent: 'manager', text: "The Front Desk bell. Nobody answers until you've documented the other seven.\n\nThen the Manager comes and an EXIT opens somewhere far away. Run. Follow the arrow. Don't let him catch you.\n\nThis is my last note. Good luck. — M." },
 ];
 const ENTS1 = [
@@ -6026,7 +6138,7 @@ const ENTS1 = [
   { id: 'drain', sector: 'B', name: 'The Drain', danger: 4, ritual: 'Crouch in the middle of the deep end for five seconds.', survive: 'Catch the plug going round in the current, ride the current in and jam it in the drain with [E]. It only holds for eight seconds: get to a yellow ladder.', lore: 'The deep end is deeper than it looks. Much deeper.' },
   { id: 'hopscotch', sector: 'B', name: 'Hopscotch', danger: 3, ritual: 'Step on the chalk squares 1 to 6 in order.', survive: 'Memorise the glowing path, then walk it across the hall. Wrong tiles give way.', lore: 'A chalk drawing that learned to giggle.' },
   { id: 'lurker', sector: 'B', name: 'Locker Lurker', danger: 4, ritual: 'Open three lockers in the changing room.', survive: 'Hide in a locker [E]. When it stops at your door, hold [Space] until it moves on. Three times.', lore: 'Folds itself into lockers. Unfolds when you open them.' },
-  { id: 'tide', sector: 'B', name: 'The Tide', danger: 3, ritual: 'Toss a coin into the wishing fountain.', survive: 'Waves roll out from the fountain. Stand on a platform when one passes, or in the bright lane when the wave leaves a gap. The water drags at your feet before each one.', lore: 'Grants wishes, technically. Every wish turns out to be for more water.' },
+  { id: 'tide', sector: 'B', name: 'The Tide', danger: 3, ritual: 'Toss a token into the wishing fountain.', survive: 'Waves roll out from the fountain. Stand on a platform when one passes, or in the bright lane when the wave leaves a gap. The water drags at your feet before each one.', lore: 'Grants wishes, technically. Every wish turns out to be for more water.' },
   { id: 'undertow', sector: 'B', boss: true, name: 'The Undertow', danger: 5, ritual: 'Document the other six, then pull the chain in the main pool.', survive: 'Hold [E] on all four valves while dodging its water. Then run for the surface hatch.', lore: 'The reason nobody swims in the Poolrooms, and the reason there is no shallow end.' },
 ];
 const NOTES1 = [
@@ -6042,7 +6154,7 @@ const NOTES1 = [
   { ent: 'drain', text: "The deep end is warm. Don't crouch in the middle of it.\n\nIf you do, the current pulls you toward the drain, and the ladders are no good while the water is moving. There's a plug going round in there. Catch it, let the current take you in, and jam it in the hole. Then run. It doesn't hold for long." },
   { ent: 'hopscotch', text: "Chalk squares on the floor of the long hall, numbered 1 to 6. Hop them in order and a kid shows up wanting to play properly.\n\nRemember the path it shows you. The wrong tiles drop." },
   { ent: 'lurker', text: "The changing room lockers. Open three and something gets out.\n\nHide in a locker [E]. When it stops at your door, hold your breath [Space] until it walks away. Not a second less." },
-  { ent: 'tide', text: "Threw a coin in the fountain and made a wish. The water made one too.\n\nWaves roll out from it. Stand on the raised tiles when they pass. Sometimes there's a gap in the wave, and you can see the lane it's going to leave open. Mind your feet before each one: the water runs back to it first." },
+  { ent: 'tide', text: "Threw a token in the fountain and made a wish. The water made one too.\n\nWaves roll out from it. Stand on the raised tiles when they pass. Sometimes there's a gap in the wave, and you can see the lane it's going to leave open. Mind your feet before each one: the water runs back to it first." },
   { ent: 'undertow', text: "The main pool has a chain in the middle. Once the other six are in your notes, pull it.\n\nThe thing at the bottom wakes up. Open all four valves, then run for the surface hatch. That's the way out. The real one. — M." },
 ];
 const ENTS2 = [
@@ -6076,7 +6188,357 @@ const ENT = Object.fromEntries(ENTS.map((e) => [e.id, e]));
 const TOTAL = ENTS.filter((e) => !e.secret).length;
 const status = Object.fromEntries(ENTS.map((e) => [e.id, 0]));
 const noteRead = NOTES.map(() => false);
+/* ---------- cards ----------
+   Every entity you beat drops one card, and 2% of the time its own Entity card too.
+   Everything picked up goes into the inventory saved with your account (progress.cards), so it carries to every floor
+   and every run. Only equipped cards (progress.equip, up to CARD_SLOTS) do anything. */
+const CARD_SLOTS = 5;
+const CARD_RAR = {
+  common: { label: 'Common', n: 1, pct: '85%', bg: '#e9e0c5', ink: '#2a2418', sub: '#5f553d', edge: '#b3a680', inner: 'rgba(42,36,24,0.32)', win: '#d8cca7', icon: '#3a3020', glow: '', hex: 0xe9e0c5 },
+  rare: { label: 'Rare', n: 2, pct: '13%', bg: '#0f2340', ink: '#e8f1ff', sub: '#a9c4e6', edge: '#5aa8ff', inner: 'rgba(140,200,255,0.32)', win: '#173761', icon: '#a6d4ff', glow: 'rgba(120,190,255,0.8)', hex: 0x5aa8ff },
+  legendary: { label: 'Legendary', n: 3, pct: '1.75%', bg: '#17110a', ink: '#f7e8c4', sub: '#d3b77c', edge: '#e8b34b', inner: 'rgba(232,179,75,0.6)', win: '#271c0b', icon: '#ffd36a', glow: 'rgba(255,200,90,0.85)', hex: 0xffc54a },
+  godly: { label: 'Godly', n: 4, pct: '0.25%', bg: '#130d1c', ink: '#fff1f7', sub: '#dcc3ea', edge: '#ff7ac6', inner: 'rgba(255,255,255,0.3)', win: '#1e1530', icon: '#ffffff', glow: 'rgba(255,120,200,0.95)', hex: 0xff7ac6 },
+  entity: { label: 'Entity', n: 0, pct: '2%', bg: '#0a110a', ink: '#e2ffd6', sub: '#9fd08a', edge: '#8cff5a', inner: 'rgba(140,255,90,0.32)', win: '#0f1f0f', icon: '#b6ff8a', glow: '', hex: 0x8cff5a },
+};
+const CARD_ORDER = ['common', 'rare', 'legendary', 'godly', 'entity'];
+const CARD_ICON = {
+  batt: 'M3 8h15v8H3z M18 11h3v2h-3 M6 11v2 M9 11v2',
+  speed: 'M4 12h10 M10 6l6 6-6 6 M19 5v14',
+  breath: 'M3 9h11a3 3 0 1 0-3-3 M3 14h15a3 3 0 1 1-3 3',
+  shield: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
+  steps: 'M8 4c-2 0-3 2-3 5s1 5 3 5 3-2 3-5-1-5-3-5z M16 10c-2 0-3 2-3 5s1 5 3 5 3-2 3-5-1-5-3-5z',
+  heal: 'M9 3h6v6h6v6h-6v6H9v-6H3V9h6z',
+  pocket: 'M3 9h13v8H3z M16 12h3v2h-3 M19 3v5 M16.5 5.5h5',
+  opener: 'M9 3h6l-1 5 3 4v9H7v-9l3-4z M10 14h4',
+  knee: 'M12 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4z M12 8l-4 6h8l-4-6 M8 14l-3 7 M16 14l3 7',
+  laces: 'M3 17l5-5 4 3 8-9 M14 6h6v6',
+  lens: 'M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16z M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8z M12 1v3 M12 20v3',
+  token: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8z',
+  stretch: 'M4 12a8 8 0 1 0 2.3-5.6 M4 3v5h5',
+  flash: 'M4 8h4l2-3h4l2 3h4v11H4z M12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z',
+  lungs: 'M12 3v8 M12 11c-2 0-3-2-5-2-2 0-3 3-3 7 0 3 1 4 3 4 3 0 5-2 5-5z M12 11c2 0 3-2 5-2 2 0 3 3 3 7 0 3-1 4-3 4-3 0-5-2-5-5z',
+  dash: 'M3 12h8 M5 8h6 M5 16h6 M13 6l6 6-6 6',
+  fizz: 'M10 3h4v4l2 3v11H8V10l2-3z M8 14h8',
+  kit: 'M4 8h16v12H4z M9 8V5h6v3 M12 11v6 M9 14h6',
+  headlamp: 'M4 13a8 5 0 0 1 16 0 M8 13h8v3H8z M12 16v4 M12 3v3 M6 5l1.5 2 M18 5l-1.5 2',
+  spring: 'M7 21h10 M8 18l8-2-8-2 8-2-8-2 8-2 M12 3v5',
+  slim: 'M9 3h6v13l-3 5-3-5z M10 7h4',
+  flood: 'M12 2v3 M4.9 4.9l2.1 2.1 M2 12h3 M19 12h3 M17 7l2.1-2.1 M8 13a4 4 0 1 1 8 0c0 2-1 3-2 4h-4c-1-1-2-2-2-4z M10 20h4',
+  watch: 'M12 8a7 7 0 1 0 0 14a7 7 0 1 0 0-14z M12 12v3l2 2 M10 2h4 M12 2v3',
+  ghost: 'M6 20V10a6 6 0 0 1 12 0v10l-2-2-2 2-2-2-2 2-2-2z M10 10v1 M14 10v1',
+  vest: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z M8.5 12l2.5 2.5 4.5-5',
+  sunlamp: 'M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10z M12 1v3 M12 20v3 M1 12h3 M20 12h3 M4.2 4.2l2.1 2.1 M17.7 17.7l2.1 2.1 M4.2 19.8l2.1-2.1 M17.7 6.3l2.1-2.1',
+  candle: 'M12 3c2 3 4 5 4 8a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-7z M9 21h6 M12 15v6',
+  exit: 'M3 6h18v12H3z M7 10h3 M7 12h2 M7 14h3 M7 10v4 M13 10l4 4 M17 10l-4 4',
+  noclip: 'M4 4h7v16H4z M13 4h7v16h-7 M2 12h20 M18 9l3 3-3 3',
+};
+// fx multiply a stat; add adds to one. Bad numbers on Entity cards are just multipliers the other way.
+const CARDS = [
+  { id: 'batt', r: 'common', name: 'Fresh Batteries', text: 'Your flashlight drains 12% slower.', icon: 'batt', fx: { batt: 0.88 } },
+  { id: 'sneak', r: 'common', name: 'Sneakers', text: 'Walk and run 5% faster.', icon: 'speed', fx: { speed: 1.05 } },
+  { id: 'breath', r: 'common', name: 'Deep Breath', text: 'Stamina comes back 20% faster.', icon: 'breath', fx: { regen: 1.2 } },
+  { id: 'wool', r: 'common', name: 'Wool Sweater', text: 'Take 7% less damage.', icon: 'shield', fx: { dmg: 0.93 } },
+  { id: 'socks', r: 'common', name: 'Soft Socks', text: 'Your footsteps are 15% quieter.', icon: 'steps', fx: { noise: 0.85 } },
+  { id: 'tape', r: 'common', name: 'First Aid Tape', text: 'Heal 1 health every 4 seconds.', icon: 'heal', add: { hpRegen: 0.25 } },
+  { id: 'pocket', r: 'common', name: 'Spare Pocket', text: 'Start every floor with an extra battery.', icon: 'pocket', add: { startBatt: 1 } },
+  { id: 'opener', r: 'common', name: 'Bottle Opener', text: 'Fizz Water heals 10 more.', icon: 'opener', add: { fizz: 10 } },
+  { id: 'knees', r: 'common', name: 'Knee Pads', text: 'Crouch-walk 20% faster.', icon: 'knee', fx: { crouch: 1.2 } },
+  { id: 'laces', r: 'common', name: 'Tight Laces', text: 'Sprint 5% faster.', icon: 'laces', fx: { sprint: 1.05 } },
+  { id: 'lens', r: 'common', name: 'Clean Lens', text: 'Flash [Q] recharges 10% faster.', icon: 'lens', fx: { flashCd: 0.9 } },
+  { id: 'lucky', r: 'common', name: 'Lucky Token', text: 'Every token you find counts as two.', icon: 'token', add: { token: 1 } },
+  { id: 'stretch', r: 'common', name: 'Stretches', text: 'Dash [Space] recharges 10% faster.', icon: 'stretch', fx: { dashCd: 0.9 } },
+  { id: 'camflash', r: 'rare', name: 'Camera Flash', text: 'Flash recharges 25% faster.', icon: 'flash', fx: { flashCd: 0.75 } },
+  { id: 'lungs', r: 'rare', name: "Runner's Lungs", text: 'Sprinting costs 25% less stamina.', icon: 'lungs', fx: { stam: 0.75 } },
+  { id: 'leather', r: 'rare', name: 'Leather Jacket', text: 'Take 15% less damage.', icon: 'shield', fx: { dmg: 0.85 } },
+  { id: 'qstep', r: 'rare', name: 'Quick Step', text: 'Dash recharges 30% faster.', icon: 'dash', fx: { dashCd: 0.7 } },
+  { id: 'bigfizz', r: 'rare', name: 'Big Fizz', text: 'Fizz Water heals 25 more, and you start every floor with a bottle.', icon: 'fizz', add: { fizz: 25, startFizz: 1 } },
+  { id: 'kit', r: 'rare', name: 'Field Kit', text: 'Heal 1 health every 2 seconds.', icon: 'kit', add: { hpRegen: 0.5 } },
+  { id: 'headlamp', r: 'rare', name: 'Headlamp', text: 'Your flashlight drains 30% slower.', icon: 'headlamp', fx: { batt: 0.7 } },
+  { id: 'rubber', r: 'rare', name: 'Rubber Soles', text: 'Footsteps 30% quieter, and crouch-walk 15% faster.', icon: 'steps', fx: { noise: 0.7, crouch: 1.15 } },
+  { id: 'spring', r: 'rare', name: 'Spring Heels', text: 'Dash goes 35% further.', icon: 'spring', fx: { dashPow: 1.35 } },
+  { id: 'slim', r: 'rare', name: 'Slim Flash', text: 'Flash uses half as much battery.', icon: 'slim', fx: { flashCost: 0.5 } },
+  { id: 'flood', r: 'legendary', name: 'Floodlight', text: 'Flash stuns 70% longer and recharges 35% faster.', icon: 'flood', fx: { stun: 1.7, flashCd: 0.65 } },
+  { id: 'marathon', r: 'legendary', name: 'Marathon', text: 'Sprinting costs half the stamina, and you move 10% faster.', icon: 'watch', fx: { stam: 0.5, speed: 1.1 } },
+  { id: 'ghostwalk', r: 'legendary', name: 'Ghost Walk', text: 'Footsteps 55% quieter, and dash recharges 40% faster.', icon: 'ghost', fx: { noise: 0.45, dashCd: 0.6 } },
+  { id: 'riot', r: 'legendary', name: 'Riot Vest', text: 'Take 35% less damage, and heal 1 health every 2 seconds.', icon: 'vest', fx: { dmg: 0.65 }, add: { hpRegen: 0.5 } },
+  { id: 'wind', r: 'legendary', name: 'Second Wind', text: 'Stamina comes back twice as fast, and sprinting costs 30% less.', icon: 'breath', fx: { regen: 2, stam: 0.7 } },
+  { id: 'sunlamp', r: 'legendary', name: 'Sun Lamp', text: 'Your battery lasts three times as long, and Flash costs half.', icon: 'sunlamp', fx: { batt: 0.33, flashCost: 0.5 } },
+  { id: 'lastlight', r: 'godly', name: 'The Last Light', text: 'Once every floor, a hit that would knock you down leaves you on 1 health. Take 25% less damage.', icon: 'candle', fx: { dmg: 0.75 } },
+  { id: 'exitsign', r: 'godly', name: 'Exit Sign', text: 'Move 15% faster, take 40% less damage, and your flashlight never runs down.', icon: 'exit', fx: { speed: 1.15, dmg: 0.6, batt: 0 } },
+  { id: 'noclip', r: 'godly', name: 'No-Clip', text: 'Dash every second, twice as far, and move 10% faster.', icon: 'noclip', fx: { dashCd: 0.33, dashPow: 2, speed: 1.1 } },
+  { id: 'phantom', r: 'godly', name: 'Phantom', text: 'You make almost no sound, sprinting costs 70% less, and you take 25% less damage.', icon: 'ghost', fx: { noise: 0.1, stam: 0.3, dmg: 0.75 } },
+];
+// one Entity card per entity you can fight. The harder it is to beat, the bigger the upside and the smaller the catch
+[
+  ['stillman', 'Unblinking', 'Flash stuns 50% longer.', 'Flash recharges 20% slower.', { stun: 1.5, flashCd: 1.2 }],
+  ['grinner', 'The Smile', 'Flashlight drains 40% slower.', 'Take 12% more damage.', { batt: 0.6, dmg: 1.12 }],
+  ['hound', 'Dead Air', 'Footsteps 60% quieter.', 'Flashlight drains 15% faster.', { noise: 0.4, batt: 1.15 }],
+  ['confetti', 'Party Hat', 'Move 10% faster.', 'Footsteps 25% louder.', { speed: 1.1, noise: 1.25 }],
+  ['knock', 'Spare Key', 'Dash recharges 20% faster.', 'Take 10% more damage.', { dashCd: 0.8, dmg: 1.1 }],
+  ['echo', 'Second Voice', 'Footsteps 40% quieter.', 'Stamina comes back 20% slower.', { noise: 0.6, regen: 0.8 }],
+  ['snack', 'Out of Order', 'Fizz Water heals 30 more.', 'Dash recharges 25% slower.', { dashCd: 1.25 }, { fizz: 30 }],
+  ['manager', 'Time Card', 'Sprinting costs half the stamina, and you move 12% faster.', 'Footsteps 15% louder.', { stam: 0.5, speed: 1.12, noise: 1.15 }],
+  ['mimic', 'Tooth in the Straw', 'Every token you find counts as two.', 'Sprinting costs 20% more stamina.', { stam: 1.2 }, { token: 1 }],
+  ['moth', 'Dust Wings', 'Dash goes 50% further.', 'Flashlight drains 25% faster.', { dashPow: 1.5, batt: 1.25 }],
+  ['attendant', 'Validated', 'Stamina comes back 30% faster.', 'Flashlight drains 20% faster.', { regen: 1.3, batt: 1.2 }],
+  ['exhaust', 'Iron Lungs', 'Sprinting costs 35% less stamina.', 'Footsteps 20% louder.', { stam: 0.65, noise: 1.2 }],
+  ['copycat', 'Mirror Step', 'Move 12% faster.', 'Flash recharges 25% slower.', { speed: 1.12, flashCd: 1.25 }],
+  ['valet', 'Valet Keys', 'Dash recharges 45% faster and goes 30% further.', 'Flash costs 50% more battery.', { dashCd: 0.55, dashPow: 1.3, flashCost: 1.5 }],
+  ['lifeguard', 'The Whistle', 'Sprint 15% faster.', 'Footsteps 30% louder.', { sprint: 1.15, noise: 1.3 }],
+  ['floatie', 'Patch Kit', 'Heal 1 health every 3 seconds.', 'Move 8% slower.', { speed: 0.92 }, { hpRegen: 0.33 }],
+  ['drain', 'The Plug', 'Heal 1 health every 2 seconds.', 'Flash recharges 15% slower.', { flashCd: 1.15 }, { hpRegen: 0.5 }],
+  ['hopscotch', 'Chalk Feet', 'Crouch-walk 40% faster.', 'Take 10% more damage.', { crouch: 1.4, dmg: 1.1 }],
+  ['lurker', 'Name Tag', 'Take 25% less damage.', 'Stamina comes back 10% slower.', { dmg: 0.75, regen: 0.9 }],
+  ['tide', 'Low Tide', 'Stamina comes back 50% faster.', 'Move 6% slower.', { regen: 1.5, speed: 0.94 }],
+  ['undertow', 'Pressure', 'Take 35% less damage, and heal 1 health every 3 seconds.', 'Move 5% slower.', { dmg: 0.65, speed: 0.95 }, { hpRegen: 0.33 }],
+  ['sun', 'Sunburn', 'Your flashlight never runs down.', 'Take 20% more damage.', { batt: 0, dmg: 1.2 }],
+  ['moon', 'Night-Light', 'Flash uses no battery.', 'Flash stuns 30% shorter.', { flashCost: 0, stun: 0.7 }],
+  ['clown', 'Wind-Up Key', 'Dash recharges 35% faster.', 'Stamina comes back 15% slower.', { dashCd: 0.65, regen: 0.85 }],
+  ['balloon', 'Helium', 'Dash goes 40% further and recharges 20% faster.', 'Take 15% more damage.', { dashPow: 1.4, dashCd: 0.8, dmg: 1.15 }],
+  ['ring', 'Paper Chain', 'Flash stuns twice as long.', 'Dash recharges 10% slower.', { stun: 2, dashCd: 1.1 }],
+  ['swing', 'Push Back', 'Take 15% less damage.', 'Move 8% slower.', { dmg: 0.85, speed: 0.92 }],
+  ['wow', 'Colours', 'Flashlight never runs down, and Flash recharges 40% faster.', 'Take 10% more damage.', { batt: 0, flashCd: 0.6, dmg: 1.1 }],
+].forEach(([ent, name, text, bad, fx, add]) => CARDS.push({ id: 'e_' + ent, r: 'entity', ent, name, text, bad, fx, add }));
+CARDS.forEach((c, i) => { c.no = c.r === 'entity' ? 'E. ' + String(i - 32).padStart(2, '0') : 'No. ' + String(i + 1).padStart(2, '0'); });
+const CARD_BY = Object.fromEntries(CARDS.map((c) => [c.id, c]));
+// Entity cards name their entity on every floor, not just the one it lives on
+const CARD_ENT = Object.fromEntries([...ENTS0, ...ENTS1, ...ENTS2].map((e) => [e.id, e]));
+// stacking stops somewhere sensible both ways, so nothing makes you untouchable or useless
+const CARD_LIM = { dmg: [0.2, 2], noise: [0.05, 3], flashCd: [0.25, 3], dashCd: [0.25, 3], stam: [0.15, 3], batt: [0, 3], speed: [0.6, 1.6], sprint: [0.6, 1.5], crouch: [0.6, 2], regen: [0.3, 4], stun: [0.3, 4], dashPow: [0.5, 2.2], flashCost: [0, 3] };
+const CARD_ADDLIM = { hpRegen: 2, fizz: 80, startFizz: 3, startBatt: 3, token: 3 };
+const CFX = { mul: {}, add: {} };
+function cardInv() {
+  if (!progress.cards || typeof progress.cards !== 'object' || Array.isArray(progress.cards)) progress.cards = {};
+  return progress.cards;
+}
+function cardCount(id) { return cardInv()[id] | 0; }
+function cardEquipped() {
+  const inv = cardInv(), seen = new Set();
+  if (!Array.isArray(progress.equip)) progress.equip = [];
+  progress.equip = progress.equip.filter((id) => CARD_BY[id] && inv[id] > 0 && !seen.has(id) && seen.add(id)).slice(0, CARD_SLOTS);
+  return progress.equip;
+}
+function cardsRecalc() {
+  CFX.mul = {}; CFX.add = {};
+  for (const id of cardEquipped()) {
+    const c = CARD_BY[id];
+    if (c.fx) for (const [k, v] of Object.entries(c.fx)) CFX.mul[k] = (CFX.mul[k] == null ? 1 : CFX.mul[k]) * v;
+    if (c.add) for (const [k, v] of Object.entries(c.add)) CFX.add[k] = (CFX.add[k] || 0) + v;
+  }
+}
+function runMul(k) {
+  if (HAUNT || CFX.mul[k] == null) return 1;
+  const lim = CARD_LIM[k]; return lim ? clamp(CFX.mul[k], lim[0], lim[1]) : CFX.mul[k];
+}
+function runAdd(k) {
+  if (HAUNT || !CFX.add[k]) return 0;
+  return Math.min(CARD_ADDLIM[k] == null ? 99 : CARD_ADDLIM[k], CFX.add[k]);
+}
+function cardHas(id) { return !HAUNT && cardEquipped().includes(id); }
+// what belongs to the floor you are on: whether the Last Light has been used, and cards still lying on the floor
+function runInit(s) {
+  const r = { last: false, drops: [] };
+  if (!s || typeof s !== 'object') return r;
+  r.last = !!s.lastUsed;
+  if (Array.isArray(s.drops)) r.drops = s.drops.filter((d) => d && CARD_BY[d.c] && Number.isFinite(d.x) && Number.isFinite(d.z)).slice(0, 20).map((d) => ({ x: +d.x, z: +d.z, c: d.c }));
+  return r;
+}
+// the roll never uses Math.random, which a fight swaps for its own seeded copy
+function cardRand() {
+  try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; } catch (e) { return Math.random(); }
+}
+function cardRoll(r) {
+  const p = (r == null ? cardRand() : r) * 100;
+  return p < 85 ? 'common' : p < 98 ? 'rare' : p < 99.75 ? 'legendary' : 'godly';
+}
+function cardPick(rar) {
+  const pool = CARDS.filter((c) => c.r === rar);
+  return pool[Math.min(pool.length - 1, Math.floor(cardRand() * pool.length))];
+}
+function cardArtHTML(c) {
+  if (c.r === 'entity') { const src = UI_IMG.p[c.ent]; return src ? `<img src="${src}" alt="">` : ''; }
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${CARD_ICON[c.icon]}"/></svg>`;
+}
+function cardHTML(c, o) {
+  o = o || {};
+  const R = CARD_RAR[c.r], ent = c.r === 'entity', danger = ent && CARD_ENT[c.ent] ? CARD_ENT[c.ent].danger | 0 : 0;
+  const gems = ent ? [0, 1, 2, 3, 4].map((i) => `<i class="${i < danger ? 'on' : ''}"></i>`).join('') : [0, 1, 2, 3].map((i) => `<i class="${i < R.n ? 'on' : ''}"></i>`).join('');
+  const foot = ent ? `Entity · ${CARD_ENT[c.ent] ? CARD_ENT[c.ent].name : ''}` : R.label;
+  return `<div class="ucard cr-${c.r}${o.sm ? ' sm' : ''}${o.on ? ' on' : ''}"><span class="uc-top"><span class="uc-no">${c.no}</span><span class="uc-gems">${gems}</span></span><span class="uc-win">${cardArtHTML(c)}</span><b class="uc-name">${escHtml(c.name)}</b><i class="uc-rule"></i><span class="uc-text">${ent ? '+ ' : ''}${escHtml(c.text)}</span>${c.bad ? `<span class="uc-bad">− ${escHtml(c.bad)}</span>` : ''}<span class="uc-foot">${escHtml(foot)}</span>${o.count > 1 ? `<span class="uc-count">×${o.count}</span>` : ''}${o.on ? '<span class="uc-on">Equipped</span>' : ''}</div>`;
+}
+// the same card, painted onto the thing that lies on the floor
+function cardTex(c) {
+  const R = CARD_RAR[c.r], cv = document.createElement('canvas'); cv.width = 256; cv.height = 384;
+  const g = cv.getContext('2d'), tex = new THREE.CanvasTexture(cv); tex.anisotropy = 4;
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+  const arch = (x, y, w, h) => { const r = w / 2; g.beginPath(); g.moveTo(x, y + h); g.lineTo(x, y + r); g.arc(x + r, y + r, r, Math.PI, 0); g.lineTo(x + w, y + h); g.closePath(); };
+  const wrap = (txt, x, y, w, lh, max) => { const words = txt.split(' '); let line = '', n = 0; for (const wd of words) { const t = line ? line + ' ' + wd : wd; if (g.measureText(t).width > w && line) { g.fillText(line, x, y + n * lh); line = wd; if (++n >= max) return y + n * lh; } else line = t; } if (line) { g.fillText(line, x, y + n * lh); n++; } return y + n * lh; };
+  const paint = (img) => {
+    g.clearRect(0, 0, 256, 384);
+    g.fillStyle = R.bg; rr(4, 4, 248, 376, 18); g.fill();
+    if (c.r === 'godly') {
+      let grad; try { grad = g.createConicGradient(3.66, 128, 192); [[0, '#ff7ac6'], [0.25, '#7af0ff'], [0.5, '#fff27a'], [0.75, '#b48cff'], [1, '#ff7ac6']].forEach(([o, col]) => grad.addColorStop(o, col)); } catch (e) { grad = g.createLinearGradient(0, 0, 256, 384); grad.addColorStop(0, '#ff7ac6'); grad.addColorStop(0.5, '#7af0ff'); grad.addColorStop(1, '#fff27a'); }
+      g.strokeStyle = grad; g.lineWidth = 8;
+    } else { g.strokeStyle = R.edge; g.lineWidth = c.r === 'common' ? 3 : 5; }
+    rr(4, 4, 248, 376, 18); g.stroke();
+    g.strokeStyle = R.inner; g.lineWidth = 1.5; rr(13, 13, 230, 358, 11); g.stroke();
+    g.textBaseline = 'top'; g.fillStyle = R.sub; g.font = '500 13px "IBM Plex Mono", monospace'; g.fillText(c.no, 24, 24);
+    const ent = c.r === 'entity', n = ent ? (CARD_ENT[c.ent] ? CARD_ENT[c.ent].danger | 0 : 0) : R.n, of = ent ? 5 : 4;
+    for (let i = 0; i < of; i++) { const x = 226 - (of - 1 - i) * 13, y = 30; g.save(); g.translate(x, y); g.rotate(Math.PI / 4); if (i < n) { g.fillStyle = ent ? '#8cff5a' : R.icon === '#3a3020' ? '#7a6c4c' : R.icon; g.fillRect(-3.5, -3.5, 7, 7); } else { g.strokeStyle = R.inner; g.lineWidth = 1.2; g.strokeRect(-3.5, -3.5, 7, 7); } g.restore(); }
+    g.save(); arch(24, 46, 208, 128); g.fillStyle = R.win; g.fill(); g.clip();
+    if (ent && img) {
+      g.drawImage(img, 24, 46, 208, 208 * (img.height / img.width || 1));
+      g.globalCompositeOperation = 'multiply'; g.fillStyle = '#7dff5a'; g.fillRect(24, 46, 208, 128); g.globalCompositeOperation = 'source-over';
+      g.fillStyle = 'rgba(0,0,0,0.3)'; for (let y = 46; y < 174; y += 3) g.fillRect(24, y, 208, 1);
+    } else if (!ent) {
+      g.translate(128 - 39, 112 - 39); g.scale(3.25, 3.25);
+      if (R.glow) { g.shadowColor = R.glow; g.shadowBlur = 6; }
+      g.strokeStyle = R.icon; g.lineWidth = 1.4; g.lineCap = 'round'; g.lineJoin = 'round'; g.stroke(new Path2D(CARD_ICON[c.icon]));
+    }
+    g.restore();
+    g.textAlign = 'center'; g.fillStyle = R.ink; g.font = '600 27px "Barlow Condensed", "Arial Narrow", sans-serif';
+    let y = wrap(c.name.toUpperCase(), 128, 186, 210, 27, 2);
+    g.fillStyle = R.inner; g.fillRect(52, y + 6, 152, 1.5);
+    g.font = '500 15px Barlow, system-ui, sans-serif'; g.fillStyle = ent ? '#c4ff9a' : R.ink;
+    y = wrap((ent ? '+ ' : '') + c.text, 128, y + 16, 210, 18, 4);
+    if (c.bad) { g.fillStyle = '#ff8f80'; wrap('− ' + c.bad, 128, y + 2, 210, 18, 3); }
+    g.fillStyle = R.sub; g.font = '500 11px "IBM Plex Mono", monospace';
+    g.fillText((ent ? 'ENTITY · ' + (CARD_ENT[c.ent] ? CARD_ENT[c.ent].name : '') : R.label).toUpperCase(), 128, 352);
+    tex.needsUpdate = true;
+  };
+  paint(null);
+  if (c.r === 'entity' && UI_IMG.p[c.ent]) { const im = new Image(); im.onload = () => paint(im); im.src = UI_IMG.p[c.ent]; }
+  return tex;
+}
+function cardMesh(d) {
+  const c = CARD_BY[d.c], R = CARD_RAR[c.r], g = new THREE.Group();
+  const card = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.75), new THREE.MeshBasicMaterial({ map: cardTex(c), side: THREE.DoubleSide, transparent: true, fog: false }));
+  card.position.y = 0.95; g.add(card);
+  const big = c.r !== 'common', glow = glowSprite(R.hex, big ? 1.6 : 1.1, big ? 0.55 : 0.3); glow.position.y = 0.95; g.add(glow);
+  g.add(fxPad(0, 0, 0.55, R.hex, big ? 0.2 : 0.12));
+  if (c.r === 'legendary' || c.r === 'godly' || c.r === 'entity') g.add(mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.4, 8, 1, true), basic(R.hex, { transparent: true, opacity: 0.4, depthWrite: false, fog: false, blending: THREE.AdditiveBlending }), 0, 2.6, 0));
+  g.position.set(d.x, 0, d.z); scene.add(g);
+  d.g = g; d.card = card; d.ph = Math.random() * 6;
+}
+function cardUnmesh(d) {
+  if (!d.g) return;
+  scene.remove(d.g);
+  try { d.card.geometry.dispose(); d.card.material.map.dispose(); d.card.material.dispose(); } catch (e) {}
+  d.g = d.card = null;
+}
+function cardPlace(at, side) {
+  const ok = (x, z) => { const t = tileAt(x, z); return t >= 0 && !solid[t] && reachable(t); };
+  let x = P.x, z = P.z;
+  if (at && Number.isFinite(at.x) && Number.isFinite(at.z) && Math.hypot(at.x - P.x, at.z - P.z) < 12 && ok(at.x, at.z)) { x = at.x; z = at.z; }
+  else { const f = fwdVec(), fx = P.x + f.x * 1.8, fz = P.z + f.z * 1.8; if (ok(fx, fz) && los(P.x, P.z, fx, fz)) { x = fx; z = fz; } }
+  if (side) { const f = fwdVec(), sx = x + f.z * 0.9, sz = z - f.x * 0.9; if (ok(sx, sz)) { x = sx; z = sz; } }
+  return { x, z };
+}
+// every win drops one card; 2% of the time the entity's own card drops beside it
+function cardDrop(ch, at) {
+  if (HAUNT || state !== 'playing') return null;
+  const c = cardPick(cardRoll()), R = CARD_RAR[c.r], p = cardPlace(at, false);
+  const d = { x: p.x, z: p.z, c: c.id }; RUN.drops.push(d);
+  let e = null;
+  if (CARD_BY['e_' + ch.id] && cardRand() < 0.02) { const q = cardPlace(at, true); e = { x: q.x, z: q.z, c: 'e_' + ch.id }; RUN.drops.push(e); }
+  const who = ENT[ch.id] ? ENT[ch.id].name : 'It';
+  later(1.2, () => { if (RUN.drops.includes(d) || (e && RUN.drops.includes(e))) toast(`${who} dropped a ${R.label} card${e ? ', and its own Entity card' : ''}. Walk over it to take it.`, c.r === 'common' && !e ? '' : 'good', 4.5); });
+  requestSave();
+  return d;
+}
+function cardGive(id) {
+  const inv = cardInv(), first = !inv[id];
+  inv[id] = (inv[id] | 0) + 1;
+  let equipped = false;
+  const eq = cardEquipped();
+  if (first && CARD_BY[id].r !== 'entity' && eq.length < CARD_SLOTS) { eq.push(id); equipped = true; }
+  cardsRecalc(); saveProgress(); requestSave();
+  return { first, equipped };
+}
+function cardTake(i) {
+  const d = RUN.drops[i]; if (!d) return;
+  const c = CARD_BY[d.c]; RUN.drops.splice(i, 1); cardUnmesh(d);
+  const res = cardGive(c.id);
+  sfx.chime(); if (c.r !== 'common') later(0.25, () => sfx.coin());
+  cardPop(c, res); cardsHud();
+}
+function cardsTick(dt) {
+  if (P.hp > 0 && P.hp < 100 && runAdd('hpRegen') > 0 && state === 'playing') P.hp = Math.min(100, P.hp + runAdd('hpRegen') * dt);
+  for (let i = RUN.drops.length - 1; i >= 0; i--) {
+    const d = RUN.drops[i];
+    if (!d.g) cardMesh(d);
+    d.ph += dt;
+    const dx = P.x - d.x, dz = P.z - d.z, dist = Math.hypot(dx, dz);
+    // once you are close it drifts to you, so you never have to stand exactly on it
+    if (dist < 2.6 && !P.hidden) { const k = Math.min(1, dt * 2.4); d.x += dx * k; d.z += dz * k; }
+    d.g.position.set(d.x, 0, d.z);
+    d.card.rotation.y += dt * 1.8; d.card.position.y = 0.95 + Math.sin(d.ph * 2.2) * 0.08;
+    if (dist < 1.1 && !P.hidden) cardTake(i);
+  }
+}
+// a floor you finish keeps nothing on its floor: anything left lying there goes into your inventory
+function cardsSweep() {
+  for (const d of RUN.drops) { cardUnmesh(d); cardGive(d.c); }
+  RUN.drops = [];
+}
+function cardsHud() {
+  const b = el('cardBox'); if (!b) return;
+  const eq = cardEquipped();
+  if (HAUNT || !eq.length || state !== 'playing') { b.hidden = true; return; }
+  b.hidden = false;
+  b.innerHTML = `<span class="cb-l">Cards</span>${eq.map((id) => `<i class="cr-${CARD_BY[id].r}" title="${escHtml(CARD_BY[id].name)}"></i>`).join('')}${Array.from({ length: CARD_SLOTS - eq.length }, () => '<i class="cb-empty"></i>').join('')}`;
+}
+function cardPop(c, res) {
+  const p = el('cardPop'); if (!p) return;
+  const head = res && !res.first ? `Another one · ×${cardCount(c.id)}` : res && res.equipped ? 'New card · equipped' : 'New card · in your inventory';
+  p.innerHTML = `<span class="cp-h">${head}</span>${cardHTML(c)}`;
+  p.hidden = false; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show');
+  clearTimeout(UI.cardPopT); UI.cardPopT = setTimeout(() => { p.hidden = true; }, 4800);
+}
+// upgrades are gone; anything bought back when they existed goes back to you as tokens, once
+function upsRefund() {
+  const u = progress.ups; if (!u || typeof u !== 'object') return;
+  let c = 0;
+  for (const x of UPS) { const lv = Math.min(u[x.id] | 0, x.cost.length); for (let i = 0; i < lv; i++) c += x.cost[i]; }
+  progress.ups = {};
+  if (!c) return;
+  progress.cash = (progress.cash | 0) + c; inv.coins = progress.cash; saveProgress();
+  UI.refundMsg = `Upgrades are gone now, so the ones you had bought were turned back into ${c} tokens for the vending machine.`;
+}
+// the Cards screen: equipped slots, then the whole inventory, with the ones you haven't found face down
+function cardsScreen(cid) {
+  const box = el(cid); if (!box) return;
+  upsRefund();
+  const invc = cardInv(), eq = cardEquipped(), f = UI.cardF || 'all', found = CARDS.filter((c) => invc[c.id] > 0).length;
+  const slots = Array.from({ length: CARD_SLOTS }, (_, i) => { const id = eq[i]; return id ? `<button type="button" class="ucbtn" data-up="c:${id}" aria-label="Take off ${escHtml(CARD_BY[id].name)}">${cardHTML(CARD_BY[id], { sm: true })}</button>` : '<div class="uc-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14 M5 12h14"/></svg>Empty slot</div>'; }).join('');
+  const tabs = [['all', 'All'], ...CARD_ORDER.map((r) => [r, CARD_RAR[r].label])].map(([k, t]) => `<button type="button" class="uc-tab${f === k ? ' on' : ''}" data-up="f:${k}" aria-pressed="${f === k}">${t}</button>`).join('');
+  const list = CARDS.filter((c) => f === 'all' || c.r === f).map((c) => {
+    const n = invc[c.id] | 0;
+    if (!n) return `<div class="uc-back cr-${c.r}" title="Not found yet"><b>?</b><span>Not found yet</span></div>`;
+    const on = eq.includes(c.id);
+    return `<button type="button" class="ucbtn" data-up="c:${c.id}" aria-pressed="${on}" aria-label="${on ? 'Take off' : 'Equip'} ${escHtml(c.name)}">${cardHTML(c, { sm: true, count: n, on })}</button>`;
+  }).join('');
+  const note = UI.refundMsg ? `<p class="shop-note good">${escHtml(UI.refundMsg)}</p>` : '';
+  box.innerHTML = `${note}<p class="shop-note">Every entity you beat drops a card, and 2% of the time its own Entity card too. Everything you pick up stays in your inventory for good. Click a card to equip it; only equipped cards do anything.</p>
+    <div class="uc-head"><h3 class="shop-h">Equipped</h3><span>${eq.length} of ${CARD_SLOTS}</span></div><div class="uc-slots">${slots}</div>
+    <p class="shop-note" id="ucMsg" role="status">${escHtml(UI.cardMsg || '')}</p>
+    <div class="uc-head"><h3 class="shop-h">Inventory</h3><span>${found} of ${CARDS.length} found</span></div><div class="uc-tabs">${tabs}</div>
+    <div class="ucards">${list}</div>`;
+  UI.cardMsg = '';
+}
+function cardsClick(v, cid) {
+  if (v.startsWith('f:')) { UI.cardF = v.slice(2); cardsScreen(cid); return; }
+  const id = v.slice(2), c = CARD_BY[id]; if (!c || !cardCount(id)) return;
+  const eq = cardEquipped(), i = eq.indexOf(id);
+  if (i >= 0) { eq.splice(i, 1); UI.cardMsg = `Took off ${c.name}.`; }
+  else if (eq.length >= CARD_SLOTS) UI.cardMsg = `All ${CARD_SLOTS} slots are full. Take a card off first.`;
+  else { eq.push(id); UI.cardMsg = `Equipped ${c.name}.`; }
+  sfx.click(); cardsRecalc(); saveProgress(); cardsHud(); cardsScreen(cid);
+}
+
 const inv = { fizz: 0, battery: 1, coins: 0, hat: false, hatWorn: false, duck: false, popper: false, tasks: 0, conf: 0 };
+const RUN = runInit(saved);
+cardsRecalc();
 const P = { x: tc(SPAWN.x), z: tc(SPAWN.y), vx: 0, vz: 0, yaw: 0, pitch: 0, hp: 100, st: 100, exhausted: false, stCd: 0, bat: 100, light: false, crouch: false, eye: 1.62, speed: 0, sprinting: false, noise: 0, shoutT: 0, bob: 0, step: 0, lockMove: false, hurt: 0, shake: 0, ex: 0, ez: 0, kx: 0, kz: 0, hidden: null };
 const UI = { sil: {}, silBusy: {}, dashAt: 0, dashCd: 1, dashN: 0, flashAt: 0, flashCd: 1, flashN: 0, hudT: 0, jf: 'all', jv: 'ents', jsel: null, bf: 'all', lsel: 0, retry: null, cardTm: 0, introTm: 0 };
 const DIR = { phase: 'quiet', t: 40, len: 40, v: 0, busy: false, warned: false, net: null };
@@ -6085,7 +6547,7 @@ const TUT = { on: false, i: 0, steps: [], moved: 0, x0: 0, z0: 0, t: 0, fight: f
 let tintOverride = null, smog = 0, smogTarget = 0;
 let state = 'title', paused = false, overlay = null, active = null, scareS = null, quackers = null, exitObj = null;
 let time = 0, deaths = 0, playTime = 0, lookDelta = 0, lookRate = 0, lastTile = -1, dragMode = false, uiCursor = false, touchMode = false;
-const picked = new Set(saved.picked || []);
+const picked = new Set((saved.picked || []).map((x) => (typeof x === 'number' ? LEVEL + ':' + x : x)));
 if (saved.status) Object.assign(status, saved.status);
 if (saved.inv) Object.assign(inv, saved.inv);
 if (saved.noteRead) saved.noteRead.forEach((v, i) => { noteRead[i] = v; });
@@ -6102,7 +6564,7 @@ const items = [], interact = [];
 let itemSerial = 0;
 function placeItem(type, t, extra = {}) {
   if (HAUNT) return null;
-  const id = itemSerial++;
+  const id = LEVEL + ':' + itemSerial++;
   if (t == null || picked.has(id)) return null;
   const x = tc(t % W) + rand(-0.3, 0.3), z = tc((t / W) | 0) + rand(-0.3, 0.3);
   const g = new THREE.Group(); g.position.set(x, 0, z);
@@ -6227,7 +6689,7 @@ if (LEVEL === 1) {
   for (const t of F.crates) {
     const x = tc(t % W), z = tc((t / W) | 0), g = buildCrate(false);
     g.position.set(x, 0, z); g.rotation.y = rand(-0.3, 0.3); scene.add(g);
-    const c = { t, x, z, g, looted: false }; crates.push(c);
+    const c = { t, x, z, g, looted: picked.has('crate:' + t) }; crates.push(c);
     addI({ x, y: 0.7, z, noLos: true, label: () => (c.looted ? 'Search the crate again' : 'Search crate'), use: () => searchCrate(c) });
   }
   const carCols = [0x7b2d26, 0x2d4a7b, 0x8c8f93, 0x2f5a3a, 0xc9b25a, 0x3a3a40];
@@ -6270,7 +6732,7 @@ if (LEVEL === 1) {
     addI({ x: lk.fx, y: 1.2, z: L.y * T + 0.75, r: 2.0, noLos: true, label: () => (active && active.id === 'lurker' ? (P.hidden === lk ? 'Climb out' : 'Hide in locker') : 'Open locker'), use: () => useLocker(lk) });
   }
   { const g = buildFountain(), x = tc(F.fount.x), z = tc(F.fount.y); g.position.set(x, 0, z); scene.add(g);
-    addI({ x, y: 0.8, z, r: 2.4, noLos: true, label: () => 'Toss a coin into the fountain', alive: () => status.tide < 3, use: tossCoin }); }
+    addI({ x, y: 0.8, z, r: 2.4, noLos: true, label: () => 'Toss a token into the fountain', alive: () => status.tide < 3, use: tossCoin }); }
   { const Mn = F.main, x = (Mn.px0 + 4) * T, z = (Mn.py0 + 3) * T;
     scene.add(mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.7, 5), M(0xb8bec4), x, 2.15, z));
     scene.add(mesh(new THREE.TorusGeometry(0.1, 0.02, 6, 14), M(0xd9b23a, { emissive: 0.4 }), x, 1.22, z));
@@ -6324,7 +6786,7 @@ function setupPlayground() {
     g.add(mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.16, 16), M(0xf4c8d4), -0.3, 0.9, 0)); g.add(mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.1, 4), M(0xffffff), -0.3, 1.03, 0));
     const cols = [0xc23a3a, 0x3a6ac2, 0xd0b030]; cols.forEach((c, i) => { const b = buildBalloonFace(c); b.position.set(0.2 + i * 0.2, 1.72, -0.15 + (i % 2) * 0.25); g.add(b); });
     g.position.set(p.x, 0, p.z); scene.add(g);
-    addI({ x: p.x + 0.3, y: 1.3, z: p.z, r: 2.6, noLos: true, label: () => 'Pop a balloon', alive: () => status.balloon < 3 && !active, use: () => { sfx.pop(); const n = recent(R2.pops, 15); toast(n === 1 ? 'It pops. There was a face on the back of it.' : 'Another one. Something, somewhere, is counting.', 'say', 3); } });
+    addI({ x: p.x + 0.3, y: 1.3, z: p.z, r: 2.6, noLos: true, label: () => 'Pop a balloon', alive: () => status.balloon < 3 && !active, use: () => { sfx.pop(); const n = recent(R2.pops, 15); if (n >= 3) { R2.pops.length = 0; toast('A shape at the far end of the room lifts a handful of strings.', 'bad', 4); later(1.2, () => startChallenge('balloon')); } else toast(n === 1 ? 'It pops. There was a face on the back of it.' : 'Another one. Something, somewhere, is counting.', 'say', 3); } });
     addI({ x: p.x - 0.3, y: 0.9, z: p.z, r: 2.4, noLos: true, label: () => `Party table · ${tasksCount()}/4 found`, alive: () => (inv.tasks & 15) !== 15 && !inv.popper && status.comeplay < 3, use: () => { const miss = TASK_NAMES.filter((n, i) => !taskDone(i)); toast(`Still missing: ${miss.join(', ')}.`, '', 5); } });
     addI({ x: p.x - 0.3, y: 0.9, z: p.z, r: 2.6, noLos: true, label: () => 'Build the Confetti Popper', alive: () => (inv.tasks & 15) === 15 && !inv.popper && status.comeplay < 3, use: () => { inv.popper = true; sfx.win(); confettiBurst(p.x, 1.2, p.z, 40, 1.6); toast('The Confetti Popper is ready. Press 3 when you are right in its face. Do not miss.', 'good', 7); requestSave(); } });
   }
@@ -6419,7 +6881,8 @@ function setupPlayground() {
   setupPlayDressing();
 }
 const COME_PLAY_TUNE = [659, 587, 494, 587, 523, 440, 494, 392];
-function cpDriver() { const me = coopMe(); if (!me) return true; const now = performance.now(); for (const o of others.values()) if (o.peer < me && now - (o.heard || 0) < 3000) return false; return true; }
+function coopDriverPeer() { const me = coopMe(); if (!me) return ''; const now = performance.now(); let best = me; for (const o of others.values()) if (o.peer < best && now - (o.heard || 0) < 3000) best = o.peer; return best; }
+function cpDriver() { const me = coopMe(); return !me || coopDriverPeer() === me; }
 function cpTick(dt) {
   if (!CP || CP.dead) return;
   const g = CP.g, u = g.userData;
@@ -6515,6 +6978,8 @@ function rituals2(dt) {
       const a = Math.atan2(P.x - px, P.z - pz);
       if (R2.ringLast != null) { let da = a - R2.ringLast; if (da > Math.PI) da -= TAU; if (da < -Math.PI) da += TAU; R2.ringA += da; }
       R2.ringLast = a;
+      if (Math.abs(R2.ringA) > TAU * 1.5) hintOnce('ring1', 'You hear paper rustling in time with your feet.', 'say');
+      if (Math.abs(R2.ringA) > TAU * 3) { R2.ringA = 0; R2.ringLast = null; startChallenge('ring'); }
     } else { R2.ringA = 0; R2.ringLast = null; }
   }
 }
@@ -6577,8 +7042,8 @@ function recent(list, secs) { const keep = list.filter((t) => time - t < secs); 
 function searchCrate(c) {
   sfx.crate(); c.g.rotation.z = 0.08; later(0.15, () => { c.g.rotation.z = 0; });
   if (!c.looted) {
-    c.looted = true; const r = Math.random();
-    if (r < 0.3) { inv.coins++; sfx.coin(); toast(`Under the straw: an old coin. (${inv.coins})`); }
+    c.looted = true; picked.add('crate:' + c.t); requestSave(); const r = Math.random();
+    if (r < 0.3) { inv.coins += 1 + runAdd('token'); sfx.coin(); toast(`Under the straw: a vending token. (${inv.coins})`); }
     else if (r < 0.48) { inv.battery++; toast('A battery, still in its blister pack.'); }
     else if (r < 0.66) { inv.fizz++; toast('A bottle of Fizz Water.'); }
     else toast('Packing straw and nothing else.');
@@ -6594,6 +7059,7 @@ function honk(c) {
   if (status.exhaust >= 3 || active) return;
   const n = recent(counts1.honks, 20);
   if (n === 2) toast('The horn echoes for far too long.', 'say');
+  if (n >= 3) { counts1.honks.length = 0; later(1.2, () => startChallenge('exhaust')); }
 }
 function pressIntercom() {
   sfx.intercom();
@@ -6628,9 +7094,9 @@ function useLocker(lk) {
 }
 function tossCoin() {
   if (active) return toast('Now is not the time for wishes.');
-  if (!inv.coins) return toast('You need a coin to make a wish.');
+  if (!inv.coins) return toast('You need a token to make a wish.');
   inv.coins--; sfx.splash(); toast('Plink. You make a wish.', 'say', 3);
-  P.hp = Math.min(100, P.hp + 15); later(1.2, () => toast('You feel a little better. The water looks pleased.', 'say', 3));
+  later(1.5, () => startChallenge('tide'));
 }
 function pullChain() {
   if (active) return toast('Not now.');
@@ -6650,7 +7116,7 @@ const R1 = { moth: 0, cop: 0, run: 0, drain: 0, hop: 0, lastHop: -1 };
 function rituals1(dt) {
   if (active || scareS) { R1.moth = R1.cop = R1.run = R1.drain = 0; return; }
   const pt = tileAt(P.x, P.z), inA = tileX(P.x) < 41;
-  if (false) {
+  if (inA && status.moth < 3 && lightOn() && P.pitch > 1.1) {
     R1.moth += dt; if (R1.moth > 2.5) hintOnce('moth', 'Something big flutters against the ceiling.', 'say');
     if (R1.moth > 5) { R1.moth = 0; startChallenge('moth'); }
   } else R1.moth = 0;
@@ -6658,7 +7124,7 @@ function rituals1(dt) {
     R1.cop += dt; if (R1.cop > 2.5) hintOnce('cop', 'Your reflection blinks a moment after you do.', 'say');
     if (R1.cop > 5) { R1.cop = 0; startChallenge('copycat'); }
   } else R1.cop = 0;
-  if (false && signs.some((s) => Math.hypot(s.x - P.x, s.z - P.z) < 4.5 && los(P.x, P.z, s.x, s.z))) {
+  if (!inA && status.lifeguard < 3 && P.sprinting && signs.some((s) => Math.hypot(s.x - P.x, s.z - P.z) < 4.5 && los(P.x, P.z, s.x, s.z))) {
     R1.run += dt;
     if (R1.run > 0.5) { R1.run = 0; sfx.whistle(); toast('A whistle shrieks: “NO RUNNING!”', 'say', 3); later(1.0, () => startChallenge('lifeguard')); }
   }
@@ -6681,7 +7147,7 @@ function onNewTile1(t) {
   if (z === 6 || z === 14) hintOnce('deep', 'The deep end. The water is warm and only ankle-deep. For now.');
   if (z === 8) hintOnce('hop', 'A long tiled hall with chalk squares on the floor.');
   if (z === 9) hintOnce('lock', 'A changing room. A row of tall metal lockers.');
-  if (z === 10) hintOnce('fount', 'A wishing fountain. The bottom is covered in coins.');
+  if (z === 10) hintOnce('fount', 'A wishing fountain. The bottom is covered in old tokens.');
   if (z === 11) hintOnce('main', 'The main pool. A chain hangs from the ceiling over the middle.');
   if (tileX(P.x) > 41) hintOnce('poolrooms', 'The Poolrooms. Everything is white tile and the air smells of chlorine.', 'good');
 }
@@ -6774,10 +7240,11 @@ function showNote(i) {
   const n = NOTES[i];
   el('noteWho').textContent = `Note #${i}${n.ent && status[n.ent] >= 1 ? ' · ' + ENT[n.ent].name : ''}`;
   el('noteText').innerHTML = n.text.split('\n\n').map((p) => `<p>${p.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`).join('');
-  el('note').hidden = false; overlay = 'note';
+  el('note').hidden = false; overlay = 'note'; uiCursor = true; if (document.pointerLockElement) document.exitPointerLock();
 }
-function openJournal() { renderJournal(); el('journal').hidden = false; overlay = 'journal'; }
+function openJournal() { renderJournal(); el('journal').hidden = false; overlay = 'journal'; uiCursor = true; if (document.pointerLockElement) document.exitPointerLock(); }
 function closeOverlay(gesture = true) {
+  if (overlay === 'journal' || overlay === 'note') uiCursor = false;
   if (overlay === 'journal') el('journal').hidden = true;
   if (overlay === 'note') el('note').hidden = true;
   if (overlay === 'vend') { el('vend').hidden = true; uiCursor = false; }
@@ -6800,10 +7267,10 @@ function openVend() {
   if (document.exitPointerLock && document.pointerLockElement) document.exitPointerLock();
 }
 function renderVend(msg) {
-  el('vwallet').textContent = `YOUR COINS: ${inv.coins}`;
+  el('vwallet').textContent = `YOUR TOKENS: ${inv.coins}`;
   if (msg) { el('vscreen').textContent = msg; vendMsgT = performance.now() + 1400; return; }
   if (performance.now() < vendMsgT) return;
-  el('vscreen').textContent = vendCode ? vendCode.padEnd(2, '_') : inv.coins ? 'SELECT' : 'INSERT COIN';
+  el('vscreen').textContent = vendCode ? vendCode.padEnd(2, '_') : inv.coins ? 'SELECT' : 'INSERT TOKEN';
 }
 function vendPress(k) {
   sfx.beep();
@@ -6826,7 +7293,7 @@ function vendSubmit() {
     return;
   }
   if (!menu[code]) return renderVend(code.length < 2 ? 'PICK A CODE' : 'INVALID');
-  if (inv.coins < 1) return renderVend('INSERT COIN');
+  if (inv.coins < 1) return renderVend('INSERT TOKEN');
   inv.coins--; sfx.vend();
   if (menu[code] === 'moth') { P.st = 100; P.exhausted = false; renderVend('MOTH BAR'); toast('Moth Bar. Chalky, but your legs feel new.', 'good'); }
   if (menu[code] === 'fizz') { inv.fizz++; renderVend('FIZZ WATER'); }
@@ -6844,7 +7311,7 @@ function takeItem(it) {
     sfx.paper(); noteRead[it.note] = true;
     const e = NOTES[it.note].ent; if (e && status[e] === 0) status[e] = 1;
     showNote(it.note);
-  } else if (it.type === 'coin') { inv.coins++; sfx.coin(); toast(`An old coin. ${inv.coins} in your pocket.`); hintOnce('coin', 'Coins work in a vending machine somewhere on this level.'); }
+  } else if (it.type === 'coin') { inv.coins += 1 + runAdd('token'); sfx.coin(); toast(`A vending token. ${inv.coins} in your pocket.`); hintOnce('coin', LEVEL === 0 ? 'Tokens work in the vending machine. You keep them between floors.' : 'Tokens are for the vending machine on Level 0. You keep them between floors.'); }
   else if (it.type === 'battery') { inv.battery++; sfx.pickup(); toast('Battery. Press 2 or R to swap it in.'); }
   else if (it.type === 'fizz') { inv.fizz++; sfx.pickup(); toast('Fizz Water. Press 1 to drink it.'); }
   else if (it.type === 'hat') { inv.hat = true; sfx.pickup(); toast('A party hat, still taped together. Press 3 to put it on.', 'good', 5); }
@@ -6854,7 +7321,7 @@ function useItem(n) {
   if (n === 1) {
     if (!inv.fizz) return toast('No Fizz Water.');
     if (P.hp >= 100) return toast('You feel fine. Save it for later.');
-    inv.fizz--; P.hp = Math.min(100, P.hp + 35); sfx.drink(); toast('Fizz Water. +35 health.', 'good');
+    const fh = 35 + runAdd('fizz'); inv.fizz--; P.hp = Math.min(100, P.hp + fh); sfx.drink(); toast(`Fizz Water. +${fh} health.`, 'good');
   } else if (n === 2) {
     if (!inv.battery) return toast('No spare batteries.');
     if (P.bat > 95) return toast('The flashlight is already full.');
@@ -6923,6 +7390,7 @@ function runTimers(dt) {
 function damage(n, reason) {
   if (state !== 'playing' || (time < P.dashT && n < 90)) return;
   n = uiDmg(n); P.hp -= n; P.hurt = 1; sfx.hurt();
+  if (P.hp <= 0 && cardHas('lastlight') && !RUN.last) { RUN.last = true; P.hp = 1; P.dashT = time + 1.2; toast('The Last Light flares. You stay on your feet with 1 health.', 'good', 4); requestSave(); }
   if (P.hp <= 0) { P.hp = 0; die(reason); }
 }
 function die(reason) {
@@ -6957,7 +7425,7 @@ function startChallenge(id, key, pose, force) {
   let ch = null;
   try { ch = seededRun(k, () => CH[id]()); } finally { if (pose) { P.x = own.x; P.z = own.z; P.yaw = own.yaw; updatePlayerField(); } }
   if (!ch) return false;
-  ch.id = id; ch.done = false; ch.admin = !!force; ch.key = k; ch.spawn = pose || own; ch.rng = mulberry32(keyHash(k + 'u')); coop.seen.add(k); active = ch;
+  ch.id = id; ch.done = false; ch.admin = !!force; ch.key = k; ch.t0 = time; ch.spawn = pose || own; ch.rng = mulberry32(keyHash(k + 'u')); coop.seen.add(k); active = ch;
   coopReset(!pose);
   const firstMeet = status[id] < 2;
   if (status[id] < 2) status[id] = 2;
@@ -6971,12 +7439,14 @@ function startChallenge(id, key, pose, force) {
 function endChallenge(ch, success, msg) {
   if (active !== ch) return;
   active = null; ch.done = true;
+  const dropAt = success && ch.g ? { x: ch.g.position.x, z: ch.g.position.z } : null;
   try { if (ch.cleanup) ch.cleanup(success); } catch (e) { console.error(e); }
   later(1.5, () => { if (ch.g && !ch.g.parent) disposeKit(ch.g); });
   H_.banner.hidden = true; H_.arrow.hidden = true; document.body.classList.remove('has-banner');
   if (success) {
-    status[ch.id] = 3; sfx.chime(); lastDocId = ch.id;
+    status[ch.id] = 3; sfx.chime(); lastDocId = ch.id; syncSeen();
     uiFightEnd(ch, true, msg);
+    cardDrop(ch, dropAt);
     docHints(ch.id);
   } else uiFightEnd(ch, false, msg);
   requestSave(); mpSend();
@@ -7104,7 +7574,7 @@ CH.grinner = () => {
     update(dt) {
       const d = distP(g), pt = tileAt(P.x, P.z), inLit = !dark[pt] && lightAt(P.x, P.z) > 0.4;
       const beam = lightOn() && d < 16 && beamHits(g.position.x, 1.65, g.position.z) && los(P.x, P.z, g.position.x, g.position.z);
-      if (mode === 'stalk') {
+      if (mode === 'stalk' && (coop.auth || !others.size)) {
         if (inLit) {
           outT += dt;
           if (outT > 15) return endChallenge(ch, false, 'You stayed in the light. It is still down there, and it is still smiling.');
@@ -7122,7 +7592,7 @@ CH.grinner = () => {
       } else if (mode === 'wind') {
         t -= dt;
         if (beam) return recoil('GOT IT');
-        if (t <= 0) { mode = 'lunge'; t = 1.5; }
+        if (t <= 0 && (coop.auth || !others.size)) { mode = 'lunge'; t = 1.5; }
       } else if (mode === 'lunge') {
         t -= dt; steer(g.position, P.x, P.z, 10.5, dt, 0.3);
         if (beam && t > 1.15) return recoil('GOT IT');
@@ -7140,6 +7610,13 @@ CH.grinner = () => {
       u.sprite.position.set(red ? rand(-0.03, 0.03) : 0, 1.62 + Math.sin(time * 2) * 0.05, 0.72);
     },
     onFlash() { if (mode === 'wind' || mode === 'lunge') { recoil('GOT IT'); return true; } away(); return true; },
+    shareGet: () => [['stalk', 'wind', 'lunge'].indexOf(mode), done],
+    shareSet(x) {
+      if (!Array.isArray(x)) return;
+      if (!coop.auth) { const md = ['stalk', 'wind', 'lunge'][x[0] | 0]; if (md && md !== mode) { if (md === 'wind') { t = 0.9; sfx.growl(); bigText('NOW', '#ff8a7a', 0.7); } else if (md === 'lunge') t = 1.5; mode = md; } }
+      // a teammate drove it back: that counts for the team
+      if ((x[1] | 0) > done) { done = Math.min(NEED, x[1] | 0); if (done >= NEED) succeed(ch, 'The smile snaps shut and does not open again. For now.'); else if (coop.auth) { mode = 'stalk'; t = rand(2.2, 3.4); away(); } }
+    },
     t: () => ({ mode, done, hits, setT: (v) => { t = v; } }),
     cleanup() { removeLater(g); },
   };
@@ -7172,12 +7649,23 @@ CH.hound = () => {
     g, scareY: 1.2, radios,
     obj: 'It is blind and hunts by sound. Creep [C] to the radios and shut all three off [hold E]. Each click brings it running. Shout [V] to pull it to where you are, then creep away.',
     progress: () => { const r = nearest(); return r && r.hold > 0 ? r.hold : off / radios.length; },
-    shareGet: () => radios.reduce((m, r, i) => m | (r.done ? 1 << i : 0), 0),
-    shareSet(m) { radios.forEach((r, i) => { if (((m | 0) >> i) & 1 && !r.done) { r.hold = 1; r.share = true; } }); },
+    shareGet: () => [radios.reduce((m, r, i) => m | (r.done ? 1 << i : 0), 0), ['patrol', 'hunt', 'sniff'].indexOf(mode)],
+    shareSet(x) {
+      const m = Array.isArray(x) ? x[0] : x;
+      radios.forEach((r, i) => { if (((m | 0) >> i) & 1 && !r.done) { r.hold = 1; r.share = true; } });
+      // the game driving it decides what it is doing, so everyone hears the same growl at the same time
+      if (Array.isArray(x) && !coop.auth) { const md = ['patrol', 'hunt', 'sniff'][x[1] | 0]; if (md && md !== mode) { if (md === 'hunt') sfx.growl(); mode = md; } }
+    },
     sub: () => { const r = nearest(); return `${mode === 'hunt' ? 'HUNTING' : mode === 'sniff' ? 'Sniffing' : 'Listening'} · noise ${noiseBar()} · radios off ${off}/${radios.length}${r ? ` · nearest ${dirWords(r.x, r.z)}${r.hold > 0 ? ' · HOLD [E]' : ''}` : ''}`; },
     update(dt) {
       const d = distP(g), hold = keys.KeyE || touch.use;
       if (P.noise > 0 && d < P.noise * 26) { tgt.x = P.x; tgt.z = P.z; if (mode !== 'hunt') { mode = 'hunt'; sfx.growl(); } }
+      // the game driving it also hears everyone else in the fight: sprinting, walking, or creeping
+      if (coop.auth) for (const o of others.values()) {
+        if (!o.f || o.f[1] !== ch.key || o.f[2] !== 0 || o.dead) continue;
+        const nz = (o.flags & 8) ? 1 : (o.flags & 32) ? ((o.flags & 1) ? 0.07 : 0.4) : 0;
+        if (nz > 0 && Math.hypot(o.tx - g.position.x, o.tz - g.position.z) < nz * 26) { tgt.x = o.tx; tgt.z = o.tz; if (mode !== 'hunt') { mode = 'hunt'; sfx.growl(); } }
+      }
       if (mode === 'hunt') { steer(g.position, tgt.x, tgt.z, 6.2 + off * 0.45, dt, 0.35); if (Math.hypot(g.position.x - tgt.x, g.position.z - tgt.z) < 0.9) { mode = 'sniff'; sniff = 1.6; } }
       else if (mode === 'sniff') { sniff -= dt; if (sniff <= 0) patrol(); }
       else { steer(g.position, tgt.x, tgt.z, 2.6, dt, 0.35); if (Math.hypot(g.position.x - tgt.x, g.position.z - tgt.z) < 1.1) { mode = 'sniff'; sniff = 1.4; } }
@@ -7298,16 +7786,18 @@ CH.knock = () => {
     const d = buildKnockDoor(); d.visible = false; d.position.set(sp.x, 0, sp.z); faceTo(d, P.x, P.z); scene.add(d); doors.push(d);
   }
   const at = (i) => doors[i].position, n = doors.length;
+  // the door that knocks jumps and lights up red, and stays lit until you have answered it
+  const marks = doors.map((d) => { const pad = fxPad(d.position.x, d.position.z, 1.25, 0xff2a14, 0.3), gl = glowSprite(0xff3a20, 3, 0), col = mesh(new THREE.CylinderGeometry(1.18, 1.18, WALL_H, 28, 1, true), basic(0xff2a14, { transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, fog: false }), d.position.x, WALL_H / 2, d.position.z); gl.position.set(d.position.x, 2.3, d.position.z); pad.visible = false; scene.add(pad, gl, col); return { pad, gl, col, k: 0 }; });
   const mk = (c, a, b) => { const iv = []; for (let i = 0; i < c - 1; i++) iv.push(Math.random() < 0.5 ? a : b); if (iv.every((v) => v === iv[0])) iv[iv.length - 1] = iv[0] === a ? b : a; return iv; };
   const pats = [{ iv: mk(3, 0.3, 0.6), door: 0 }, { iv: mk(4, 0.3, 0.6), door: n > 1 ? 1 : 0 }, { iv: mk(5, 0.3, 0.6), door: n > 2 ? (Math.random() < 0.5 ? 0 : 2) : 0 }];
   let round = 0, fails = 0, phase = 'wait', t = 1.2, presses = [], queue = [], opening = false, dots = '', behindT = 0, behindKnock = 0, lastDoor = n - 1;
   toast('A door stands in front of you where there was no door. Something knocks.', 'bad', 4);
-  function knockAt(i, v = 1) { const p = at(i), pn = panner(p.x, 1.2, p.z); tone(140, 0.09, 0.9 * v, { f2: 90, dest: pn }); hiss(0.03, 0.45 * v, { type: 'bandpass', f: 900, q: 2, dest: pn }); if (pn) setTimeout(() => pn.disconnect(), 600); const u = doors[i].userData; u.shake = 0.18; if (u.knob) u.knob.rotation.z = 0.5; if (u.dust) u.dust(); }
+  function knockAt(i, v = 1) { const p = at(i), pn = panner(p.x, 1.2, p.z); tone(140, 0.09, 0.9 * v, { f2: 90, dest: pn }); hiss(0.03, 0.45 * v, { type: 'bandpass', f: 900, q: 2, dest: pn }); if (pn) setTimeout(() => pn.disconnect(), 600); const u = doors[i].userData; u.shake = 0.18; if (u.knob) u.knob.rotation.z = 0.5; if (u.dust) u.dust(); marks[i].k = 1; if (v >= 0.9) P.shake = Math.max(P.shake, 0.05); }
   function listen() {
     phase = 'listen'; dots = '';
     const want = Math.min(n, round + 1); let extra = 0;
     doors.forEach((d, i) => { if (i < want && !d.visible) { d.visible = true; d.scale.set(0.01, 1, 1); extra = 1; tween(0.35, (k) => d.scale.set(Math.max(0.01, k), 1, 1)); } });
-    if (extra) toast('Another door opens up. Listen for which one is knocking.', 'bad', 3.4);
+    if (extra) toast('Another door opens up. Watch for the one that lights up red.', 'bad', 3.4);
     let tt = time + (extra ? 1.0 : 0.2); queue = [tt]; for (const iv of pats[round].iv) { tt += iv; queue.push(tt); } t = tt - time + 0.7;
   }
   const nearDoor = () => { let best = -1, bd = 2.9; doors.forEach((d, i) => { if (!d.visible) return; const dd = Math.hypot(d.position.x - P.x, d.position.z - P.z); if (dd < bd) { bd = dd; best = i; } }); return best; };
@@ -7336,9 +7826,9 @@ CH.knock = () => {
   }
   const ch = {
     g, scareY: 1.58, pats, doors,
-    obj: 'Listen for which door knocks. Go to it, then copy the rhythm exactly with [E].',
+    obj: 'The door that knocks jumps and lights up red. Go to it, then copy the rhythm exactly with [E].',
     progress: () => Math.min(1, round / 3),
-    sub: () => (phase === 'listen' ? `Listen... ${dots}` : phase === 'repeat' ? `YOUR TURN · ${presses.length ? `${presses.length}/${pats[round].iv.length + 1} knocks` : `get to the door that knocked · ${Math.ceil(Math.max(0, t))}s`} · mistakes ${fails}/3` : phase === 'behind' ? 'Something is behind you. Turn round and answer it [E]' : `Round ${Math.min(round + 1, 3)}/3`),
+    sub: () => { const w = (i) => dirWords(at(i).x, at(i).z); return phase === 'listen' ? `Listen... ${dots}${n > 1 && round > 0 ? ` · knocking ${w(pats[round].door)}` : ''}` : phase === 'repeat' ? `YOUR TURN · ${presses.length ? `${presses.length}/${pats[round].iv.length + 1} knocks` : `go to the red door ${w(pats[round].door)} · ${Math.ceil(Math.max(0, t))}s`} · mistakes ${fails}/3` : phase === 'behind' ? `Something is behind you, ${w(lastDoor)}. Turn round and answer it [E]` : `Round ${Math.min(round + 1, 3)}/3`; },
     update(dt) {
       t -= dt;
       if (phase === 'wait' && t <= 0) listen();
@@ -7370,6 +7860,11 @@ CH.knock = () => {
         if (u.knob) u.knob.rotation.z = Math.max(0, u.knob.rotation.z - dt * 2.5);
         if (u.tick) u.tick(dt);
         if (i > 0 && u.eye) u.eye.lookAt(camera.position);
+        const mk = marks[i], lit = (phase === 'repeat' && round < 3 && i === pats[round].door) || (phase === 'behind' && i === lastDoor);
+        mk.k = Math.max(lit ? 0.5 + Math.sin(time * 5) * 0.14 : 0, mk.k - dt * 2.4);
+        mk.gl.position.set(d.position.x, 2.3, d.position.z); mk.gl.material.opacity = mk.k * 0.95;
+        mk.pad.visible = mk.k > 0.02; mk.pad.position.set(d.position.x, 0, d.position.z); mk.pad.children[0].material.opacity = mk.k * 0.4; mk.pad.children[1].material.opacity = mk.k; mk.col.position.set(d.position.x, WALL_H / 2, d.position.z); mk.col.material.opacity = mk.k * 0.3;
+        d.rotation.z = Math.sin(time * 46) * Math.max(0, mk.k - 0.65) * 0.14;
       });
     },
     onInteract() {
@@ -7381,13 +7876,13 @@ CH.knock = () => {
       if (phase !== 'repeat') return true;
       const nd = nearDoor();
       if (nd < 0) { toast('Get closer to the door that knocked.', '', 1.4); return true; }
-      if (nd !== pats[round].door) { presses = []; wrong('Wrong door. Listen again.'); if (!ch.done) { phase = 'wait'; t = 1.6; } return true; }
+      if (nd !== pats[round].door) { presses = []; wrong('Wrong door. Go to the one that is lit up red.'); if (!ch.done) { phase = 'wait'; t = 1.6; } return true; }
       presses.push(time); knockAt(nd, 0.75);
       if (presses.length >= pats[round].iv.length + 1) judge();
       return true;
     },
-    t: () => ({ phase, round, fails, pats, doors, lastDoor }),
-    cleanup() { doors.forEach((d) => removeLater(d)); },
+    t: () => ({ phase, round, fails, pats, doors, lastDoor, marks }),
+    cleanup() { marks.forEach((mk) => { scene.remove(mk.pad); scene.remove(mk.gl); scene.remove(mk.col); }); doors.forEach((d) => removeLater(d)); },
   };
   return ch;
 };
@@ -7506,7 +8001,7 @@ CH.snack = () => {
         else if (d < 4) moveCircle(g.position, -toP.x * 1.5 * dt, -toP.z * 1.5 * dt, 0.45);
         faceTo(g, P.x, P.z, 0.15);
         hide = (!see || d > 11) ? hide + dt : Math.max(0, hide - dt * 0.5);
-        if (hide > 2.6 && d < 26) { hide = 0; mode = 'aim'; modeT = 0.95; say('INSERT COIN', '#ff5040'); sfx.buzz(); bigText('INSERT COIN', '#ff5040', 0.9); }
+        if (hide > 2.6 && d < 26) { hide = 0; mode = 'aim'; modeT = 0.95; say('INSERT TOKEN', '#ff5040'); sfx.buzz(); bigText('INSERT TOKEN', '#ff5040', 0.9); }
         throwT -= dt;
         if (throwT <= 0 && stock > 0) {
           if (see && d < 22) { volley++; if (volley % 4 === 0) { mode = 'wind'; modeT = 0.75; say('SPECIAL OFFER', '#ffe14d'); } else { fire(); sfx.can(); stock--; throwT = 1.05; } }
@@ -7555,7 +8050,7 @@ CH.snack = () => {
         if (s.t <= 0) { scene.remove(s.m); slicks.splice(i, 1); continue; }
         if (Math.hypot(s.x - P.x, s.z - P.z) < 0.85) { P.ex -= P.vx * 0.55; P.ez -= P.vz * 0.55; hintOnce('slick', 'Sticky. It drags at your feet.', 'say'); }
       }
-      if (stock <= 0 && !cans.length) return succeed(ch, 'OUT OF STOCK. Snackbot powers down and waddles home. It left you 2 coins.');
+      if (stock <= 0 && !cans.length) return succeed(ch, 'OUT OF STOCK. Snackbot powers down and waddles home.');
       if (d < (mode === 'rush' ? 1.25 : 1.1) && grace <= 0) { if (mode === 'rush') g.rotation.x = 0; caught(ch, 30, 'Snackbot gave you a hug. A heavy one.'); }
     },
     onInteract() {
@@ -7570,7 +8065,6 @@ CH.snack = () => {
       g.rotation.x = 0; g.position.y = 0; if (u.crackK) u.crackK(0); say('');
       v.reset(); solid[v.t] = 2; invalidateFields();
       resolve(P, 0.32);
-      if (success) inv.coins += 2;
     },
   };
   return ch;
@@ -7689,7 +8183,7 @@ CH.manager = () => {
 };
 function escape(ch) {
   if (ch) succeed(ch, null);
-  state = 'won'; sfx.win(); musicStop(); H_.arrow.hidden = true; mpSend({ w: 1 });
+  cardsSweep(); state = 'won'; sfx.win(); musicStop(); H_.arrow.hidden = true; mpSend({ w: 1 });
   if (document.pointerLockElement) document.exitPointerLock();
   if (LEVEL === 0) progress.level1 = true;
   el('winRun').textContent = (ACCT.mode === 'cloud' && ACCT.player ? ACCT.player + ' · ' : '') + recordRun();
@@ -8215,6 +8709,13 @@ CH.lifeguard = () => {
       if (blows > 0 && stop <= 0) { blows--; stop = 2.8; sfx.whistle(); bigText('STOP', '#7dff9b', 0.8); toast(blows ? 'It freezes. It has to. One blast left.' : 'It freezes. That was the last of your breath.', 'good', 2.4); }
       return true;
     },
+    shareGet: () => (phase === 'run' ? 1 : 0),
+    shareSet(x) {
+      if (x !== 1 || phase !== 'sneak') return;
+      phase = 'run'; sfx.whistle(); bigText('RUN', '#ff8a7a', 1); g.userData.beam.visible = false; mark.visible = true; startDist = Math.max(1, homeField[tileAt(P.x, P.z)]);
+      H_.arrow.hidden = false; el('arrow-t').textContent = 'BACK';
+      toast('A teammate took the whistle. It is coming down, chair and all. Run back to where you started.', 'bad', 4);
+    },
     t: () => ({ phase, seen, blows, catches, start, stop }),
     cleanup() { el('arrow-t').textContent = 'EXIT'; g.rotation.z = 0; g.position.y = 0; removeLater(mark); removeLater(g); },
   };
@@ -8567,7 +9068,7 @@ CH.tide = () => {
     crest.material.uniforms.gapOn.value = crest2.material.uniforms.gapOn.value = kind === 'gap' ? 1 : 0; crest.material.uniforms.gapA.value = crest2.material.uniforms.gapA.value = gapA;
   }
   warn();
-  toast('The fountain gulps down your coin. Then the water stands up.', 'bad', 4);
+  toast('The fountain gulps down your token. Then the water stands up.', 'bad', 4);
   const inGap = (a) => { let d = a - gapA; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU; return Math.abs(d) < GAP; };
   function pass(i, d) {
     passed[i] = true;
@@ -8927,6 +9428,13 @@ CH.balloon = () => {
         const n2 = findSpot({ minD: 8, maxD: 11 }) || findSpot({ minD: 6, maxD: 13 }); if (n2) { g.position.set(n2.x, 0, n2.z); px = n2.x; pz = n2.z; }
       }
       return true;
+    },
+    shareGet: () => [stage, head],
+    shareSet(x) {
+      if (!Array.isArray(x)) return;
+      if ((x[0] | 0) === 2 && stage === 1) { stage = 2; spawn = 2.5; if (g.userData.bunch) g.userData.bunch.visible = false; bigText('HIS HEAD', '#ff8a7a', 1); toast('His bunch is gone. His head is the last balloon. Let him get close.', 'bad', 4); }
+      const hd = Math.min(HEAD, x[1] | 0);
+      if (hd > head) { head = hd; const rg = g.userData.rig && g.userData.rig.g; if (rg) rg.scale.multiplyScalar(0.84); if (head >= HEAD) succeed(ch, 'The last of the air goes out of him, slowly, like a sigh. There is nothing left but the strings.'); }
     },
     t: () => ({ list, pops, stage, head, hits }),
     cleanup() { list.forEach((o) => scene.remove(o.m)); removeLater(g); },
@@ -9498,9 +10006,9 @@ function updatePlayer(dt) {
   const m = Math.hypot(f, s); if (m > 1) { f /= m; s /= m; }
   const wantSprint = (keys.ShiftLeft || keys.ShiftRight || touch.sprint) && f > 0.3 && !P.crouch;
   const sprinting = wantSprint && !P.exhausted && P.st > 0 && m > 0.2;
-  if (sprinting) { P.st -= 9 * (1 - uiUp('stam') * 0.17) * dt; P.stCd = 1; if (P.st <= 0) { P.st = 0; P.exhausted = true; toast('Out of breath.', '', 2); } }
-  else { P.stCd -= dt; if (P.stCd <= 0) P.st = Math.min(100, P.st + 15 * dt); if (P.exhausted && P.st >= 35) P.exhausted = false; }
-  let sp = P.crouch ? 1.7 : sprinting ? 6.0 : 3.3; if (HAUNT) sp = hauntSp(sp, sprinting); if (f < -0.1 && !sprinting) sp *= 0.8;
+  if (sprinting) { P.st -= 9 * runMul('stam') * dt; P.stCd = 1; if (P.st <= 0) { P.st = 0; P.exhausted = true; toast('Out of breath.', '', 2); } }
+  else { P.stCd -= dt; if (P.stCd <= 0) P.st = Math.min(100, P.st + 15 * runMul('regen') * dt); if (P.exhausted && P.st >= 35) P.exhausted = false; }
+  let sp = P.crouch ? 1.7 * runMul('crouch') : sprinting ? 6.0 * runMul('sprint') : 3.3; if (HAUNT) sp = hauntSp(sp, sprinting); else sp *= runMul('speed'); if (f < -0.1 && !sprinting) sp *= 0.8;
   const sy = Math.sin(P.yaw), cy = Math.cos(P.yaw);
   const tx = (-sy * f + cy * s) * sp, tz = (-cy * f - sy * s) * sp, k = 1 - Math.exp(-dt * 11);
   P.vx += (tx - P.vx) * k; P.vz += (tz - P.vz) * k;
@@ -9508,7 +10016,7 @@ function updatePlayer(dt) {
   P.ex = P.ez = 0; const kd = Math.exp(-dt * 5); P.kx *= kd; P.kz *= kd;
   P.speed = Math.hypot(_p.x - P.x, _p.z - P.z) / dt; P.x = _p.x; P.z = _p.z;
   P.sprinting = sprinting && P.speed > 2.5;
-  P.noise = P.speed < 0.3 ? 0 : P.crouch ? 0.07 : P.sprinting ? 1 : 0.4;
+  P.noise = (P.speed < 0.3 ? 0 : P.crouch ? 0.07 : P.sprinting ? 1 : 0.4) * runMul('noise');
   if (time - P.shoutT < 0.5) P.noise = Math.max(P.noise, 1.6);
   if (P.speed > 0.4) {
     P.bob += dt * P.speed * 2.2; P.step += P.speed * dt;
@@ -9522,11 +10030,11 @@ function updatePlayer(dt) {
   const pt = tileAt(P.x, P.z);
   ritual.dark = pt >= 0 && dark[pt] && !lightOn() && P.speed < 0.25 ? ritual.dark + dt : 0;
   if (!active && LEVEL === 0) {
-    if (false) { if (ritual.back > 6) hintOnce('back6', 'You feel watched from behind.', 'say'); if (ritual.back > 12) { ritual.back = 0; startChallenge('stillman'); } }
-    if (false) { if (ritual.sprint > 6) hintOnce('run6', 'Your footsteps are echoing far too loudly.', 'say'); if (ritual.sprint > 10) { ritual.sprint = 0; startChallenge('hound'); } }
-    if (false) { if (ritual.dark > 3) hintOnce('dark3', 'Something in the dark is waking up.', 'say'); if (ritual.dark > 6) { ritual.dark = 0; startChallenge('grinner'); } }
+    if (status.stillman < 3) { if (ritual.back > 6) hintOnce('back6', 'You feel watched from behind.', 'say'); if (ritual.back > 12) { ritual.back = 0; startChallenge('stillman'); } }
+    if (status.hound < 3) { if (ritual.sprint > 6) hintOnce('run6', 'Your footsteps are echoing far too loudly.', 'say'); if (ritual.sprint > 10) { ritual.sprint = 0; startChallenge('hound'); } }
+    if (status.grinner < 3) { if (ritual.dark > 3) hintOnce('dark3', 'Something in the dark is waking up.', 'say'); if (ritual.dark > 6) { ritual.dark = 0; startChallenge('grinner'); } }
   }
-  if (P.light) { P.bat = Math.max(0, P.bat - 0.85 * (1 - uiUp('batt') * 0.2) * dt); if (P.bat <= 0) { P.light = false; toast('The flashlight dies. Swap in a battery [2].', 'bad'); } }
+  if (P.light) { P.bat = Math.max(0, P.bat - 0.85 * runMul('batt') * dt); if (P.bat <= 0) { P.light = false; toast('The flashlight dies. Swap in a battery [2].', 'bad'); } }
   if (LEVEL === 1) rituals1(dt);
   if (LEVEL === 2) rituals2(dt);
 }
@@ -9635,10 +10143,15 @@ function update(dt) {
   const t = tileAt(P.x, P.z);
   if (t !== lastTile) { lastTile = t; onNewTile(t); }
   updatePlayerField();
-  uiWorld(dt);
+  uiWorld(dt); cardsTick(dt);
   runTimers(dt);
   if (adminPending && LEVEL === 2 && !HAUNT && !active && !scareS && !overlay && state === 'playing') { const id = adminPending; adminPending = null; if (!startChallenge(id, undefined, undefined, true)) toast('It could not find a way to you here. Move somewhere more open and try again.', 'bad', 5); }
-  if (active && !active.done && !active.downed) { const r0 = Math.random; if (active.rng) Math.random = active.rng; try { uiFightTick(active, dt); } finally { Math.random = r0; } }
+  if (active && !active.done && !active.downed) {
+    const ch = active, g = ch.g, follow = !!(MP.game && !coop.auth && coop.ent && g && ch.id !== 'mimic' && others.size);
+    const keep = follow ? [g.position.x, g.position.y, g.position.z, g.rotation.x, g.rotation.y, g.rotation.z, g.scale.x, g.scale.y, g.scale.z, g.visible] : null;
+    const r0 = Math.random; if (ch.rng) Math.random = ch.rng; try { uiFightTick(ch, dt); } finally { Math.random = r0; }
+    if (keep && active === ch && !ch.done) { g.position.set(keep[0], keep[1], keep[2]); g.rotation.set(keep[3], keep[4], keep[5]); g.scale.set(keep[6], keep[7], keep[8]); g.visible = keep[9]; }
+  }
   coopEntitySync(dt);
   if (active && active.g && !active.done && !active.downed) animEntity(active.g, dt);
   mpTick(dt); coopTick(); exitTick(); dreadTick(dt); if (HAUNT) hauntTick(dt);
@@ -9664,7 +10177,7 @@ function updateHUD(dt) {
   setText(el('s3t'), LEVEL === 2 ? (inv.popper ? 'Popper' : 'Empty') : inv.hat ? (inv.hatWorn ? 'Hat on' : 'Hat') : 'Empty'); el('s3').classList.toggle('empty', LEVEL === 2 ? !inv.popper : !inv.hat || inv.hatWorn);
   { const tt = el('taskTag'); tt.hidden = LEVEL !== 2 || status.comeplay === 3; if (!tt.hidden) setText(tt, inv.popper ? 'CONFETTI POPPER READY [3]' : `POPPER TASKS ${tasksCount()}/4 · CONFETTI ${Math.min(8, inv.conf | 0)}/8`); }
   setText(el('s4t'), inv.duck ? (quackers ? 'Quack' : 'Duck') : 'Empty'); el('s4').classList.toggle('empty', !inv.duck);
-  setText(H_.coins, `¢${inv.coins}`);
+  setText(H_.coins, `${inv.coins} ${inv.coins === 1 ? 'token' : 'tokens'}`);
   const label = focus ? (touchMode ? `USE · ${focus.label()}` : `<b>E</b> ${focus.label()}`) : '';
   setHTML(H_.prompt, label); H_.cross.classList.toggle('hot', !!focus);
   if (active && active.downed) {
@@ -9685,7 +10198,7 @@ const nC = el('fx-noise'), nG = nC.getContext('2d'), nImg = nG.createImageData(1
 function grain() { const a = nImg.data; for (let i = 0; i < a.length; i += 4) { const v = Math.random() * 255; a[i] = a[i + 1] = a[i + 2] = v; a[i + 3] = 255; } nG.putImageData(nImg, 0, 0); }
 
 /* ---------- restore a hot-reloaded session ---------- */
-if (saved.P) { Object.assign(P, saved.P, { lockMove: false, shake: 0, hurt: 0 }); resolve(P, 0.32); }
+if (saved.P && Number.isFinite(saved.P.x) && Number.isFinite(saved.P.z)) { Object.assign(P, saved.P, { lockMove: false, shake: 0, hurt: 0 }); if (!Number.isFinite(P.yaw)) P.yaw = 0; if (!Number.isFinite(P.pitch)) P.pitch = 0; resolve(P, 0.32); }
 if (saved.quackers) spawnQuackers();
 if (LEVEL === 1) openGate(true);
 if (hot && hot.snapshot) {
@@ -9820,9 +10333,12 @@ function upsertOther(p) {
     o.tx = +pr.p[0] || 0; o.tz = +pr.p[1] || 0; o.tyaw = +pr.p[2] || 0; o.flags = pr.p[3] | 0;
     if (o.first) { o.x = o.tx; o.z = o.tz; o.yaw = o.tyaw; o.first = false; }
   }
-  if (Array.isArray(pr.dr) && typeof pr.dr[0] === 'string') { DIR.net = [pr.dr[0], +pr.dr[1] || 0, pr.dr[2] == null ? null : +pr.dr[2] || 0, +pr.dr[3] || 1]; DIR.fresh = true; }
-  if (LEVEL < 2 && Array.isArray(pr.rm)) RM.net = pr.rm.map((v) => +v || 0);
-  if (LEVEL === 2) { const m = (pr.tk | 0) & 15; for (let b = 0; b < 4; b++) if ((m >> b) & 1) setTask(b); if (CP && Array.isArray(pr.rm)) CP.net = { x: +pr.rm[0] || 0, z: +pr.rm[1] || 0 }; }
+  const fromDriver = p.peer === coopDriverPeer();
+  if (fromDriver && Array.isArray(pr.dr) && typeof pr.dr[0] === 'string') { DIR.net = [pr.dr[0], +pr.dr[1] || 0, pr.dr[2] == null ? null : +pr.dr[2] || 0, +pr.dr[3] || 1]; DIR.fresh = true; DIR.netAt = performance.now(); }
+  if (fromDriver && LEVEL < 2 && Array.isArray(pr.rm)) { RM.net = pr.rm.map((v) => +v || 0); RM.netTarget = typeof pr.rmt === 'string' ? pr.rmt : ''; }
+  // it noticed you on their screen: the fight starts here, where you are
+  if (fromDriver && LEVEL < 2 && Array.isArray(pr.rmn) && pr.rmn[1] === coopMe() && pr.rmn[0] !== RM.askSeen && Math.abs(Date.now() - (+pr.rmn[0] || 0)) < 8000) { RM.askSeen = pr.rmn[0]; if (!active && !scareS && state === 'playing') rmNotice(); }
+  if (LEVEL === 2) { const m = (pr.tk | 0) & 15; for (let b = 0; b < 4; b++) if ((m >> b) & 1) setTask(b); if (fromDriver && CP && Array.isArray(pr.rm)) CP.net = { x: +pr.rm[0] || 0, z: +pr.rm[1] || 0 }; }
   o.f = validFight(pr.f);
   const inFight = active && o.f && o.f[1] === active.key;
   if (inFight && active.shareSet && pr.x != null) active.shareSet(pr.x);
@@ -9870,7 +10386,7 @@ function mpStart() {
 }
 function mpSend(extra) {
   if (!MP.game) return;
-  const flags = (P.crouch ? 1 : 0) | (lightOn() ? 2 : 0) | (state === 'dead' ? 4 : 0);
+  const flags = (P.crouch ? 1 : 0) | (lightOn() ? 2 : 0) | (state === 'dead' ? 4 : 0) | (P.sprinting ? 8 : 0) | (P.hidden ? 16 : 0) | (P.speed > 0.3 ? 32 : 0);
   const patch = Object.assign({ p: [+P.x.toFixed(2), +P.z.toFixed(2), +P.yaw.toFixed(2), flags] }, extra || {});
   const ac = active, holding = !!(ac && ac.key && CH[ac.id] && coop.auth && !ac.downed), g = holding && ac.g && !ac.done && ENT[ac.id] ? ac.g : null;
   if (g) {
@@ -9885,6 +10401,9 @@ function mpSend(extra) {
   if (!HAUNT && LEVEL < 3 && cpDriver()) patch.dr = [DIR.phase, +DIR.v.toFixed(2), +(+DIR.t || 0).toFixed(1), +(+DIR.len || 1).toFixed(1)];
   if (!HAUNT && LEVEL < 2 && RM.g && cpDriver()) patch.rm = [+RM.g.position.x.toFixed(2), +RM.g.position.z.toFixed(2), +RM.g.rotation.y.toFixed(2), RM.mode === 'chase' ? 1 : 0];
   if (LEVEL === 2) { patch.tk = inv.tasks | 0; patch.rm = CP && !CP.dead && cpDriver() ? [+CP.g.position.x.toFixed(2), +CP.g.position.z.toFixed(2)] : null; }
+  const drv = cpDriver();
+  patch.dr = null;
+  if (LEVEL < 2) { if (!drv || patch.rm === undefined) patch.rm = drv && patch.rm ? patch.rm : null; patch.rmt = drv ? RM.target || '' : null; patch.rmn = drv && RM.ask ? [RM.ask.at, RM.ask.peer] : null; }
   MP.game.presence(patch).catch(() => {});
 }
 function mpTick(dt) {
@@ -9940,10 +10459,10 @@ function coopTick() {
 function coopSummon(o) {
   const f = o.f;
   if (!f || f[2] !== 0 || coop.seen.has(f[1]) || state !== 'playing' || o.first) return;
-  coop.seen.add(f[1]);
   const id = f[0], name = ENT[id].name;
-  if (status[id] === 3 && !f[9]) return;
-  if (active || scareS) { toast(`${o.name} summoned ${name}, but you are busy with your own.`, 'bad', 5); return; }
+  if (active && !active.done && !active.downed && !scareS && !overlay && active.id === id && active.key !== f[1] && time - (active.t0 || 0) < 6 && String(f[1]) < String(active.key)) endChallenge(active, false, null);
+  if (active || scareS || overlay) { if (coop.busyFor !== f[1] && !scareS && !(active && active.id === id)) { coop.busyFor = f[1]; toast(`${o.name} is fighting ${name}. You will join them as soon as you are free.`, 'bad', 5); } return; }
+  coop.seen.add(f[1]);
   const far = Math.hypot(o.tx - P.x, o.tz - P.z) > 4;
   if (far) pullTo(o);
   const pose = typeof f[5] === 'number' && typeof f[6] === 'number' && typeof f[7] === 'number' ? { x: f[5], z: f[6], yaw: f[7] } : { x: o.tx, z: o.tz, yaw: o.tyaw };
@@ -9982,7 +10501,7 @@ function teamDocument(id, o) {
   status[id] = 3; lastDocId = id;
   if (id === 'quackers') { if (!quackers && state === 'playing') spawnQuackers(); }
   else { sfx.chime(); toast(`${o.name} documented ${e.name}. It is in your journal too (${documented()}/${TOTAL}).`, 'good', 5); docHints(id); }
-  teamReward(id, o); requestSave();
+  teamReward(id, o); requestSave(); syncSeen();
 }
 function teamReward(id, o) {
   if (id === 'comeplay') cpKill(true);
@@ -10040,7 +10559,7 @@ const keyHash = (k) => { let h = 7; for (let i = 0; i < k.length; i++) h = (Math
 function seededRun(key, fn) { const r0 = Math.random; Math.random = mulberry32(keyHash(key)); try { return fn(); } finally { Math.random = r0; } }
 function coopReset(driving) { Object.assign(coop, { auth: driving, gen: driving ? 1 : 0, myGen: driving ? 1 : 0, handTo: '', noHand: time + 2, ent: null, lastE: time, seq: 0 }); }
 function coopMe() { if (!coop.me && MP.game) { const m = MP.game.peers().find((p) => p.isMe); if (m) coop.me = m.peer; } return coop.me || ''; }
-function coopClaim() { coop.gen = (coop.gen | 0) + 1; coop.myGen = coop.gen; coop.auth = true; coop.handTo = ''; coop.noHand = time + 2; coop.lastE = time; mpSend(); }
+function coopClaim() { coop.gen = (coop.gen | 0) + 1; coop.myGen = coop.gen; coop.auth = true; coop.handTo = ''; coop.noHand = time + 3; coop.closer = 0; coop.lastE = time; mpSend(); }
 const coopAnySees = (ch) => { for (const o of others.values()) if (o.f && o.f[1] === ch.key && o.f[2] === 0 && o.f[8] === 1) return true; return false; };
 function coopHear(e) {
   const n = (i) => +e[i] || 0, t = coop.ent || (coop.ent = {}), seq = n(8);
@@ -10058,7 +10577,10 @@ function coopAuthority(ch) {
     if (time < coop.noHand || !ch.g) return;
     // somebody else is clearly closer: it is theirs now, so it goes after them
     const gx = ch.g.position.x, gz = ch.g.position.z, mine = Math.hypot(P.x - gx, P.z - gz);
-    for (const o of fighters) if (Math.hypot(o.tx - gx, o.tz - gz) + 2.5 < mine) { coop.auth = false; coop.handTo = o.peer; coop.lastE = time; mpSend(); return; }
+    const nearer = fighters.find((o) => Math.hypot(o.tx - gx, o.tz - gz) + 3.5 < mine);
+    if (!nearer) { coop.closer = 0; return; }
+    if (!coop.closer) coop.closer = time;
+    if (time - coop.closer > 1) { coop.closer = 0; coop.auth = false; coop.handTo = nearer.peer; coop.lastE = time; mpSend(); }
     return;
   }
   if (fighters.some((o) => o.f[4] === me && me)) return coopClaim();
@@ -10593,6 +11115,7 @@ function runSnapshot() {
   return {
     v: 1, active: true, savedAt: Date.now(), level: LEVEL, seed, gateOpen, picked: [...picked], status: Object.assign({}, status), inv: Object.assign({}, inv),
     noteRead: noteRead.slice(), deaths, playTime: Math.round(playTime), quackers: !!quackers, documented: documented(), total: TOTAL,
+    lastUsed: RUN.last, drops: RUN.drops.map((d) => ({ x: +d.x.toFixed(2), z: +d.z.toFixed(2), c: d.c })),
     P: alive ? { x: +P.x.toFixed(2), z: +P.z.toFixed(2), yaw: +P.yaw.toFixed(3), pitch: 0, hp: Math.max(1, Math.round(P.hp)), bat: Math.round(P.bat) } : null,
   };
 }
@@ -10655,7 +11178,7 @@ setupTitle();
 if (saved.seed && !saved.resumed && state === 'title') el('startBtn').textContent = 'Resume tape';
 
 // debugging handle for testing in the console
-window.__bfn = { kit: { buildStillman, buildGrinner, buildHound, buildConfetti, buildKnockDoor, buildEcho, buildVending, buildManager, buildDuck, buildCrate, buildMoth, buildAttendant, buildSmog, buildCopy, buildValet, buildLifeguard, buildFloatie, buildChalkKid, buildLurker, buildTideSpirit, buildUndertow, buildDrowned, buildSun, buildMoon, buildPockets, buildBalloonMan, buildPaperRing, buildPusher, buildComePlay, buildWow, wowSky, poseStillman, fleshMat, eyeMat, THREE }, ui: () => ({ DIR, RM, TUT, UI, ENTS, KIND }), scareNow: () => active && caught(active, 1, 'Caught.'), darkTile: () => { for (let t = 0; t < N; t++) if (dark[t] && Lr[t] < 0.25 && reachable(t) && !solid[t]) return [t % W, (t / W) | 0]; return null; }, dbg: () => ({ mode: MU.mode, dread, A }), l2: () => ({ CP, R2, F, inv, popI, swingProp, interact, WOW, wowSpot, status }), audioTest: (id, dur = 1.3) => { audioInit(); if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); const bus = scareScream(id, dur); return { ctx: A.ctx, bus }; }, scareInfo: () => scareS && { t: scareS.t, drop: scareS.drop, dur: scareS.dur, hit: scareS.hit, cut: scareS.cut }, goLevel: (lv) => switchLevel(lv, true), start: (id) => startChallenge(id), win: () => active && succeed(active, null), coop: () => ({ auth: coop.auth, gen: coop.gen, me: coop.me, entSeq: coop.ent && coop.ent.seq, active: active && active.id, downed: !!(active && active.downed), key: active && active.key, exit: !!exitObj, ex: exitObj && [exitObj.x, exitObj.z], gate: gateOpen, j: journalCode(), notes: noteCode(), hp: P.hp, state, banner: H_.bnObj.textContent, toasts: [...H_.toasts.children].map((t) => t.textContent) }), give: () => { inv.coins += 5; inv.fizz += 3; inv.battery += 3; inv.hat = true; inv.duck = true; }, doc: (id) => { status[id] = 3; }, tp: (x, y) => { P.x = tc(x); P.z = tc(y); }, set: (o) => Object.assign(P, o), keys, state: () => ({ state, paused, overlay, active: active && active.id, scare: !!scareS, status: Object.assign({}, status), inv: Object.assign({}, inv), hp: P.hp, x: P.x, z: P.z }),
+window.__bfn = { kit: { buildStillman, buildGrinner, buildHound, buildConfetti, buildKnockDoor, buildEcho, buildVending, buildManager, buildDuck, buildCrate, buildMoth, buildAttendant, buildSmog, buildCopy, buildValet, buildLifeguard, buildFloatie, buildChalkKid, buildLurker, buildTideSpirit, buildUndertow, buildDrowned, buildSun, buildMoon, buildPockets, buildBalloonMan, buildPaperRing, buildPusher, buildComePlay, buildWow, wowSky, poseStillman, fleshMat, eyeMat, THREE }, ui: () => ({ DIR, RM, TUT, UI, ENTS, KIND }), scareNow: () => active && caught(active, 1, 'Caught.'), darkTile: () => { for (let t = 0; t < N; t++) if (dark[t] && Lr[t] < 0.25 && reachable(t) && !solid[t]) return [t % W, (t / W) | 0]; return null; }, dbg: () => ({ mode: MU.mode, dread, A, timers, time, RUN, cardRoll, CARDS, cardDrop, upsRefund, picked, items, uiCursor, overlay }), l2: () => ({ CP, R2, F, inv, popI, swingProp, interact, WOW, wowSpot, status }), audioTest: (id, dur = 1.3) => { audioInit(); if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); const bus = scareScream(id, dur); return { ctx: A.ctx, bus }; }, scareInfo: () => scareS && { t: scareS.t, drop: scareS.drop, dur: scareS.dur, hit: scareS.hit, cut: scareS.cut }, goLevel: (lv) => switchLevel(lv, true), start: (id) => startChallenge(id), win: () => active && succeed(active, null), coop: () => ({ auth: coop.auth, gen: coop.gen, me: coop.me, entSeq: coop.ent && coop.ent.seq, active: active && active.id, downed: !!(active && active.downed), key: active && active.key, exit: !!exitObj, ex: exitObj && [exitObj.x, exitObj.z], gate: gateOpen, j: journalCode(), notes: noteCode(), hp: P.hp, state, banner: H_.bnObj.textContent, toasts: [...H_.toasts.children].map((t) => t.textContent) }), give: () => { inv.coins += 5; inv.fizz += 3; inv.battery += 3; inv.hat = true; inv.duck = true; }, doc: (id) => { status[id] = 3; }, tp: (x, y) => { P.x = tc(x); P.z = tc(y); }, set: (o) => Object.assign(P, o), keys, state: () => ({ state, paused, overlay, active: active && active.id, scare: !!scareS, status: Object.assign({}, status), inv: Object.assign({}, inv), hp: P.hp, x: P.x, z: P.z }),
   ch: () => active, step: (n = 60, dt = 1 / 60) => { for (let i = 0; i < n; i++) if (state === 'playing' && (!paused || HAUNT) && !overlay) { if (scareS) { time += dt; updateScare(dt); } else update(dt); updateHUD(dt); } renderFrame(); },
   ent: () => active && active.g ? { x: active.g.position.x, z: active.g.position.z, d: distP(active.g) } : null, face: () => { if (active && active.g) P.yaw = Math.atan2(-(active.g.position.x - P.x), -(active.g.position.z - P.z)); }, info: () => ({ P: { x: P.x, z: P.z, hp: P.hp }, active: active && active.id, F, documented: documented() }) };
 
