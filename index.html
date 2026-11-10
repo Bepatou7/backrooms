@@ -920,6 +920,46 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
 #shopOv{z-index:45}
 .jfoot .btn{font-size:22px;padding:8px 16px 7px}
 .uc-on{top:7px;padding:2px 7px;font-size:9px;z-index:4}
+/* v30: pings, ability boxes, the entity arrow, teammates' distances, ally flash, invisibility */
+#allyFlash{background:#fff;opacity:0;z-index:30;pointer-events:none}
+#abVeil{opacity:0;transition:opacity .4s;pointer-events:none;box-shadow:inset 0 0 140px 40px rgba(120,170,255,.45);background:rgba(90,130,220,.08)}
+#abVeil.on{opacity:1}
+#pmarks{position:fixed;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+.pmark{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;gap:3px;margin:-9px 0 0 -60px;width:120px;font-family:var(--f-mono);font-size:12px;line-height:1.2;color:#f3eedf;text-shadow:0 1px 2px #000,0 0 4px #000;will-change:transform}
+.pmark i{width:12px;height:12px;border:2px solid var(--c);transform:rotate(45deg);background:rgba(0,0,0,.35)}
+.pmark span{padding:2px 6px;background:rgba(6,5,3,.72);border-bottom:2px solid var(--c);white-space:nowrap;text-align:center}
+.pmark.small{font-size:11px}.pmark.small i{width:8px;height:8px}
+.pmark.off span{opacity:.85}
+#abArrow{position:fixed;left:50%;top:calc(50% + 46px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;z-index:5}
+#abArrow[hidden]{display:none}
+#abArrow i{font-style:normal;font-size:38px;line-height:1;color:#ff4a3d;text-shadow:0 0 10px rgba(255,60,40,.8);transition:transform .08s linear}
+#abArrow span{font-family:var(--f-mono);font-size:13px;color:#ffd9d4;background:rgba(40,4,2,.75);padding:2px 8px;border-bottom:2px solid #ff4a3d}
+#partyTag{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:15px}
+#partyTag[hidden]{display:none}
+#partyTag span{border-right:3px solid var(--c);padding-right:6px}
+.tool.tab{border-bottom:2px solid #ff7ac6}
+.tool.tab span{overflow:hidden;text-overflow:ellipsis}
+.tool.off{opacity:.6}
+.tab-q{position:absolute;top:3px;right:5px;font-family:var(--f-mono);font-size:11px;color:#ffc4e4}
+.ab-chip{display:inline-block;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;padding:1px 6px;margin-right:4px;background:#1d4a2a;color:#b8ffc8;border-radius:2px}
+.ab-chip.v{background:#1e2c55;color:#c8d8ff}.ab-chip.d{background:#4a2414;color:#ffd0b0}
+.uc-lv{position:absolute;right:10px;top:34px;font-family:var(--f-mono);font-size:11px;font-weight:700;padding:2px 6px;border-radius:3px;background:#f3eedf;color:#1a1408;z-index:3}
+.uc-ab{position:absolute;right:8px;bottom:8px;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:3px;background:#ff7ac6;color:#2a0a1a;z-index:3}
+.uc-cell{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.uc-comb{font-size:13px;padding:6px 8px}
+.uc-loads{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0 10px}
+.uc-loads span{font-size:13px;color:var(--osd-dim);margin-left:6px}
+.uc-roll{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:rgba(255,122,198,.08);border:1px dashed rgba(255,122,198,.55);border-radius:6px;margin-bottom:10px}
+.uc-roll>div{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 280px}
+.uc-roll b{font-size:17px}.uc-roll span{font-size:14px;color:var(--osd-dim)}
+.uc-roll .uc-odds{font-family:var(--f-mono);font-size:12px}
+.uc-roll .btn{white-space:nowrap}
+
+/* v30: the card footer carries the rarity on one line and the level and count as small tags under it, so nothing sits on the text */
+.uc-foot{display:flex;flex-direction:column;align-items:center;gap:4px}
+.uc-tags{display:flex;gap:4px;justify-content:center;letter-spacing:.08em}
+.uc-tags i{font-style:normal;padding:1px 5px;border-radius:3px;border:1px solid var(--sub);color:var(--sub)}
+.uc-tags i.up{background:#f3eedf;border-color:#f3eedf;color:#1a1408;font-weight:700}
 </style>
 
 <canvas id="c" tabindex="-1" aria-label="Level 0, first-person view"></canvas>
@@ -929,6 +969,8 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
 <div id="fx-track"></div>
 <div class="fx" id="hurt"></div>
 <div class="fx" id="flash"></div>
+<div class="fx" id="allyFlash"></div>
+<div class="fx" id="abVeil"></div>
 <div class="fx" id="scare" hidden></div>
 <div class="fx" id="blink"><div class="lid top"></div><div class="lid bot"></div></div>
 
@@ -952,6 +994,7 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
     <div id="hatTag" hidden>PARTY HAT: ON</div>
     <div id="taskTag" hidden></div>
     <div id="mpTag" hidden></div>
+    <div id="partyTag" hidden></div>
   </div>
   <div id="banner" hidden>
     <div id="bn-head"><div id="bn-name"></div><span id="bnKind" class="kind"></span></div>
@@ -960,6 +1003,8 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
     <div id="bn-sub"></div>
   </div>
   <div id="arrow" hidden><div id="arrow-i">▲</div><div id="arrow-t">EXIT</div></div>
+  <div id="pmarks" aria-hidden="true"></div>
+  <div id="abArrow" hidden><i>▲</i><span></span></div>
   <div id="cross"></div>
   <div id="prompt"></div>
   <div id="big"></div>
@@ -972,10 +1017,12 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
   <div id="inv">
     <div class="tool" id="tDash"><kbd>Q</kbd><span>Dash</span><i class="cd" id="tDashCd"></i></div>
     <div class="tool" id="tFlash"><kbd>R</kbd><span>Flash</span><i class="cd" id="tFlashCd"></i></div>
+    <div class="tool tab" id="tAb1" hidden><kbd id="tAb1k">Z</kbd><span id="tAb1n"></span><i class="cd" id="tAb1Cd"></i><b class="tab-q" id="tAb1q"></b></div>
+    <div class="tool tab" id="tAb2" hidden><kbd id="tAb2k">X</kbd><span id="tAb2n"></span><i class="cd" id="tAb2Cd"></i><b class="tab-q" id="tAb2q"></b></div>
     <div class="tool" id="tLight"><kbd>F</kbd><span id="lighttag">Light</span><span class="batt" id="batt"><i id="batfill"></i></span><span id="batpct"></span></div>
     <div class="tool-sep"></div>
     <button class="slot" id="s1" data-slot="1"><span class="k">1</span><span id="s1t">FIZZ ×0</span></button>
-    <button class="slot" id="s2" data-slot="2"><span class="k">2 / R</span><span id="s2t">BATT ×0</span></button>
+    <button class="slot" id="s2" data-slot="2"><span class="k">2</span><span id="s2t">BATT ×0</span></button>
     <button class="slot" id="s3" data-slot="3"><span class="k">3</span><span id="s3t">HAT</span></button>
     <button class="slot" id="s4" data-slot="4"><span class="k">4</span><span id="s4t">DUCK</span></button>
   </div>
@@ -1041,7 +1088,19 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
   <div class="pane" id="pane-museum" role="tabpanel" hidden><h2 class="pane-h">Journal</h2><div class="subtabs" role="group" aria-label="Journal sections"><button type="button" data-sub="ents">Entities</button><button type="button" data-sub="museum">Scare museum</button></div><p class="panep">Every jumpscare you have met, on request, with the sound on. Meet an entity to unlock its exhibit.</p><div id="museumBox" class="bestiary"></div></div>
   <div class="pane" id="pane-ups" role="tabpanel" hidden><h2 class="pane-h">Cards</h2><div id="upsBox"></div></div>
   <div class="pane" id="pane-news" role="tabpanel" hidden><h2 class="pane-h">Updates</h2>
-    <article class="news"><h3>v29 · Nicer cards, more garden <span>Latest</span></h3><ul>
+    <article class="news"><h3>v30 · Play together <span>Latest</span></h3><ul>
+      <li><b>Pings.</b> Press B (or the middle mouse button) to mark the spot you're aiming at, an entity or an item, for everyone in your room. Every marker shows how far away it is in meters, and so do teammates in the corner of your screen and the arrows on fight hints.</li>
+      <li><b>Drop items.</b> G drops a battery and H drops Fizz Water for a teammate to pick up.</li>
+      <li><b>Flash with care.</b> Your flash now blinds teammates who are in front of you, for up to a few seconds depending on how close they are.</li>
+      <li><b>The Sun burns hotter on a crowd.</b> Standing close together heats you up faster, and the shade cools a crowd more slowly.</li>
+      <li><b>Combine cards.</b> Two copies of a stackable card combine into one at the next level with double the effect, for example 7% less damage becomes 14%. Every card says how far it stacks.</li>
+      <li><b>Three loadouts</b>, each with its own cards and abilities.</li>
+      <li><b>Mystery roll.</b> 10 card tokens for a random card in the card shop, three times on every level. Luck makes the rarer cards more likely.</li>
+      <li><b>Seven new cards:</b> Spare Bulb (+1 flash charge), Thick Skin (+20 max health), Static Charm (a chance to switch an entity off for its first round), Big Binder (+2 card slots), Four-Leaf (+10% luck), Molasses (entities move slower) and Pogo Insoles (jump higher, Level 3 and up).</li>
+      <li><b>Twelve ability cards</b> with their own keys (Z and X) and cooldowns: Sugar Rush, Pocket Medkit, Prank Call, Grab Bag, Dowsing Rod, Static Burst, Green Wall, Vanish, Decoy Radio, Red String, Pop-Up Shop and Teleport Pads.</li>
+      <li><b>Fixes.</b> The battery slot no longer says R, which is the Flash key now.</li>
+    </ul></article>
+    <article class="news"><h3>v29 · Nicer cards, more garden</h3><ul>
       <li><b>Cards look better.</b> Corner ornaments, a light sheen on Rare and up, gold rays behind Legendary art, a slowly turning holographic edge on Godly cards, and Entity cards with a bigger, flickering portrait and a REC stamp.</li>
       <li><b>Entity cards are better.</b> Bigger upsides and a much smaller catch on every one.</li>
       <li><b>Three more entities in the Concrete Garden:</b> the Bloom, Rush Hour and the Creeper. The Groundskeeper now wakes once you have documented any five of the other eight.</li>
@@ -1461,7 +1520,7 @@ const LOCAL_RUN = 'bfn-run';
 const readLocalRun = () => { try { return JSON.parse(localStorage.getItem(LOCAL_RUN) || 'null'); } catch (e) { return null; } };
 const writeLocalRun = (r) => { try { if (r) localStorage.setItem(LOCAL_RUN, JSON.stringify(r)); else localStorage.removeItem(LOCAL_RUN); } catch (e) {} };
 const acctChanged = () => ACCT.listeners.forEach((f) => { try { f(); } catch (e) {} });
-const progressDoc = () => JSON.parse(JSON.stringify({ level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {}, cards: progress.cards || {}, equip: progress.equip || [], jump: !!progress.jump, lucky: progress.lucky | 0 }));
+const progressDoc = () => JSON.parse(JSON.stringify({ level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {}, cards: progress.cards || {}, equip: progress.equip || [], abil: progress.abil || [], lv: progress.lv || {}, loads: progress.loads || [], ld: progress.ld | 0, jump: !!progress.jump, lucky: progress.lucky | 0 }));
 const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej({ code: 'timeout' }), ms))]);
 function mergeProgress(p) {
   if (!p) return;
@@ -1470,7 +1529,10 @@ function mergeProgress(p) {
   if (p.jump) progress.jump = true;
   if ((p.lucky | 0) > (progress.lucky | 0)) progress.lucky = p.lucky | 0;
   if (p.cards && typeof p.cards === 'object') { if (!progress.cards || typeof progress.cards !== 'object' || Array.isArray(progress.cards)) progress.cards = {}; for (const [k, v] of Object.entries(p.cards)) if (okKey(k) && typeof v === 'number' && (progress.cards[k] | 0) < v) progress.cards[k] = Math.min(9999, v | 0); }
-  if (Array.isArray(p.equip) && !(Array.isArray(progress.equip) && progress.equip.length)) progress.equip = p.equip.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 5);
+  if (Array.isArray(p.equip) && !(Array.isArray(progress.equip) && progress.equip.length)) progress.equip = p.equip.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 7);
+  if (Array.isArray(p.abil) && !(Array.isArray(progress.abil) && progress.abil.length)) progress.abil = p.abil.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 2);
+  if (p.lv && typeof p.lv === 'object') { if (!progress.lv || typeof progress.lv !== 'object' || Array.isArray(progress.lv)) progress.lv = {}; for (const [k, v] of Object.entries(p.lv)) if (okKey(k) && typeof v === 'number' && (progress.lv[k] | 0) < v) progress.lv[k] = Math.min(10, v | 0); }
+  if (Array.isArray(p.loads) && !(Array.isArray(progress.loads) && progress.loads.some((l) => l && l.c && l.c.length))) { progress.loads = p.loads.slice(0, 3); progress.ld = Math.max(0, Math.min(2, p.ld | 0)); }
   for (const [k, v] of Object.entries(p.seen || {})) if (typeof v === 'number' && (progress.seen[k] || 0) < v) progress.seen[k] = v;
   const have = new Set(progress.runs.map((r) => r.at));
   for (const r of Array.isArray(p.runs) ? p.runs : []) if (r && typeof r.t === 'number' && !have.has(r.at)) { progress.runs.push(r); have.add(r.at); }
@@ -1947,7 +2009,7 @@ const okKey = (k) => /^[a-z][a-z0-9_]{0,23}$/i.test(k) && k !== 'constructor' &&
 const okNum = (v, a, b, d = 0) => (typeof v === 'number' && isFinite(v) ? clamp(v, a, b) : d);
 // a code can come from anywhere, so only the fields and shapes this game writes get through
 function cleanProgress(p) {
-  const out = { level1: true, seen: {}, runs: [], lastRun: 0, cash: 0, ups: {}, cards: {}, equip: [], jump: false, lucky: 0 };
+  const out = { level1: true, seen: {}, runs: [], lastRun: 0, cash: 0, ups: {}, cards: {}, equip: [], abil: [], lv: {}, loads: [], ld: 0, jump: false, lucky: 0 };
   if (p && typeof p === 'object') { out.jump = !!p.jump; out.lucky = okNum(p.lucky, 0, 1e6) | 0; }
   if (!p || typeof p !== 'object') return out;
   if (p.seen && typeof p.seen === 'object') for (const [k, v] of Object.entries(p.seen)) if (okKey(k) && typeof v === 'number') out.seen[k] = clamp(v | 0, 0, 3);
@@ -1955,7 +2017,12 @@ function cleanProgress(p) {
   out.lastRun = okNum(p.lastRun, 0, 9e15); out.cash = okNum(p.cash, 0, 1e6) | 0;
   if (p.ups && typeof p.ups === 'object') for (const [k, v] of Object.entries(p.ups)) if (okKey(k) && typeof v === 'number') out.ups[k] = clamp(v | 0, 0, 10);
   if (p.cards && typeof p.cards === 'object') for (const [k, v] of Object.entries(p.cards)) if (okKey(k) && typeof v === 'number' && v >= 1) out.cards[k] = clamp(v | 0, 1, 9999);
-  if (Array.isArray(p.equip)) out.equip = p.equip.filter((k) => typeof k === 'string' && okKey(k) && out.cards[k]).slice(0, 5);
+  if (Array.isArray(p.equip)) out.equip = p.equip.filter((k) => typeof k === 'string' && okKey(k) && out.cards[k]).slice(0, 7);
+  if (Array.isArray(p.abil)) out.abil = p.abil.filter((k) => typeof k === 'string' && okKey(k) && out.cards[k]).slice(0, 2);
+  if (p.lv && typeof p.lv === 'object') for (const [k, v] of Object.entries(p.lv)) if (okKey(k) && typeof v === 'number' && out.cards[k]) out.lv[k] = clamp(v | 0, 1, 10);
+  const ids = (a, n) => (Array.isArray(a) ? a.filter((k) => typeof k === 'string' && okKey(k)).slice(0, n) : []);
+  if (Array.isArray(p.loads)) out.loads = p.loads.slice(0, 3).map((l) => ({ c: ids(l && l.c, 7), a: ids(l && l.a, 2) }));
+  out.ld = clamp(p.ld | 0, 0, 2);
   return out;
 }
 function cleanRun(r) {
@@ -1970,9 +2037,9 @@ function cleanRun(r) {
     deaths: okNum(r.deaths, 0, 1e5) | 0, playTime: okNum(r.playTime, 0, 1e7), quackers: !!r.quackers, documented: okNum(r.documented, 0, 99) | 0, total: okNum(r.total, 0, 99) | 0, P: null,
   };
   for (const k of Object.keys(out.status)) out.status[k] = clamp(out.status[k] | 0, 0, 3);
-  out.lastUsed = !!r.lastUsed;
+  out.lastUsed = !!r.lastUsed; out.rolls = okNum(r.rolls, 0, 3) | 0;
   out.drops = Array.isArray(r.drops) ? r.drops.filter((d) => d && finite(d.x) && finite(d.z) && typeof d.c === 'string' && /^[a-z0-9_]{1,24}$/.test(d.c)).slice(0, 20).map((d) => ({ x: d.x, z: d.z, c: d.c })) : [];
-  if (r.P && typeof r.P === 'object' && finite(r.P.x) && finite(r.P.z)) out.P = { x: r.P.x, z: r.P.z, yaw: okNum(r.P.yaw, -1e3, 1e3), pitch: 0, hp: okNum(r.P.hp, 1, 100, 100), bat: okNum(r.P.bat, 0, 100, 100) };
+  if (r.P && typeof r.P === 'object' && finite(r.P.x) && finite(r.P.z)) out.P = { x: r.P.x, z: r.P.z, yaw: okNum(r.P.yaw, -1e3, 1e3), pitch: 0, hp: okNum(r.P.hp, 1, 200, 100), bat: okNum(r.P.bat, 0, 100, 100) };
   return out;
 }
 const codeB64 = (u8) => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
@@ -2053,6 +2120,8 @@ const KB_ACTIONS = [
   ['interact', 'Use (hold for some things)', 'KeyE'], ['light', 'Flashlight', 'KeyF'], ['flash', 'Flash', 'KeyR'], ['shout', 'Shout', 'KeyV'],
   ['journal', 'Journal', 'KeyJ'], ['chat', 'Chat (with friends)', 'KeyT'],
   ['slot1', 'Fizz Water', 'Digit1'], ['slot2', 'Battery', 'Digit2'], ['slot3', 'Slot 3', 'Digit3'], ['slot4', 'Slot 4', 'Digit4'],
+  ['ping', 'Ping where you aim (or middle mouse)', 'KeyB'], ['dropb', 'Drop a battery', 'KeyG'], ['dropf', 'Drop Fizz Water', 'KeyH'],
+  ['ab1', 'Ability card 1', 'KeyZ'], ['ab2', 'Ability card 2', 'KeyX'],
 ];
 const KB = { map: {}, wait: null };
 const KB_NAMES = { Space: 'Space', ShiftLeft: 'Left Shift', ShiftRight: 'Right Shift', ControlLeft: 'Left Ctrl', ControlRight: 'Right Ctrl', AltLeft: 'Left Alt', AltRight: 'Right Alt', Tab: 'Tab', Enter: 'Enter', CapsLock: 'Caps Lock', Backquote: '`', Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/', Backslash: '\\', ArrowUp: 'Up', ArrowDown: 'Down', ArrowLeft: 'Left', ArrowRight: 'Right', Backspace: 'Backspace' };
@@ -2442,7 +2511,7 @@ function jumpPress() {
   if (!progress.jump) { hintOnce('nojump', 'Your legs will not do it. Not yet. Something in this place is holding the ground down. The notes mention a spring.', 'say'); return; }
   // a moment's grace after stepping off an edge, so a late jump still counts
   if ((P.air && !(P.coyote && time - P.coyote < 0.15 && P.vy <= 0)) || P.hidden || P.lockMove) return;
-  P.vy = 7.3; P.air = true; P.coyote = 0; P.crouch = false; P.jumpT = time;
+  P.vy = 7.3 * (1 + runAdd('jump')); P.air = true; P.coyote = 0; P.crouch = false; P.jumpT = time;
   tone(260, 0.12, 0.05, { f2: 420, type: 'triangle' });
 }
 function vertTick(dt) {
@@ -4739,10 +4808,11 @@ function uiFlashTargets() {
 }
 function uiFlash() {
   if (HAUNT) return hauntPower();
-  if (P.hidden || time < UI.flashAt) return;
+  flashTick();
+  if (P.hidden || (UI.fq | 0) <= 0) return;
   const fc = 10 * runMul('flashCost');
   if (P.bat < fc) { toast('Not enough battery to flash. Swap one in [2].', 'bad', 2.5); return; }
-  P.bat -= fc; UI.flashN++; UI.flashCd = 8 * runMul('flashCd'); UI.flashAt = time + UI.flashCd;
+  P.bat -= fc; UI.flashN++; { const full = UI.fq >= flashMax(); UI.fq--; if (full || time >= UI.flashAt) { UI.flashCd = 8 * runMul('flashCd'); UI.flashAt = time + UI.flashCd; } }
   const dur = 2.5 * runMul('stun'), f = fwdVec();
   sfx.click(); hiss(0.18, 0.12, { type: 'highpass', f: 2400 });
   el('flash').animate([{ opacity: settings.calm ? 0.22 : 0.72 }, { opacity: 0 }], { duration: 280 });
@@ -4756,6 +4826,7 @@ function uiFlash() {
     t.hit(dur); toast(`${name} flinches. Move!`, 'good', 2.4); said = true;
   }
   if (!said && UI.flashN < 3) toast('Flash stuns what is in front of you. Nothing there.', '', 2.4);
+  abEmit('fl', [+P.x.toFixed(2), +P.z.toFixed(2), +f.x.toFixed(3), +f.z.toFixed(3)]);
 }
 function dirList() {
   const inA = LEVEL === 1 && tileX(P.x) < 41;
@@ -4969,7 +5040,7 @@ function uiHud(dt) {
   if (HAUNT) { el('goal').hidden = true; el('rmAlert').hidden = true; return; }
   UI.hudT -= dt;
   setText(el('hpnum'), String(Math.max(0, Math.ceil(P.hp))));
-  { const w = Math.max(0, UI.dashAt - time) / (UI.dashCd || 1), q = Math.max(0, UI.flashAt - time) / (UI.flashCd || 1); el('tDashCd').style.height = (w * 100).toFixed(0) + '%'; el('tFlashCd').style.height = (q * 100).toFixed(0) + '%'; el('tDash').classList.toggle('off', w > 0 || P.st < 12); el('tFlash').classList.toggle('off', q > 0 || P.bat < 10); }
+  { const w = Math.max(0, UI.dashAt - time) / (UI.dashCd || 1), q = (UI.fq == null ? 1 : UI.fq) > 0 ? 0 : Math.max(0, UI.flashAt - time) / (UI.flashCd || 1); el('tDashCd').style.height = (w * 100).toFixed(0) + '%'; el('tFlashCd').style.height = (q * 100).toFixed(0) + '%'; el('tDash').classList.toggle('off', w > 0 || P.st < 12); el('tFlash').classList.toggle('off', q > 0 || P.bat < 10); }
   if (UI.hudT > 0) return;
   UI.hudT = 0.2;
   if (progress.cash !== inv.coins) { progress.cash = inv.coins; saveProgress(); }
@@ -5026,6 +5097,7 @@ function uiTutStart() {
 }
 function uiStart() {
   upsRefund(); cardsRecalc();
+  if (!saved.resumed && !HAUNT) P.hp = hpMax();
   if (!saved.resumed && !HAUNT) { const b = runAdd('startBatt'), f = runAdd('startFizz'); if (b) inv.battery += b; if (f) inv.fizz += f; }
   later(0.1, cardsHud);
   if (progress.cash != null) inv.coins = progress.cash | 0;
@@ -5071,7 +5143,7 @@ function uiShop(cid) {
   cardsScreen(cid);
 }
 function uiBuy(id, cid) {
-  if (typeof id === 'string' && /^[cfbsv]:/.test(id)) cardsClick(id, cid);
+  if (typeof id === 'string' && /^[cfbsvmrl]:/.test(id)) cardsClick(id, cid);
 }
 function uiSyncSet() {
   kbRender();
@@ -5199,7 +5271,7 @@ function fxMeter(n) {
   return g;
 }
 function fxStrike(ch, g, y, dmg, reason, after) {
-  if (ch.done || time < P.dashT) return false;
+  if (ch.done || time < P.dashT || abSafe(ch)) return false;
   ch.done = true;
   startScare(g, y, () => {
     ch.done = false;
@@ -6830,7 +6902,9 @@ const noteRead = NOTES.map(() => false);
    Every entity you beat drops one card, and 2% of the time its own Entity card too.
    Everything picked up goes into the inventory saved with your account (progress.cards), so it carries to every floor
    and every run. Only equipped cards (progress.equip, up to CARD_SLOTS) do anything. */
-const CARD_SLOTS = 5;
+const CARD_SLOTS = 5, CARD_AB = 2;
+// what the newest cards and abilities are doing right now, this floor
+const AB = { at: {}, q: {}, speedT: 0, invisT: 0, invisAt: null, decoy: null, walls: [], pads: [], padA: null, padUse: {}, shop: null, arrowT: 0, arrowG: null, glow: null, track: null, seq: 0, ev: [], drops: [], took: [], dropN: 0, padN: 0, marks: [], prank: null, blindT: 0, v: new THREE.Vector3() };
 const CARD_RAR = {
   common: { label: 'Common', n: 1, pct: '75%', bg: '#e9e0c5', ink: '#2a2418', sub: '#5f553d', edge: '#b3a680', inner: 'rgba(42,36,24,0.32)', win: '#d8cca7', icon: '#3a3020', glow: '', hex: 0xe9e0c5 },
   rare: { label: 'Rare', n: 2, pct: '20%', bg: '#0f2340', ink: '#e8f1ff', sub: '#a9c4e6', edge: '#5aa8ff', inner: 'rgba(140,200,255,0.32)', win: '#173761', icon: '#a6d4ff', glow: 'rgba(120,190,255,0.8)', hex: 0x5aa8ff },
@@ -6869,6 +6943,25 @@ const CARD_ICON = {
   candle: 'M12 3c2 3 4 5 4 8a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-7z M9 21h6 M12 15v6',
   exit: 'M3 6h18v12H3z M7 10h3 M7 12h2 M7 14h3 M7 10v4 M13 10l4 4 M17 10l-4 4',
   noclip: 'M4 4h7v16H4z M13 4h7v16h-7 M2 12h20 M18 9l3 3-3 3',
+  bulb: 'M9 18h6 M10 21h4 M12 3a6 6 0 0 0-4 10.5c1 1 1 2 1 3.5h6c0-1.5 0-2.5 1-3.5A6 6 0 0 0 12 3z',
+  hearts: 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z M12 9v6 M9 12h6',
+  static: 'M13 2L4 14h7l-1 8 9-12h-7z M3 5l2 2 M21 5l-2 2',
+  binder: 'M5 3h12v18H5z M9 3v18 M12 8h3 M12 12h3 M5 7H3 M5 12H3 M5 17H3',
+  clover: 'M12 12c-3-1-6-4-3-7 2-2 4 0 3 3 M12 12c1-3 4-6 7-3 2 2 0 4-3 3 M12 12c3 1 6 4 3 7-2 2-4 0-3-3 M12 12c-1 3-4 6-7 3-2-2 0-4 3-3 M12 12l3 9',
+  snail: 'M3 18h14 M17 18a6 6 0 1 0-12 0 M11 18a3 3 0 1 0 0-6 M17 18l3-6 M20 12l1-3',
+  pogo: 'M12 2v14 M8 6h8 M9 16h6 M10 19l2 3 2-3 M10 19l4-3',
+  run: 'M13 4a2 2 0 1 0 0 4a2 2 0 1 0 0-4z M10 21l2-6-3-3 2-4 4 3 3 1 M7 12l2-4 M3 9h4 M2 13h4',
+  potion: 'M10 3h4 M10 3v5l-4 8a3 3 0 0 0 3 5h6a3 3 0 0 0 3-5l-4-8V3 M8 14h8',
+  boo: 'M6 20V10a6 6 0 0 1 12 0v10l-2-2-2 2-2-2-2 2-2-2z M9.5 10h1 M13.5 10h1 M10 14q2 2 4 0',
+  bag: 'M5 8h14l-1 13H6z M9 8V6a3 3 0 0 1 6 0v2 M10 13h4',
+  rod: 'M4 20L14 10 M14 10l2-6 2 2 2 2-6 2z M16 14a4 4 0 0 0 4 4 M17 11a7 7 0 0 0 6 6',
+  burst: 'M12 2v6 M12 16v6 M2 12h6 M16 12h6 M5 5l4 4 M15 15l4 4 M5 19l4-4 M15 9l4-4',
+  wall: 'M3 5h18v14H3z M3 10h18 M3 15h18 M9 5v5 M15 5v5 M6 10v5 M12 10v5 M18 10v5 M9 15v4 M15 15v4',
+  eyeoff: 'M3 12s3-6 9-6 9 6 9 6-3 6-9 6-9-6-9-6z M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6z M4 4l16 16',
+  radio: 'M4 9h16v11H4z M7 9l10-6 M8 13a2 2 0 1 0 0 4a2 2 0 1 0 0-4z M13 13h4 M13 16h4',
+  arrow: 'M12 3l7 9h-4v9H9v-9H5z',
+  shop: 'M3 9l2-5h14l2 5 M3 9h18v3a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z M5 12v8h14v-8 M10 20v-5h4v5',
+  tele: 'M5 18a7 3 0 1 0 14 0a7 3 0 1 0-14 0 M8 15V6 M16 15V6 M12 3v3 M10 9l2-3 2 3',
 };
 // fx multiply a stat; add adds to one. Bad numbers on Entity cards are just multipliers the other way.
 const CARDS = [
@@ -6947,36 +7040,94 @@ const CARDS = [
   ['groundskeeper', "Groundskeeper's Gloves", 'Heal 1 health every second, and take 15% less damage.', 'Footsteps 8% louder.', { dmg: 0.85, noise: 1.08 }, { hpRegen: 1 }],
 ].forEach(([ent, name, text, bad, fx, add]) => CARDS.push({ id: 'e_' + ent, r: 'entity', ent, name, text, bad, fx, add }));
 CARDS.forEach((c, i) => { c.no = c.r === 'entity' ? 'E. ' + String(i - 32).padStart(2, '0') : 'No. ' + String(i + 1).padStart(2, '0'); });
+// v30: cards that level up when you combine two of them, and ability cards with their own key and cooldown
+// st = how high a card can be levelled by combining (1 = it does not stack). tx = its text at a level.
+const CARD_ST = { batt: 3, sneak: 3, breath: 3, wool: 3, socks: 3, tape: 3, opener: 3, knees: 3, laces: 3, lens: 3, stretch: 3, camflash: 2, lungs: 2, leather: 2, qstep: 2, kit: 2, headlamp: 2, rubber: 2, spring: 2 };
+const CARD_TX = { tape: (L) => `Heal ${L} health every 4 seconds.`, opener: (L) => `Fizz Water heals ${10 * L} more.`, kit: (L) => `Heal ${L} health every 2 seconds.` };
+CARDS.forEach((c) => { c.st = CARD_ST[c.id] || 1; if (CARD_TX[c.id]) c.tx = CARD_TX[c.id]; });
+[
+  { id: 'xflash', r: 'legendary', name: 'Spare Bulb', icon: 'bulb', add: { flashes: 1 }, st: 2, tx: (L) => `+${L} Flash charge${L > 1 ? 's' : ''}: ${1 + L} flashes before it needs to recharge.` },
+  { id: 'hp20', r: 'rare', name: 'Thick Skin', icon: 'hearts', add: { maxHp: 20 }, st: 5, tx: (L) => `+${20 * L} max health.` },
+  { id: 'jam4', r: 'rare', name: 'Static Charm', icon: 'static', add: { jam: 0.04 }, st: 10, tx: (L) => `${4 * L}% chance an entity's power stays off for its first round (10 seconds).` },
+  { id: 'slots2', r: 'rare', name: 'Big Binder', icon: 'binder', add: { slots: 2 }, st: 1, text: '+2 card slots. This card fills one of them.' },
+  { id: 'luck10', r: 'common', name: 'Four-Leaf', icon: 'clover', add: { luck: 0.1 }, st: 5, tx: (L) => `+${10 * L}% luck on card drops, the card shop roll and the Lucky Roll.` },
+  { id: 'slowent', r: 'rare', name: 'Molasses', icon: 'snail', fx: { entSlow: 0.8 }, st: 1, text: 'Entities move 20% slower.' },
+  { id: 'hijump', r: 'rare', name: 'Pogo Insoles', icon: 'pogo', add: { jump: 0.12 }, st: 3, l3: true, tx: (L) => `Jump ${12 * L}% higher. Only drops on Level 3 and up, where you can jump.` },
+  { id: 'ab_speed', r: 'rare', kind: 'ab', cd: 20, name: 'Sugar Rush', icon: 'run', st: 1, text: 'Move 20% faster for 10 seconds.' },
+  { id: 'ab_heal', r: 'rare', kind: 'ab', cd: 15, name: 'Pocket Medkit', icon: 'potion', st: 1, text: 'Heal 15 health.' },
+  { id: 'ab_scare', r: 'godly', kind: 'ab', cd: 30, name: 'Prank Call', icon: 'boo', st: 3, tx: (L) => `Give the nearest teammate a real jumpscare. It can't hurt them. ${L > 1 ? `${L} charges.` : ''}`.trim() },
+  { id: 'ab_roll', r: 'rare', kind: 'ab', cd: 25, name: 'Grab Bag', icon: 'bag', st: 1, text: '50% chance of a random item: mostly Fizz, batteries and tokens, sometimes something from this level, rarely a card.' },
+  { id: 'ab_track', r: 'legendary', kind: 'ab', cd: 70, name: 'Dowsing Rod', icon: 'rod', st: 1, text: 'Marks the nearest entity, or the nearest clue to one you have not documented, with its distance, for 20 seconds.' },
+  { id: 'ab_jam', r: 'legendary', kind: 'ab', cd: 50, name: 'Static Burst', icon: 'burst', st: 1, text: "Switch the entity's power off for one round: for 10 seconds it can't move or hurt anyone." },
+  { id: 'ab_wall', r: 'rare', kind: 'ab', cd: 25, name: 'Green Wall', icon: 'wall', st: 3, tx: (L) => `Put up a green wall in front of you for 5 seconds. Entities can't get through it. ${L > 1 ? `Up to ${L} walls at once.` : ''}`.trim() },
+  { id: 'ab_invis', r: 'legendary', kind: 'ab', cd: 30, name: 'Vanish', icon: 'eyeoff', st: 3, tx: (L) => `Go invisible for ${7 * L} seconds. Entities lose you and go to where you vanished.` },
+  { id: 'ab_fake', r: 'legendary', kind: 'ab', cd: 40, name: 'Decoy Radio', icon: 'radio', st: 1, text: 'Send a fake signal where you aim, up to 25 m away. Entities go after it for 6 seconds.' },
+  { id: 'ab_arrow', r: 'rare', kind: 'ab', cd: 30, name: 'Red String', icon: 'arrow', st: 1, text: 'For 8 seconds an arrow in the middle of your screen points at the entity, with its distance, and it glows red.' },
+  { id: 'ab_shop', r: 'godly', kind: 'ab', cd: 100, name: 'Pop-Up Shop', icon: 'shop', st: 1, text: 'Set up the card shop where you stand for 60 seconds. Your whole team can use it [E].' },
+  { id: 'ab_tele', r: 'legendary', kind: 'ab', cd: 20, name: 'Teleport Pads', icon: 'tele', st: 3, tx: (L) => `Press once, then again within 10 m, to place two linked pads. Anyone can use them [E]. Each pair has its own 20 second cooldown per player. ${L > 1 ? `${L} pairs.` : ''}`.trim() },
+].forEach((c, i) => { c.no = 'No. ' + String(34 + i).padStart(2, '0'); if (!c.text) c.text = c.tx(1); CARDS.push(c); });
 const CARD_BY = Object.fromEntries(CARDS.map((c) => [c.id, c]));
+const isAb = (c) => !!(c && c.kind === 'ab');
 // Entity cards name their entity on every floor, not just the one it lives on
 const CARD_ENT = Object.fromEntries([...ENTS0, ...ENTS1, ...ENTS2, ...ENTS3].map((e) => [e.id, e]));
 // stacking stops somewhere sensible both ways, so nothing makes you untouchable or useless
-const CARD_LIM = { dmg: [0.2, 2], noise: [0.05, 3], flashCd: [0.25, 3], dashCd: [0.25, 3], stam: [0.15, 3], batt: [0, 3], speed: [0.6, 1.6], sprint: [0.6, 1.5], crouch: [0.6, 2], regen: [0.3, 4], stun: [0.3, 4], dashPow: [0.5, 2.2], flashCost: [0, 3] };
-const CARD_ADDLIM = { hpRegen: 2, fizz: 80, startFizz: 3, startBatt: 3, token: 3 };
+const CARD_LIM = { entSlow: [0.5, 1], dmg: [0.2, 2], noise: [0.05, 3], flashCd: [0.25, 3], dashCd: [0.25, 3], stam: [0.15, 3], batt: [0, 3], speed: [0.6, 1.6], sprint: [0.6, 1.5], crouch: [0.6, 2], regen: [0.3, 4], stun: [0.3, 4], dashPow: [0.5, 2.2], flashCost: [0, 3] };
+const CARD_ADDLIM = { hpRegen: 2, fizz: 80, startFizz: 3, startBatt: 3, token: 3, flashes: 2, maxHp: 100, jam: 0.4, slots: 2, luck: 0.5, jump: 0.36 };
 const CFX = { mul: {}, add: {} };
 function cardInv() {
   if (!progress.cards || typeof progress.cards !== 'object' || Array.isArray(progress.cards)) progress.cards = {};
   return progress.cards;
 }
 function cardCount(id) { return cardInv()[id] | 0; }
+// a card's level: 1, or higher once you have combined copies of it. Stored per card, kept with your account
+function cardLvs() { if (!progress.lv || typeof progress.lv !== 'object' || Array.isArray(progress.lv)) progress.lv = {}; return progress.lv; }
+function cardLv(id) { const c = CARD_BY[id]; if (!c || !(cardInv()[id] > 0)) return 1; return clamp(cardLvs()[id] | 0 || 1, 1, c.st || 1); }
+function cardTxt(c, L) { L = L || 1; if (c.tx) return c.tx(L); return L > 1 ? c.text.replace(/(\d+)%/g, (m, n) => `${Math.min(99, n * L)}%`) : c.text; }
+// five slots for passive cards, seven with the Big Binder on; two more for ability cards
+function cardSlots() { const e = Array.isArray(progress.equip) ? progress.equip : []; return CARD_SLOTS + (e.slice(0, CARD_SLOTS).includes('slots2') && cardInv().slots2 > 0 ? 2 : 0); }
 function cardEquipped() {
   const inv = cardInv(), seen = new Set();
   if (!Array.isArray(progress.equip)) progress.equip = [];
-  progress.equip = progress.equip.filter((id) => CARD_BY[id] && inv[id] > 0 && !seen.has(id) && seen.add(id)).slice(0, CARD_SLOTS);
+  progress.equip = progress.equip.filter((id) => CARD_BY[id] && !isAb(CARD_BY[id]) && inv[id] > 0 && !seen.has(id) && seen.add(id));
+  progress.equip = progress.equip.slice(0, cardSlots());
   return progress.equip;
+}
+function cardAbil() {
+  const inv = cardInv(), seen = new Set();
+  if (!Array.isArray(progress.abil)) progress.abil = [];
+  progress.abil = progress.abil.filter((id) => isAb(CARD_BY[id]) && inv[id] > 0 && !seen.has(id) && seen.add(id)).slice(0, CARD_AB);
+  return progress.abil;
+}
+// three loadouts; the one in use is always progress.equip and progress.abil
+function cardLoads() {
+  if (!Array.isArray(progress.loads)) progress.loads = [];
+  for (let i = 0; i < 3; i++) { const l = progress.loads[i]; if (!l || typeof l !== 'object' || !Array.isArray(l.c) || !Array.isArray(l.a)) progress.loads[i] = { c: [], a: [] }; }
+  progress.loads.length = 3;
+  progress.ld = clamp(progress.ld | 0, 0, 2);
+  return progress.loads;
+}
+function cardLoadSwap(i) {
+  const L = cardLoads(); i = clamp(i | 0, 0, 2);
+  L[progress.ld] = { c: cardEquipped().slice(), a: cardAbil().slice() };
+  progress.ld = i; progress.equip = L[i].c.slice(); progress.abil = L[i].a.slice();
+  cardEquipped(); cardAbil(); cardsRecalc(); saveProgress(); requestSave(); cardsHud();
 }
 function cardsRecalc() {
   CFX.mul = {}; CFX.add = {};
   for (const id of cardEquipped()) {
-    const c = CARD_BY[id];
-    if (c.fx) for (const [k, v] of Object.entries(c.fx)) CFX.mul[k] = (CFX.mul[k] == null ? 1 : CFX.mul[k]) * v;
-    if (c.add) for (const [k, v] of Object.entries(c.add)) CFX.add[k] = (CFX.add[k] || 0) + v;
+    const c = CARD_BY[id], L = cardLv(id);
+    if (c.fx) for (const [k, v] of Object.entries(c.fx)) CFX.mul[k] = (CFX.mul[k] == null ? 1 : CFX.mul[k]) * Math.max(0, 1 + (v - 1) * L);
+    if (c.add) for (const [k, v] of Object.entries(c.add)) CFX.add[k] = (CFX.add[k] || 0) + v * L;
   }
 }
 function runMul(k) {
-  if (HAUNT || CFX.mul[k] == null) return 1;
-  const lim = CARD_LIM[k]; return lim ? clamp(CFX.mul[k], lim[0], lim[1]) : CFX.mul[k];
+  if (HAUNT) return 1;
+  const b = k === 'speed' && AB.speedT > time ? 1.2 : 1;
+  if (CFX.mul[k] == null) return b;
+  const lim = CARD_LIM[k]; return (lim ? clamp(CFX.mul[k], lim[0], lim[1]) : CFX.mul[k]) * b;
 }
+function hpMax() { return 100 + runAdd('maxHp'); }
+function luck() { return runAdd('luck'); }
 function runAdd(k) {
   if (HAUNT || !CFX.add[k]) return 0;
   return Math.min(CARD_ADDLIM[k] == null ? 99 : CARD_ADDLIM[k], CFX.add[k]);
@@ -6984,9 +7135,9 @@ function runAdd(k) {
 function cardHas(id) { return !HAUNT && cardEquipped().includes(id); }
 // what belongs to the floor you are on: whether the Last Light has been used, and cards still lying on the floor
 function runInit(s) {
-  const r = { last: false, drops: [] };
+  const r = { last: false, drops: [], rolls: 0 };
   if (!s || typeof s !== 'object') return r;
-  r.last = !!s.lastUsed;
+  r.last = !!s.lastUsed; r.rolls = clamp(s.rolls | 0, 0, 3);
   if (Array.isArray(s.drops)) r.drops = s.drops.filter((d) => d && CARD_BY[d.c] && Number.isFinite(d.x) && Number.isFinite(d.z)).slice(0, 20).map((d) => ({ x: +d.x, z: +d.z, c: d.c }));
   return r;
 }
@@ -6994,12 +7145,14 @@ function runInit(s) {
 function cardRand() {
   try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; } catch (e) { return Math.random(); }
 }
-function cardRoll(r) {
-  const p = (r == null ? cardRand() : r) * 100;
-  return p < 75 ? 'common' : p < 95 ? 'rare' : p < 99 ? 'legendary' : 'godly';
+// luck moves the odds up: at +50% luck, Rare 30%, Legendary 8%, Godly 2%
+function cardOdds(lk) { lk = lk == null ? luck() : lk; const g = 1 * (1 + 2 * lk), l = 4 * (1 + 2 * lk), r = 20 * (1 + lk); return { common: 100 - g - l - r, rare: r, legendary: l, godly: g }; }
+function cardRoll(r, lk) {
+  const p = (r == null ? cardRand() : r) * 100, o = cardOdds(r == null ? lk : 0);
+  return p < o.common ? 'common' : p < o.common + o.rare ? 'rare' : p < 100 - o.godly ? 'legendary' : 'godly';
 }
 function cardPick(rar) {
-  const pool = CARDS.filter((c) => c.r === rar);
+  const pool = CARDS.filter((c) => c.r === rar && !(c.l3 && LEVEL < 3));
   return pool[Math.min(pool.length - 1, Math.floor(cardRand() * pool.length))];
 }
 function cardArtHTML(c) {
@@ -7010,8 +7163,10 @@ function cardHTML(c, o) {
   o = o || {};
   const R = CARD_RAR[c.r], ent = c.r === 'entity', danger = ent && CARD_ENT[c.ent] ? CARD_ENT[c.ent].danger | 0 : 0;
   const gems = ent ? [0, 1, 2, 3, 4].map((i) => `<i class="${i < danger ? 'on' : ''}"></i>`).join('') : [0, 1, 2, 3].map((i) => `<i class="${i < R.n ? 'on' : ''}"></i>`).join('');
-  const foot = ent ? `Entity · ${CARD_ENT[c.ent] ? CARD_ENT[c.ent].name : ''}` : R.label;
-  return `<div class="ucard cr-${c.r}${o.sm ? ' sm' : ''}${o.on ? ' on' : ''}"><i class="uc-corn" aria-hidden="true"></i><i class="uc-sheen" aria-hidden="true"></i><span class="uc-top"><span class="uc-no">${c.no}</span><span class="uc-gems">${gems}</span></span><span class="uc-win">${cardArtHTML(c)}${ent ? `<span class="uc-rec">● REC</span><span class="uc-ts">${c.no.replace('E. ', '00:')}</span>` : ''}</span><b class="uc-name">${escHtml(c.name)}</b><i class="uc-rule"></i><span class="uc-text">${ent ? '+ ' : ''}${escHtml(c.text)}</span>${c.bad ? `<span class="uc-bad">− ${escHtml(c.bad)}</span>` : ''}<span class="uc-foot">${escHtml(foot)}</span>${o.count > 1 ? `<span class="uc-count">×${o.count}</span>` : ''}${o.on ? '<span class="uc-on">Equipped</span>' : ''}</div>`;
+  const L = o.lv || 1, ab = isAb(c);
+  const foot = ent ? `Entity · ${CARD_ENT[c.ent] ? CARD_ENT[c.ent].name : ''}` : `${R.label}${ab ? ` · Ability ${c.cd}s` : ''}`;
+  const tags = ent ? '' : `<span class="uc-tags">${c.st > 1 ? `<i class="${L > 1 ? 'up' : ''}">Lv ${L}/${c.st}</i>` : '<i>No stack</i>'}${o.count > 1 ? `<i>×${o.count}</i>` : ''}</span>`;
+  return `<div class="ucard cr-${c.r}${o.sm ? ' sm' : ''}${o.on ? ' on' : ''}"><i class="uc-corn" aria-hidden="true"></i><i class="uc-sheen" aria-hidden="true"></i><span class="uc-top"><span class="uc-no">${c.no}</span><span class="uc-gems">${gems}</span></span><span class="uc-win">${cardArtHTML(c)}${ent ? `<span class="uc-rec">● REC</span><span class="uc-ts">${c.no.replace('E. ', '00:')}</span>` : ''}</span><b class="uc-name">${escHtml(c.name)}</b><i class="uc-rule"></i><span class="uc-text">${ent ? '+ ' : ''}${escHtml(cardTxt(c, L))}</span>${c.bad ? `<span class="uc-bad">− ${escHtml(c.bad)}</span>` : ''}<span class="uc-foot"><span>${escHtml(foot)}</span>${tags}</span>${ent && o.count > 1 ? `<span class="uc-count">×${o.count}</span>` : ''}${o.on ? '<span class="uc-on">Equipped</span>' : ''}</div>`;
 }
 // the same card, painted onto the thing that lies on the floor
 function cardTex(c) {
@@ -7097,10 +7252,12 @@ function cardDrop(ch, at) {
 }
 function cardGive(id) {
   const inv = cardInv(), first = !inv[id];
+  if (first) delete cardLvs()[id];
   inv[id] = (inv[id] | 0) + 1;
   let equipped = false;
-  const eq = cardEquipped();
-  if (first && CARD_BY[id].r !== 'entity' && eq.length < CARD_SLOTS) { eq.push(id); equipped = true; }
+  const eq = cardEquipped(), ab = cardAbil();
+  if (first && isAb(CARD_BY[id])) { if (ab.length < CARD_AB) { ab.push(id); equipped = true; } }
+  else if (first && CARD_BY[id].r !== 'entity' && eq.length < cardSlots()) { eq.push(id); equipped = true; }
   cardsRecalc(); saveProgress(); requestSave();
   return { first, equipped };
 }
@@ -7112,7 +7269,7 @@ function cardTake(i) {
   cardReveal(c, res); cardsHud();
 }
 function cardsTick(dt) {
-  if (P.hp > 0 && P.hp < 100 && runAdd('hpRegen') > 0 && state === 'playing') P.hp = Math.min(100, P.hp + runAdd('hpRegen') * dt);
+  if (P.hp > 0 && P.hp < hpMax() && runAdd('hpRegen') > 0 && state === 'playing') P.hp = Math.min(hpMax(), P.hp + runAdd('hpRegen') * dt);
   for (let i = RUN.drops.length - 1; i >= 0; i--) {
     const d = RUN.drops[i];
     if (!d.g) cardMesh(d);
@@ -7133,9 +7290,34 @@ function cardsSweep() {
 function cardsHud() {
   const b = el('cardBox'); if (!b) return;
   const eq = cardEquipped();
-  if (HAUNT || !eq.length || state !== 'playing') { b.hidden = true; return; }
-  b.hidden = false;
-  b.innerHTML = `<span class="cb-l">Cards</span>${eq.map((id) => `<i class="cr-${CARD_BY[id].r}" title="${escHtml(CARD_BY[id].name)}"></i>`).join('')}${Array.from({ length: CARD_SLOTS - eq.length }, () => '<i class="cb-empty"></i>').join('')}`;
+  if (HAUNT || !eq.length || state !== 'playing') { b.hidden = true; } else {
+    b.hidden = false;
+    b.innerHTML = `<span class="cb-l">Cards · ${cardLoads() && progress.ld + 1}</span>${eq.map((id) => `<i class="cr-${CARD_BY[id].r}" title="${escHtml(CARD_BY[id].name)}${cardLv(id) > 1 ? ' Lv ' + cardLv(id) : ''}"></i>`).join('')}${Array.from({ length: cardSlots() - eq.length }, () => '<i class="cb-empty"></i>').join('')}`;
+  }
+  if (typeof abHud === 'function') abHud(true);
+}
+// combining: two copies of the same card become one card a level higher
+function cardCombine(id) {
+  const c = CARD_BY[id], ci = cardInv(); if (!c) return 'No such card.';
+  const L = cardLv(id);
+  if ((c.st || 1) < 2) return `${c.name} doesn't stack.`;
+  if (L >= c.st) return `${c.name} is already at its highest level (${c.st}).`;
+  if ((ci[id] | 0) < 2) return `You need two ${c.name} cards to combine.`;
+  ci[id]--; cardLvs()[id] = L + 1;
+  cardsRecalc(); saveProgress(); requestSave(); cardsHud();
+  return '';
+}
+// the card shop's mystery roll: 10 card tokens for a random card, three times on each level
+const ROLL_COST = 10, ROLL_MAX = 3;
+function rollsLeft() { return Math.max(0, ROLL_MAX - (RUN.rolls | 0)); }
+function cardShopRoll() {
+  if (state !== 'playing' && state !== 'dead') return 'Mystery rolls only work while you are on a level.';
+  if (!rollsLeft()) return 'No mystery rolls left on this level. Escape it for three more.';
+  if (tokGet() < ROLL_COST) return `You need ${ROLL_COST} card tokens.`;
+  tokSet(tokGet() - ROLL_COST); RUN.rolls = (RUN.rolls | 0) + 1; requestSave();
+  const c = cardPick(cardRoll()), res = cardGive(c.id);
+  cardReveal(c, res, { bought: true }); cardsHud();
+  return '';
 }
 function cardPop(c, res) {
   const p = el('cardPop'); if (!p) return;
@@ -7161,8 +7343,8 @@ function tokGet() { return state === 'playing' || state === 'dead' ? inv.coins |
 function tokSet(v) { v = Math.max(0, v | 0); inv.coins = v; progress.cash = v; saveProgress(); requestSave(); }
 function cardSell(id) {
   const ci = cardInv(), c = CARD_BY[id]; if (!c || !(ci[id] > 0)) return 0;
-  ci[id]--; if (!ci[id]) delete ci[id];
-  cardEquipped(); cardsRecalc(); cardsHud();
+  ci[id]--; if (!ci[id]) { delete ci[id]; delete cardLvs()[id]; }
+  cardEquipped(); cardAbil(); cardsRecalc(); cardsHud();
   const pay = CARD_PRICE[c.r][0]; tokSet(tokGet() + pay);
   return pay;
 }
@@ -7224,8 +7406,8 @@ function rvNext() {
 }
 /* ---------- the Lucky Roll: one per level you finish. A reel spins, slows, and stops on a rarity ---------- */
 function luckyRarity(r) {
-  const p = (r == null ? cardRand() : r) * 100;
-  return p < 65 ? 'rare' : p < 90 ? 'legendary' : 'godly';
+  const p = (r == null ? cardRand() : r) * 100, lk = r == null ? luck() : 0, g = 10 * (1 + lk), l = 25 * (1 + lk / 2);
+  return p < 100 - g - l ? 'rare' : p < 100 - g ? 'legendary' : 'godly';
 }
 function luckyRoll() {
   if (HAUNT) return null;
@@ -7239,7 +7421,7 @@ function luckyReveal(c, res) {
   try { audioInit(); if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); } catch (e) {}
   const N = 44, land = 38, cells = [];
   for (let i = 0; i < N; i++) { const r = i === land ? c.r : luckyRarity(); cells.push(`<i class="lr-c rt-${r}"><b>?</b></i>`); }
-  box.innerHTML = `<div class="lr-in"><span class="lr-tag">Level finished</span><h2>Lucky Roll</h2><p>65% Rare · 25% Legendary · 10% Godly</p><div class="lr-win"><div class="lr-strip">${cells.join('')}</div><div class="lr-mark"></div></div><div class="lr-res"></div></div>`;
+  box.innerHTML = `<div class="lr-in"><span class="lr-tag">Level finished</span><h2>Lucky Roll</h2><p>${luck() ? `Luck +${Math.round(luck() * 100)}% · ` : ''}${Math.round(100 - 10 * (1 + luck()) - 25 * (1 + luck() / 2))}% Rare · ${Math.round(25 * (1 + luck() / 2))}% Legendary · ${Math.round(10 * (1 + luck()))}% Godly</p><div class="lr-win"><div class="lr-strip">${cells.join('')}</div><div class="lr-mark"></div></div><div class="lr-res"></div></div>`;
   box.hidden = false; box.className = 'lr-on';
   const strip = box.querySelector('.lr-strip'), cw = 112, dur = settings.calm || reduceMotion ? 1.2 : 5.2;
   const off = land * cw + cw / 2 + (cardRand() - 0.5) * (cw * 0.6);
@@ -7256,32 +7438,38 @@ function luckyReveal(c, res) {
     setTimeout(() => { box.hidden = true; box.className = ''; cardReveal(c, res, { lucky: true }); }, 1100);
   }, dur * 1000 + 150);
 }
-// the Cards screen: equipped slots and the whole inventory, or the card shop
+// the Cards screen: loadouts, equipped slots and the whole inventory, or the card shop
 function cardsScreen(cid) {
   const box = el(cid); if (!box) return;
-  upsRefund();
-  const ci = cardInv(), eq = cardEquipped(), f = UI.cardF || 'all', mode = UI.cardMode || 'inv', found = CARDS.filter((c) => ci[c.id] > 0).length;
+  upsRefund(); cardLoads();
+  const ci = cardInv(), eq = cardEquipped(), ab = cardAbil(), f = UI.cardF || 'all', mode = UI.cardMode || 'inv', found = CARDS.filter((c) => ci[c.id] > 0).length;
   const modes = `<div class="uc-modes"><button type="button" class="uc-tab${mode === 'inv' ? ' on' : ''}" data-up="v:inv" aria-pressed="${mode === 'inv'}">Inventory</button><button type="button" class="uc-tab${mode === 'shop' ? ' on' : ''}" data-up="v:shop" aria-pressed="${mode === 'shop'}">Card shop</button><span class="uc-wallet"><i class="tk b"></i>${tokGet()} card tokens</span></div>`;
   const note = UI.refundMsg ? `<p class="shop-note good">${escHtml(UI.refundMsg)}</p>` : '';
   const msg = `<p class="shop-note" id="ucMsg" role="status">${escHtml(UI.cardMsg || '')}</p>`;
   UI.cardMsg = '';
   if (mode === 'shop') {
-    const have = tokGet();
+    const have = tokGet(), inRun = state === 'playing' || state === 'dead', left = rollsLeft(), o = cardOdds();
+    const roll = `<div class="uc-roll"><div><b>Mystery roll</b><span>${ROLL_COST} card tokens for a random card of any rarity, abilities included. ${inRun ? `${left} of ${ROLL_MAX} left on this level.` : `Only on a level: ${ROLL_MAX} per level.`}</span><span class="uc-odds">${luck() ? `Luck +${Math.round(luck() * 100)}% · ` : ''}Common ${o.common.toFixed(0)}% · Rare ${o.rare.toFixed(0)}% · Legendary ${o.legendary.toFixed(0)}% · Godly ${o.godly.toFixed(0)}%</span></div><button type="button" class="btn" data-up="r:x" ${inRun && left && have >= ROLL_COST ? '' : 'disabled'}>Roll · <i class="tk b"></i>${ROLL_COST}</button></div>`;
     const buy = ['common', 'rare', 'legendary', 'godly'].map((r) => { const cost = CARD_PRICE[r][1]; return `<button type="button" class="uc-pack cr-${r}" data-up="b:${r}" ${have >= cost ? '' : 'disabled'}><span class="uc-pk-back"><b>?</b></span><b class="uc-pk-n">${CARD_RAR[r].label} card</b><span class="uc-pk-p"><i class="tk b"></i>${cost}</span></button>`; }).join('');
-    const sell = CARDS.filter((c) => ci[c.id] > 0).map((c) => { const n = ci[c.id], on = eq.includes(c.id), armed = UI.sellArm === c.id; return `<div class="uc-sell">${cardHTML(c, { sm: true, count: n, on })}<button type="button" class="ghost uc-sellb${armed ? ' armed' : ''}" data-up="s:${c.id}">${armed ? 'Sure? Click again' : `Sell for ${CARD_PRICE[c.r][0]}`}</button></div>`; }).join('');
-    box.innerHTML = `${modes}${note}<p class="shop-note">Buy a random card of the rarity you pick, or sell cards you don't need. Buying costs about three times what selling pays, and Entity cards can't be bought. Blue card tokens turn up on every level.</p>${msg}<div class="uc-head"><h3 class="shop-h">Buy</h3></div><div class="uc-packs">${buy}</div><div class="uc-head"><h3 class="shop-h">Sell</h3><span>${found ? 'Your inventory' : 'Nothing to sell yet'}</span></div><div class="ucards">${sell}</div>`;
+    const sell = CARDS.filter((c) => ci[c.id] > 0).map((c) => { const n = ci[c.id], on = eq.includes(c.id) || ab.includes(c.id), armed = UI.sellArm === c.id; return `<div class="uc-sell">${cardHTML(c, { sm: true, count: n, on, lv: cardLv(c.id) })}<button type="button" class="ghost uc-sellb${armed ? ' armed' : ''}" data-up="s:${c.id}">${armed ? 'Sure? Click again' : `Sell for ${CARD_PRICE[c.r][0]}`}</button></div>`; }).join('');
+    box.innerHTML = `${modes}${note}${msg}<div class="uc-head"><h3 class="shop-h">Roll</h3></div>${roll}<div class="uc-head"><h3 class="shop-h">Buy</h3><span>Pick the rarity</span></div><div class="uc-packs">${buy}</div><div class="uc-head"><h3 class="shop-h">Sell</h3><span>${found ? 'Your inventory' : 'Nothing to sell yet'}</span></div><div class="ucards">${sell}</div>`;
     return;
   }
-  const slots = Array.from({ length: CARD_SLOTS }, (_, i) => { const id = eq[i]; return id ? `<button type="button" class="ucbtn" data-up="c:${id}" aria-label="Take off ${escHtml(CARD_BY[id].name)}">${cardHTML(CARD_BY[id], { sm: true })}</button>` : '<div class="uc-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14 M5 12h14"/></svg>Empty slot</div>'; }).join('');
-  const tabs = [['all', 'All'], ...CARD_ORDER.map((r) => [r, CARD_RAR[r].label])].map(([k, t]) => `<button type="button" class="uc-tab${f === k ? ' on' : ''}" data-up="f:${k}" aria-pressed="${f === k}">${t}</button>`).join('');
-  const list = CARDS.filter((c) => f === 'all' || c.r === f).map((c) => {
+  const loads = `<div class="uc-loads" role="group" aria-label="Loadouts">${[0, 1, 2].map((i) => `<button type="button" class="uc-tab${progress.ld === i ? ' on' : ''}" data-up="l:${i}" aria-pressed="${progress.ld === i}">Loadout ${i + 1}</button>`).join('')}<span>Each loadout keeps its own cards and abilities.</span></div>`;
+  const slotBtn = (id, empty) => (id ? `<button type="button" class="ucbtn" data-up="c:${id}" aria-label="Take off ${escHtml(CARD_BY[id].name)}">${cardHTML(CARD_BY[id], { sm: true, lv: cardLv(id) })}</button>` : `<div class="uc-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14 M5 12h14"/></svg>${empty}</div>`);
+  const slots = Array.from({ length: cardSlots() }, (_, i) => slotBtn(eq[i], 'Empty slot')).join('');
+  const aslots = Array.from({ length: CARD_AB }, (_, i) => slotBtn(ab[i], `Ability · ${kbName(kbGet('ab' + (i + 1)))}`)).join('');
+  const tabs = [['all', 'All'], ['ab', 'Abilities'], ...CARD_ORDER.map((r) => [r, CARD_RAR[r].label])].map(([k, t]) => `<button type="button" class="uc-tab${f === k ? ' on' : ''}" data-up="f:${k}" aria-pressed="${f === k}">${t}</button>`).join('');
+  const list = CARDS.filter((c) => f === 'all' || (f === 'ab' ? isAb(c) : c.r === f)).map((c) => {
     const n = ci[c.id] | 0;
     if (!n) return `<div class="uc-back cr-${c.r}" title="Not found yet"><b>?</b><span>Not found yet</span></div>`;
-    const on = eq.includes(c.id);
-    return `<button type="button" class="ucbtn" data-up="c:${c.id}" aria-pressed="${on}" aria-label="${on ? 'Take off' : 'Equip'} ${escHtml(c.name)}">${cardHTML(c, { sm: true, count: n, on })}</button>`;
+    const on = eq.includes(c.id) || ab.includes(c.id), L = cardLv(c.id), can = (c.st || 1) > L && n >= 2;
+    return `<div class="uc-cell"><button type="button" class="ucbtn" data-up="c:${c.id}" aria-pressed="${on}" aria-label="${on ? 'Take off' : 'Equip'} ${escHtml(c.name)}">${cardHTML(c, { sm: true, count: n, on, lv: L })}</button>${can ? `<button type="button" class="ghost uc-comb" data-up="m:${c.id}">Combine 2 → Lv ${L + 1}</button>` : ''}</div>`;
   }).join('');
-  box.innerHTML = `${modes}${note}<p class="shop-note">Every entity you beat drops a card, and 5% of the time its own Entity card too. Every level you finish gives you a Lucky Roll. Everything you pick up stays in your inventory for good. Click a card to equip it; only equipped cards do anything.</p>
-    <div class="uc-head"><h3 class="shop-h">Equipped</h3><span>${eq.length} of ${CARD_SLOTS}</span></div><div class="uc-slots">${slots}</div>
+  box.innerHTML = `${modes}${note}<p class="shop-note">Every entity you beat drops a card. Click a card to equip it. Two copies of a stackable card combine into one at the next level, with double the effect. Ability cards go in the two ability slots and work with their own key.</p>
+    ${loads}
+    <div class="uc-head"><h3 class="shop-h">Equipped</h3><span>${eq.length} of ${cardSlots()}</span></div><div class="uc-slots">${slots}</div>
+    <div class="uc-head"><h3 class="shop-h">Abilities</h3><span>${ab.length} of ${CARD_AB} · keys ${kbName(kbGet('ab1'))} and ${kbName(kbGet('ab2'))}</span></div><div class="uc-slots">${aslots}</div>
     ${msg}
     <div class="uc-head"><h3 class="shop-h">Inventory</h3><span>${found} of ${CARDS.length} found</span></div><div class="uc-tabs">${tabs}</div>
     <div class="ucards">${list}</div>`;
@@ -7290,6 +7478,9 @@ function cardsClick(v, cid) {
   const k = v[0], id = v.slice(2);
   if (k === 'f') { UI.cardF = id; cardsScreen(cid); return; }
   if (k === 'v') { UI.cardMode = id; UI.sellArm = null; cardsScreen(cid); return; }
+  if (k === 'l') { cardLoadSwap(+id); UI.cardMsg = `Loadout ${+id + 1}.`; sfx.click(); cardsScreen(cid); return; }
+  if (k === 'r') { const e = cardShopRoll(); UI.cardMsg = e; if (!e) sfx.chime(); cardsScreen(cid); return; }
+  if (k === 'm') { const e = cardCombine(id); UI.cardMsg = e || `Combined. ${CARD_BY[id].name} is now level ${cardLv(id)}.`; if (!e) { sfx.chime(); later(0.2, () => sfx.coin()); } cardsScreen(cid); return; }
   if (k === 'b') {
     const c = cardBuy(id);
     UI.cardMsg = c ? `You got ${c.name}.` : `You need ${CARD_PRICE[id] ? CARD_PRICE[id][1] : '?'} card tokens for that.`;
@@ -7297,17 +7488,18 @@ function cardsClick(v, cid) {
   }
   if (k === 's') {
     const c = CARD_BY[id]; if (!c || !cardCount(id)) return;
-    const big = c.r === 'legendary' || c.r === 'godly' || c.r === 'entity' || (cardCount(id) === 1 && cardEquipped().includes(id));
+    const big = c.r === 'legendary' || c.r === 'godly' || c.r === 'entity' || cardLv(id) > 1 || (cardCount(id) === 1 && (cardEquipped().includes(id) || cardAbil().includes(id)));
     if (big && UI.sellArm !== id) { UI.sellArm = id; cardsScreen(cid); return; }
     UI.sellArm = null; const pay = cardSell(id);
     UI.cardMsg = `Sold ${c.name} for ${pay} card tokens.`; sfx.coin(); cardsScreen(cid); return;
   }
   const c = CARD_BY[id]; if (!c || !cardCount(id)) return;
-  const eq = cardEquipped(), i = eq.indexOf(id);
-  if (i >= 0) { eq.splice(i, 1); UI.cardMsg = `Took off ${c.name}.`; }
-  else if (eq.length >= CARD_SLOTS) UI.cardMsg = `All ${CARD_SLOTS} slots are full. Take a card off first.`;
-  else { eq.push(id); UI.cardMsg = `Equipped ${c.name}.`; }
-  sfx.click(); cardsRecalc(); saveProgress(); cardsHud(); cardsScreen(cid);
+  const list = isAb(c) ? cardAbil() : cardEquipped(), max = isAb(c) ? CARD_AB : cardSlots(), i = list.indexOf(id);
+  if (i >= 0) { list.splice(i, 1); UI.cardMsg = `Took off ${c.name}.`; if (id === 'slots2') cardEquipped(); }
+  else if (list.length >= max) UI.cardMsg = isAb(c) ? 'Both ability slots are full. Take one off first.' : `All ${max} slots are full. Take a card off first.`;
+  else { list.push(id); UI.cardMsg = `Equipped ${c.name}.`; }
+  cardLoads()[progress.ld] = { c: cardEquipped().slice(), a: cardAbil().slice() };
+  sfx.click(); cardsRecalc(); saveProgress(); requestSave(); cardsHud(); cardsScreen(cid);
 }
 
 const inv = { fizz: 0, battery: 1, coins: 0, vtok: 0, hat: false, hatWorn: false, duck: false, popper: false, tasks: 0, conf: 0 };
@@ -8096,8 +8288,8 @@ function takeItem(it) {
 function useItem(n) {
   if (n === 1) {
     if (!inv.fizz) return toast('No Fizz Water.');
-    if (P.hp >= 100) return toast('You feel fine. Save it for later.');
-    const fh = 35 + runAdd('fizz'); inv.fizz--; P.hp = Math.min(100, P.hp + fh); sfx.drink(); toast(`Fizz Water. +${fh} health.`, 'good');
+    if (P.hp >= hpMax()) return toast('You feel fine. Save it for later.');
+    const fh = 35 + runAdd('fizz'); inv.fizz--; P.hp = Math.min(hpMax(), P.hp + fh); sfx.drink(); toast(`Fizz Water. +${fh} health.`, 'good');
   } else if (n === 2) {
     if (!inv.battery) return toast('No spare batteries.');
     if (P.bat > 95) return toast('The flashlight is already full.');
@@ -8150,7 +8342,7 @@ function ringBell() {
 }
 function doInteract() {
   if (active && active.onInteract && active.onInteract()) return;
-  if (focus) focus.use();
+  if (focus) focus.use(); else abUseSpot();
 }
 
 /* =========================================================
@@ -8164,7 +8356,7 @@ function runTimers(dt) {
   for (let i = tweens.length - 1; i >= 0; i--) { const w = tweens[i]; w.t += dt; const k = Math.min(1, w.t / w.dur); w.fn(k); if (k >= 1) { tweens.splice(i, 1); if (w.done) w.done(); } }
 }
 function damage(n, reason) {
-  if (state !== 'playing' || (time < P.dashT && n < 90)) return;
+  if (state !== 'playing' || ((time < P.dashT || (active && abSafe(active))) && n < 90)) return;
   n = uiDmg(n); P.hp -= n; P.hurt = 1; sfx.hurt();
   if (P.hp <= 0 && cardHas('lastlight') && !RUN.last) { RUN.last = true; P.hp = 1; P.dashT = time + 1.2; toast('The Last Light flares. You stay on your feet with 1 health.', 'good', 4); requestSave(); }
   if (P.hp <= 0) { P.hp = 0; die(reason); }
@@ -8181,7 +8373,7 @@ function die(reason) {
 }
 function respawn() {
   const inB = LEVEL === 1 && P.x > 41.5 * T, sp = inB ? SPAWN_B : SPAWN;
-  P.x = tc(sp.x); P.z = tc(sp.y); P.y = 0; P.vy = 0; P.air = false; P.vx = P.vz = P.ex = P.ez = P.kx = P.kz = 0; P.hidden = null; P.hp = 100; P.st = 100; P.exhausted = false; P.lockMove = false; P.yaw = 0; P.pitch = 0;
+  P.x = tc(sp.x); P.z = tc(sp.y); P.y = 0; P.vy = 0; P.air = false; P.vx = P.vz = P.ex = P.ez = P.kx = P.kz = 0; P.hidden = null; P.hp = hpMax(); P.st = 100; P.exhausted = false; P.lockMove = false; P.yaw = 0; P.pitch = 0;
   state = 'playing'; el('dead').hidden = true; el('slats').hidden = true; resetRituals(); requestSave();
   toast(LEVEL === 3 ? 'You wake up on the cracked pavement of the main street again. The grass has grown a little.' : LEVEL === 1 ? (inB ? 'You wake up on wet tile again. The whole place smells of chlorine.' : 'You wake up on cold concrete again. Somewhere, water drips.') : (LEVEL === 2 ? 'You wake up on the soft floor again, by the party table. Somebody has moved your shoes.' : 'You wake up on the carpet again. The hum never stopped.'), '', 5);
   requestLock();
@@ -8843,6 +9035,7 @@ function startChallenge(id, key, pose, force) {
   const firstMeet = status[id] < 2;
   if (status[id] < 2) status[id] = 2;
   sfx.stinger(); uiFightStart(ch, id, firstMeet);
+  if (runAdd('jam') && cardRand() < runAdd('jam')) { ch.jamT = time + 10; later(0.8, () => toast(`Static Charm: ${ENT[id].name}'s power is off for its first round (10 seconds).`, 'good', 4)); }
   H_.banner.hidden = false; document.body.classList.add('has-banner');
   setText(H_.bnName, ENT[id].name.toUpperCase());
   H_.bnBarWrap.classList.toggle('rage', !!ch.rage);
@@ -8873,7 +9066,7 @@ function docHints(id) {
 }
 function succeed(ch, msg) { if (!ch.done) endChallenge(ch, true, msg); }
 function caught(ch, dmg, reason) {
-  if (ch.done || time < P.dashT) return;
+  if (ch.done || time < P.dashT || abSafe(ch)) return;
   ch.done = true;
   startScare(ch.g, ch.scareY || 1.6, () => {
     ch.done = false;
@@ -8900,7 +9093,7 @@ function dirWords(x, z) {
   const dx = x - P.x, dz = z - P.z, f = fwdVec(), fd = dx * f.x + dz * f.z, rd = dx * -f.z + dz * f.x, ang = Math.atan2(rd, fd) * 180 / Math.PI, d = Math.hypot(dx, dz);
   const a = Math.abs(ang), side = ang > 0 ? 'right' : 'left';
   const w = a < 25 ? 'ahead' : a < 70 ? `ahead-${side}` : a < 115 ? side : a < 155 ? `behind-${side}` : 'behind';
-  return `<span class="arr" style="transform:rotate(${ang.toFixed(0)}deg)">↑</span> ${w} · ${d < 6 ? 'very close' : d < 14 ? 'nearby' : 'far'}`;
+  return `<span class="arr" style="transform:rotate(${ang.toFixed(0)}deg)">↑</span> ${w} · ${Math.round(d)} m`;
 }
 
 CH.stillman = () => {
@@ -9139,7 +9332,7 @@ CH.confetti = () => {
   function startFreeze() { phase = 'freeze'; len = t = rand(2, 3); rot = 0; bigText('FREEZE!', '#ff8a7a'); }
   function next() {
     round++;
-    if (round >= ROUNDS) { confettiBurst(g.position.x, 2.2, g.position.z, 220, 4.5); sfx.horn(); P.hp = Math.min(100, P.hp + 30); inv.battery++; succeed(ch, 'Best party ever! Mr. Confetti hands you a battery and some cake. (+30 health)'); }
+    if (round >= ROUNDS) { confettiBurst(g.position.x, 2.2, g.position.z, 220, 4.5); sfx.horn(); P.hp = Math.min(hpMax(), P.hp + 30); inv.battery++; succeed(ch, 'Best party ever! Mr. Confetti hands you a battery and some cake. (+30 health)'); }
     else startMusic();
   }
   function strike(msg) {
@@ -10687,17 +10880,18 @@ CH.sun = () => {
   const nextCord = () => cords.filter((c) => !c.done).sort((a, b) => Math.hypot(a.x - P.x, a.z - P.z) - Math.hypot(b.x - P.x, b.z - P.z))[0];
   const ch = {
     g, scareY: 1.55, cords,
-    obj: 'Its heat burns you out in the open, and the parasols keep moving. Hop from shade to shade and pull the three blind cords [hold E] to shut it out.',
+    obj: 'Its heat burns you out in the open, and the parasols keep moving. Hop from shade to shade and pull the three blind cords [hold E] to shut it out. It burns hotter on a crowd, so spread out.',
     progress: () => { const c = nextCord(); return c && c.hold > 0 ? c.hold : pulled / cords.length; },
     shareGet: () => cords.reduce((m, c, i) => m | (c.done ? 1 << i : 0), 0),
     shareSet(m) { cords.forEach((c, i) => { if (((m | 0) >> i) & 1 && !c.done) { c.hold = 1; c.share = true; } }); },
-    sub: () => { const u = nearest(), c = nextCord(); return `Cords ${pulled}/${cords.length}${c ? ` · next ${dirWords(c.x, c.z)}${c.hold > 0 ? ' · HOLD [E]' : ''}` : ''} · burn ${Math.round(heat * 100)}% · parasol ${dirWords(u.position.x, u.position.z)}`; },
+    sub: () => { const u = nearest(), c = nextCord(); return `Cords ${pulled}/${cords.length}${c ? ` · next ${dirWords(c.x, c.z)}${c.hold > 0 ? ' · HOLD [E]' : ''}` : ''} · burn ${Math.round(heat * 100)}%${ch.crowd ? ` · ${ch.crowd + 1} of you close together: it burns faster` : ''} · parasol ${dirWords(u.position.x, u.position.z)}`; },
     update(dt) {
       moveT -= dt;
       if (moveT <= 0) { moveT = rand(6.5, 9); place(); sfx.blow(); toast('A hot wind takes the parasols somewhere else.', 'bad', 2.5); }
       steer(g.position, P.x, P.z, 1.5 + pulled * 0.6, dt, 0.5); faceTo(g, P.x, P.z, 0.2);
       const shaded = shades.some((u) => Math.hypot(u.position.x - P.x, u.position.z - P.z) < 1.35);
-      heat = clamp(heat + (shaded ? -0.24 : 0.15 + pulled * 0.05) * dt, 0, 1);
+      const crowd = ch.crowd = sunCrowd(), safe = abSafe(ch);
+      heat = clamp(heat + (shaded ? -0.24 / (1 + 0.75 * crowd) : safe ? 0 : (0.15 + pulled * 0.05) * (1 + 0.5 * crowd)) * dt, 0, 1);
       tintOverride = [1 + heat * 0.5, 0.95 + heat * 0.05, 0.9 - heat * 0.45];
       P.hurt = Math.max(P.hurt, heat * heat * 0.8);
       const hold = keys.KeyE || touch.use;
@@ -11083,7 +11277,7 @@ CH.wow = () => {
     const colr = NAMES[i], hex = '#' + new THREE.Color(COLS[i]).getHexString();
     tween(0.9, (k) => u.setDrain(i, k));
     bigText(colr, hex, 1); sfx.chime(); tone(880 * Math.pow(0.84, i), 0.5, 0.16, { type: 'triangle', f2: 220 });
-    if (fromHere) { P.hp = Math.min(100, P.hp + 8); }
+    if (fromHere) { P.hp = Math.min(hpMax(), P.hp + 8); }
     u.flare(0); ring(orb.position.x, orb.position.z, 0.5, 9, 0.7, COLS[i]); P.shake = Math.max(P.shake, 0.3);
     orb.visible = false;
     if (got >= 7) { ending = 3.2; beams.forEach((b) => { scene.remove(b.st); if (b.m) scene.remove(b.m); }); beams.length = 0; toast('The last colour goes out of it. It is only a picture now. It is still smiling.', 'good', 5); u.shared.grey.value = 1; }
@@ -11116,7 +11310,7 @@ CH.wow = () => {
       for (let i = trails.length - 1; i >= 0; i--) { const e = trails[i]; e.t -= dt; e.m.material.opacity = 0.6 * Math.max(0, e.t / 1.1); if (e.t <= 0) { scene.remove(e.m); e.m.material.dispose(); trails.splice(i, 1); } }
       if (ending > 0) {
         ending -= dt; u.flare(0); u.aura.material.opacity *= 1 - dt; g.position.y -= dt * 1.2; sky.material.uniforms.fade.value = clamp(ending / 3.2, 0, 1);
-        if (ending <= 0) { P.hp = 100; inv.wowBeam = true; if (duck && duck.g) { sfx.quack(); later(0.25, sfx.quack); bigText('QUACK', '#ffe14d', 2); confettiBurst(duck.g.position.x, 0.6, duck.g.position.z, 160, 3.4); quackers = { g: duck.g, quackT: 0 }; duck.kept = true; } succeed(ch, duck && duck.g ? 'WOW. All seven colours went somewhere, and they went into the duck. It seems fine about it. Your flashlight will not run out now.' : 'WOW. It goes back into the floor, still grinning. Your flashlight feels warm, and it will not run out now.'); }
+        if (ending <= 0) { P.hp = hpMax(); inv.wowBeam = true; if (duck && duck.g) { sfx.quack(); later(0.25, sfx.quack); bigText('QUACK', '#ffe14d', 2); confettiBurst(duck.g.position.x, 0.6, duck.g.position.z, 160, 3.4); quackers = { g: duck.g, quackT: 0 }; duck.kept = true; } succeed(ch, duck && duck.g ? 'WOW. All seven colours went somewhere, and they went into the duck. It seems fine about it. Your flashlight will not run out now.' : 'WOW. It goes back into the floor, still grinning. Your flashlight feels warm, and it will not run out now.'); }
         return;
       }
       if (rise < 1) return;
@@ -11201,7 +11395,7 @@ function updateQuackers(dt) {
   else if (d > 0.3) moveCircle(g.position, (tx - g.position.x) / d * Math.min(d * 3, 7) * dt, (tz - g.position.z) / d * Math.min(d * 3, 7) * dt, 0.2);
   g.position.y = d > 0.4 ? Math.abs(Math.sin(time * 9)) * 0.12 : 0;
   faceTo(g, P.x, P.z, 0.15);
-  if (!active && P.hp < 100 && state === 'playing') P.hp = Math.min(100, P.hp + 0.8 * dt);
+  if (!active && P.hp < hpMax() && state === 'playing') P.hp = Math.min(hpMax(), P.hp + 0.8 * dt);
   quackers.quackT -= dt;
   if (active && active.g && quackers.quackT <= 0 && distP(active.g) < 12) { sfx.quack(); quackers.quackT = 2.6; }
 }
@@ -11295,7 +11489,13 @@ listen(window, 'keydown', (e) => {
   else if (c === 'Digit2') useItem(2);
   else if (c === 'Digit3') useItem(3);
   else if (c === 'Digit4') useItem(4);
+  else if (c === 'KeyB') abPing();
+  else if (c === 'KeyG') abDrop('battery');
+  else if (c === 'KeyH') abDrop('fizz');
+  else if (c === 'KeyZ') abUse(0);
+  else if (c === 'KeyX') abUse(1);
 });
+listen(window, 'mousedown', (e) => { if (e.button === 1 && state === 'playing' && !paused && !overlay && !scareS) { e.preventDefault(); abPing(); } });
 listen(window, 'keyup', (e) => { keys[keyMap(e.code)] = false; keys[e.code] = false; });
 listen(window, 'blur', () => { for (const k in keys) keys[k] = false; });
 
@@ -11583,6 +11783,7 @@ function animEntity(g, dt) {
 }
 function update(dt) {
   time += dt; playTime += dt;
+  abSnap();
   if (playTime - autoSaveAt > 45) { autoSaveAt = playTime; requestSave(); }
   updatePlayer(dt);
   updateCamera(dt);
@@ -11604,12 +11805,13 @@ function update(dt) {
   updateQuackers(dt);
   updateWorldFx(dt);
   updateFocus();
+  abMove(dt); abTick(dt);
   lookRate = lookDelta / dt; lookDelta = 0;
 }
 
 function updateHUD(dt) {
   uiHud(dt);
-  setWidth(H_.hp, P.hp); H_.hp.classList.toggle('low', P.hp < 35);
+  setWidth(H_.hp, P.hp / hpMax() * 100); H_.hp.classList.toggle('low', P.hp < 35);
   setWidth(H_.st, P.st); H_.st.classList.toggle('tired', P.exhausted);
   H_.batfill.style.width = (P.bat * 0.9).toFixed(0) + '%'; H_.batt.classList.toggle('low', P.bat < 20);
   setText(H_.batpct, Math.ceil(P.bat) + '%');
@@ -11624,7 +11826,7 @@ function updateHUD(dt) {
   { const tt = el('taskTag'); tt.hidden = LEVEL !== 2 || status.comeplay === 3; if (!tt.hidden) setText(tt, inv.popper ? 'CONFETTI POPPER READY [3]' : `POPPER TASKS ${tasksCount()}/4 · CONFETTI ${Math.min(8, inv.conf | 0)}/8`); }
   setText(el('s4t'), inv.duck ? (quackers ? 'Quack' : 'Duck') : 'Empty'); el('s4').classList.toggle('empty', !inv.duck);
   setHTML(H_.coins, `${LEVEL === 0 ? `<span title="Red vending tokens"><i class="tk r"></i>${inv.vtok}</span>` : ''}<span title="Blue card tokens"><i class="tk b"></i>${inv.coins}</span>`);
-  const label = focus ? (touchMode ? `USE · ${focus.label()}` : `<b>E</b> ${focus.label()}`) : TRD.look ? `<b>E</b> Hold to trade cards with ${escHtml(TRD.look.name)}` : '';
+  const label = focus ? (touchMode ? `USE · ${focus.label()}` : `<b>E</b> ${focus.label()}`) : TRD.look ? `<b>E</b> Hold to trade cards with ${escHtml(TRD.look.name)}` : abPrompt();
   setHTML(H_.prompt, label); H_.cross.classList.toggle('hot', !!focus);
   if (active && active.downed) {
     const o = coopFighting(active);
@@ -11633,7 +11835,7 @@ function updateHUD(dt) {
   } else if (active) {
     setText(H_.bnObj, active.obj);
     H_.bnBar.style.width = (clamp(active.progress(), 0, 1) * 100).toFixed(1) + '%';
-    setHTML(H_.bnSub, active.sub());
+    setHTML(H_.bnSub, abChips() + active.sub());
   }
   P.hurt = Math.max(0, P.hurt - dt * 1.4);
   H_.hurt.style.opacity = Math.max(P.hurt, P.hp < 30 ? 0.35 + Math.sin(time * 4) * 0.12 : 0, dread * 0.42).toFixed(2);
@@ -11665,7 +11867,7 @@ function showTab(name) {
   document.querySelectorAll('#title .tab').forEach((b) => { const on = b.dataset.tab === grp; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
   document.querySelectorAll('#title [data-sub]').forEach((b) => { const on = b.dataset.sub === name; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   ['play', 'ents', 'runs', 'museum', 'keys', 'ups', 'acct', 'news'].forEach((n) => { el('pane-' + n).hidden = n !== name; });
-  if (name === 'news') { try { localStorage.setItem('bfn-news', '29'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
+  if (name === 'news') { try { localStorage.setItem('bfn-news', '30'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
   if (name === 'acct') renderProfiles();
   el('title').classList.toggle('sub', name !== 'play');
   if (name === 'keys') { el('paneSet').appendChild(el('setRows')); uiSyncSet(); }
@@ -11686,7 +11888,7 @@ function setupTitle() {
   el('lvl0Best').textContent = bestText(0);
   el('lvl1Best').textContent = bestText(1); el('lvl2Best').textContent = bestText(2); el('lvl3Best').textContent = bestText(3);
   showTab(PROF.reopen ? 'acct' : 'play'); PROF.reopen = false;
-  try { if (localStorage.getItem('bfn-news') === '29') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
+  try { if (localStorage.getItem('bfn-news') === '30') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
   renderAccount();
   uiTitle(); uiNudge();
 }
@@ -11810,6 +12012,7 @@ function upsertOther(p) {
   if (pr.w && !o.won) { o.won = true; toast(`${o.name} escaped Level ${LVN}!`, 'good', 6); }
   coopSummon(o);
   tradeHear(o, pr.td);
+  v30Hear(o, pr);
   if (typeof pr.j === 'string' && pr.j.length === ENTS.length && /^[0-3]+$/.test(pr.j)) teamJournal(o, pr.j, typeof pr.nr === 'string' && pr.nr.length === NOTES.length && /^[01]+$/.test(pr.nr) ? pr.nr : '');
 }
 function onGamePeers(ch) {
@@ -12004,9 +12207,495 @@ function rsTick(dt) {
   RS.t += dt;
   if (RS.t >= RS.next) { RS.t = 0; RS.next = rsGap(); rsQuiet(); }
 }
+/* ---------- v30: party play and ability cards ----------
+   Pings with distances in meters, items you can drop for a teammate, a flash that blinds teammates who are looking,
+   ability cards on their own keys and cooldowns, and the things they leave in the world (walls, pads, decoys, a shop).
+   Anything a teammate needs to see travels in presence: short-lived events in `ev`, and what is lying in the world
+   (drops, pads, a shop) as absolute lists. Everything here also works alone. */
+const AB_FN = {};
+const abMe = () => coopMe() || 'me';
+const abM = (d) => `${Math.max(0, Math.round(d))} m`;
+function abOpen(x, z) { const t = tileAt(x, z); return t >= 0 && !solid[t]; }
+function abSegD(w, x, z) {
+  const ax = w.x - w.px * w.h, az = w.z - w.pz * w.h, bx = w.x + w.px * w.h, bz = w.z + w.pz * w.h, dx = bx - ax, dz = bz - az;
+  const t = clamp(((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz), 0, 1);
+  return Math.hypot(x - (ax + dx * t), z - (az + dz * t));
+}
+function abSafe(ch) { return !!ch && ((ch.jamT || 0) > time || AB.invisT > time); }
+function abInvis() { return AB.invisT > time; }
+// ---------- flash charges (the Spare Bulb) ----------
+function flashMax() { return 1 + Math.round(runAdd('flashes')); }
+function flashTick() {
+  const m = flashMax();
+  if (UI.fq == null || UI.fq > m) UI.fq = m;
+  if (UI.fq < m && time >= UI.flashAt) { UI.fq++; if (UI.fq < m) { UI.flashCd = 8 * runMul('flashCd'); UI.flashAt = time + UI.flashCd; } }
+}
+// ---------- the Sun: it burns hotter on a crowd ----------
+function sunCrowd() {
+  let n = 0;
+  for (const o of others.values()) if (!o.dead && Math.hypot(o.x - P.x, o.z - P.z) < 3.5) n++;
+  return n;
+}
+// ---------- events to and from teammates ----------
+function abEmit(type, data) {
+  AB.seq++; AB.ev.push({ t: time, e: [AB.seq, type, ...data] });
+  if (AB.ev.length > 12) AB.ev.shift();
+  if (MP.game) mpSend();
+}
+function v30Pub() {
+  const pads = AB.pads.map((p) => [p.id, +p.a.x.toFixed(2), +p.a.z.toFixed(2), +p.b.x.toFixed(2), +p.b.z.toFixed(2)]);
+  return {
+    ev: AB.ev.filter((x) => time - x.t < 3).map((x) => x.e),
+    dp: AB.drops.map((d) => [d.id, d.type, +d.x.toFixed(2), +d.z.toFixed(2)]),
+    dt: AB.took.slice(-30),
+    tp: pads.length ? pads : null,
+    sh: AB.shop && AB.shop.until > time ? [+AB.shop.x.toFixed(2), +AB.shop.z.toFixed(2), Math.ceil(AB.shop.until - time)] : null,
+  };
+}
+const abNum = (v) => typeof v === 'number' && isFinite(v);
+function v30Hear(o, pr) {
+  const v = o.v3 || (o.v3 = { seq: null, dp: [], dt: [], tp: [], sh: null });
+  if (Array.isArray(pr.ev)) {
+    const evs = pr.ev.filter((e) => Array.isArray(e) && abNum(e[0]) && typeof e[1] === 'string').slice(-12);
+    const top = evs.reduce((m, e) => Math.max(m, e[0]), v.seq == null ? -1 : v.seq);
+    if (v.seq == null) v.seq = top;
+    else { for (const e of evs) if (e[0] > v.seq) { try { abHearEv(o, e); } catch (er) { console.error(er); } } v.seq = top; }
+  }
+  v.dp = Array.isArray(pr.dp) ? pr.dp.filter((d) => Array.isArray(d) && typeof d[0] === 'string' && d[0].length < 40 && (d[1] === 'battery' || d[1] === 'fizz') && abNum(d[2]) && abNum(d[3])).slice(0, 12) : [];
+  v.dt = Array.isArray(pr.dt) ? pr.dt.filter((x) => typeof x === 'string' && x.length < 40).slice(-30) : [];
+  v.tp = Array.isArray(pr.tp) ? pr.tp.filter((p) => Array.isArray(p) && p.length === 5 && p.every(abNum)).slice(0, 3) : [];
+  v.sh = Array.isArray(pr.sh) && pr.sh.length === 3 && pr.sh.every(abNum) ? { x: pr.sh[0], z: pr.sh[1], until: time + clamp(pr.sh[2], 0, 60) } : null;
+}
+function abHearEv(o, e) {
+  const type = e[1];
+  if (type === 'fl' && e.length >= 6 && [2, 3, 4, 5].every((i) => abNum(e[i]))) abBlind(o, e[2], e[3], e[4], e[5]);
+  else if (type === 'pg' && [2, 3, 4].every((i) => abNum(e[i]))) abPingShow(e[2], e[3], e[4], cleanText(String(e[5] || 'PING'), 24), o.name, o.color);
+  else if (type === 'sc' && e[2] === coopMe()) { AB.prank = { from: o.name, at: time }; }
+  else if (type === 'jm' && active && !active.done && active.key === e[2] && abNum(e[3])) { active.jamT = time + clamp(e[3], 0, 12); toast(`${o.name} switched its power off. It can't move or hurt anyone for ${Math.round(e[3])} seconds.`, 'good', 4); }
+  else if (type === 'dc' && abNum(e[2]) && abNum(e[3])) abDecoy(e[2], e[3], clamp(+e[4] || 6, 0, 6), o.name);
+  else if (type === 'wl' && [2, 3, 4].every((i) => abNum(e[i]))) abWall(e[2], e[3], e[4], clamp(+e[5] || 5, 0, 5));
+}
+// ---------- markers on screen: pings, clues, pads ----------
+function abMark(x, y, z, text, col, dur, o) { AB.marks.push(Object.assign({ x, y, z, text, col, until: time + dur }, o || {})); }
+function abMarksDraw() {
+  const box = el('pmarks'); if (!box) return;
+  if (!AB.pool) { AB.pool = []; box.innerHTML = ''; }
+  AB.marks = AB.marks.filter((m) => m.until > time && (!m.g || m.g.parent));
+  const list = AB.marks.map((m) => { if (m.g) { m.x = m.g.position.x; m.z = m.g.position.z; } return m; });
+  if (state === 'playing' && !HAUNT) {
+    for (const p of abAllPads()) for (const [e, f] of [[p.a, p.b], [p.b, p.a]]) {
+      if (Math.hypot(e.x - P.x, e.z - P.z) > 22) continue;
+      const cd = Math.max(0, (AB.padUse[p.key] || 0) - time);
+      list.push({ x: e.x, y: 0.9, z: e.z, text: cd > 0 ? `PAD · ${Math.ceil(cd)}s` : 'PAD', col: '#7fe3ff', small: true });
+    }
+    if (AB.padA) list.push({ x: AB.padA.x, y: 0.9, z: AB.padA.z, text: 'PAD 1 OF 2', col: '#7fe3ff', small: true });
+    for (const s of abAllShops()) list.push({ x: s.x, y: 2.3, z: s.z, text: `CARD SHOP · ${Math.ceil(s.until - time)}s`, col: '#ff7ac6' });
+  }
+  const W2 = innerWidth, H2 = innerHeight;
+  while (AB.pool.length < list.length) { const d = document.createElement('div'); d.className = 'pmark'; d.innerHTML = '<i></i><span></span>'; box.appendChild(d); AB.pool.push(d); }
+  AB.pool.forEach((d, i) => {
+    const m = list[i];
+    if (!m || state !== 'playing') { d.hidden = true; return; }
+    d.hidden = false;
+    AB.v.set(m.x, m.y, m.z).project(camera);
+    let x = AB.v.x, y = AB.v.y; const behind = AB.v.z > 1;
+    if (behind) { x = -x; y = -y; }
+    const off = behind || Math.abs(x) > 0.95 || Math.abs(y) > 0.9;
+    if (off) { const k = 0.95 / Math.max(Math.abs(x), Math.abs(y) / 0.9 * 0.95, 1e-3); x *= k; y *= k; if (behind) y = Math.min(y, -0.6); }
+    const sx = (x * 0.5 + 0.5) * W2, sy = (-y * 0.5 + 0.5) * H2;
+    d.style.transform = `translate(${sx.toFixed(0)}px,${sy.toFixed(0)}px)`;
+    d.style.setProperty('--c', m.col || '#f3eedf');
+    d.classList.toggle('off', off); d.classList.toggle('small', !!m.small);
+    const t = `${m.text} · ${abM(Math.hypot(m.x - P.x, m.z - P.z))}`;
+    if (d._t !== t) { d._t = t; d.lastChild.textContent = t; }
+  });
+}
+// ---------- aiming: where the middle of the screen lands, up to some distance ----------
+function abAim(maxD) {
+  const c = camera.position, D = U.camDir.value;
+  for (let t = 0.3; t <= maxD; t += 0.08) {
+    const x = c.x + D.x * t, y = c.y + D.y * t, z = c.z + D.z * t, ti = tileAt(x, z);
+    if (ti < 0) return { x: x - D.x * 0.2, y, z: z - D.z * 0.2, t, hit: 'wall' };
+    const gnd = LEVEL === 3 ? Math.max(-1, groundAt(x, z)) : 0;
+    if (LEVEL === 3 ? solid[ti] && solid[ti] !== 2 : solid[ti]) return { x: x - D.x * 0.2, y: Math.max(0.3, y), z: z - D.z * 0.2, t, hit: 'wall' };
+    if (y <= gnd + 0.02) return { x, y: gnd, z, t, hit: 'floor' };
+    if (LEVEL !== 3 && y >= WALL_H - 0.02) return { x, y: WALL_H - 0.1, z, t, hit: 'ceil' };
+  }
+  return { x: c.x + D.x * maxD, y: c.y + D.y * maxD, z: c.z + D.z * maxD, t: maxD, hit: 'air' };
+}
+function abEntities() {
+  const out = [];
+  if (active && active.g && !active.done && active.g.visible !== false && ENT[active.id]) out.push({ g: active.g, name: ENT[active.id].name });
+  if (LEVEL < 2 && RM.g && RM.g.visible) out.push({ g: RM.g, name: ENT[RM.id] ? ENT[RM.id].name : 'Something' });
+  if (LEVEL === 2 && CP && !CP.dead && CP.g) out.push({ g: CP.g, name: ENT.comeplay ? ENT.comeplay.name : 'Something' });
+  for (const o of others.values()) if (o.ent && o.ent.visible && ENT[o.entId]) out.push({ g: o.ent, name: ENT[o.entId].name });
+  return out.sort((a, b) => Math.hypot(a.g.position.x - P.x, a.g.position.z - P.z) - Math.hypot(b.g.position.x - P.x, b.g.position.z - P.z));
+}
+// ---------- ping ----------
+function abPing() {
+  if (HAUNT || state !== 'playing' || time - (AB.pingAt || -9) < 0.45) return;
+  AB.pingAt = time;
+  const h = abAim(45), c = camera.position, D = U.camDir.value;
+  let x = h.x, y = h.y, z = h.z, label = h.hit === 'air' ? 'OVER THERE' : 'HERE';
+  for (const e of abEntities()) {
+    const ex = e.g.position.x - c.x, ey = 1.3 - c.y, ez = e.g.position.z - c.z, t = ex * D.x + ey * D.y + ez * D.z;
+    if (t > 0 && t < h.t + 1 && Math.hypot(ex - D.x * t, ey - D.y * t, ez - D.z * t) < 1.3) { x = e.g.position.x; y = 1.6; z = e.g.position.z; label = e.name.toUpperCase(); break; }
+  }
+  if (label === 'HERE' || label === 'OVER THERE') {
+    let best = null, bd = 1.6;
+    for (const it of items) { if (!it.alive) continue; const d = Math.hypot(it.x - x, it.z - z); if (d < bd) { bd = d; best = it; } }
+    if (best) { x = best.x; z = best.z; y = 0.5; label = { note: 'A NOTE', coin: 'A TOKEN', battery: 'A BATTERY', fizz: 'FIZZ WATER', hat: 'A PARTY HAT', duck: 'A DUCK' }[best.type] || 'THIS'; }
+  }
+  abEmit('pg', [+x.toFixed(2), +y.toFixed(2), +z.toFixed(2), label]);
+  abPingShow(x, y, z, label, 'You', safeColor(ACCT.color));
+}
+function abPingShow(x, y, z, label, who, col) {
+  abMark(x, y + 0.4, z, `${who}: ${label}`, col, 8);
+  if (scene) { const pad = fxPad(x, z, 0.5, new THREE.Color(col).getHex(), 0.3); pad.position.y = LEVEL === 3 ? Math.max(0, y - 0.02) : 0; scene.add(pad); later(8, () => scene.remove(pad)); }
+  tone(880, 0.08, 0.06, { type: 'triangle' }); tone(1320, 0.1, 0.05, { type: 'triangle', when: 0.09 });
+}
+// ---------- a teammate's flash ----------
+function abBlind(o, x, z, fx, fz) {
+  if (state !== 'playing' || HAUNT) return;
+  const dx = P.x - x, dz = P.z - z, d = Math.hypot(dx, dz);
+  if (d > 12 || !los(x, z, P.x, P.z)) return;
+  const dot = d < 0.01 ? 1 : (dx * fx + dz * fz) / d;
+  if (d > 2.5 && dot < 0.3) return;
+  const k = (1 - d / 12) * (d < 2.5 ? 1 : clamp(dot, 0.3, 1)), dur = 0.8 + 2.4 * k, op = settings.calm ? 0.35 * k + 0.1 : 0.6 + 0.4 * k;
+  const f = el('allyFlash');
+  if (f) f.animate([{ opacity: op, offset: 0 }, { opacity: op * 0.92, offset: 0.4 }, { opacity: 0, offset: 1 }], { duration: dur * 1000, easing: 'ease-in' });
+  AB.blindT = time + dur;
+  toast(`${o.name}'s flash got you. Blinded for ${dur.toFixed(1)}s.`, 'bad', 2.4);
+}
+// ---------- dropping items for teammates ----------
+function abDrop(type) {
+  if (HAUNT || state !== 'playing' || P.hidden) return;
+  const have = type === 'battery' ? inv.battery : inv.fizz;
+  if (!have) { toast(type === 'battery' ? 'No spare batteries to drop.' : 'No Fizz Water to drop.', '', 2); return; }
+  if (AB.drops.length >= 10) { toast('You have dropped plenty. Pick some up first.', '', 2.5); return; }
+  const f = fwdVec(); let x = P.x + f.x * 1.3, z = P.z + f.z * 1.3;
+  if (!abOpen(x, z) || !los(P.x, P.z, x, z)) { x = P.x; z = P.z; }
+  if (type === 'battery') inv.battery--; else inv.fizz--;
+  AB.drops.push({ id: `${abMe()}:${++AB.dropN}:${Math.random().toString(36).slice(2, 5)}`, type, x, z, t0: time, mine: true });
+  sfx.click(); toast(`Dropped ${type === 'battery' ? 'a battery' : 'Fizz Water'}. Anyone can pick it up.`, '', 2.5);
+  if (MP.game) mpSend();
+}
+function abDropMesh(type) {
+  const g = new THREE.Group(), b = new THREE.Group();
+  if (type === 'battery') { b.add(mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.2, 10), M(0x2f6b3a, { emissive: 0.4 }))); b.add(mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.03, 8), M(0xd9b23a, { emissive: 0.5 }), 0, 0.11, 0)); }
+  else { b.add(mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.24, 12), M(0x8fd3ff, { emissive: 0.5 }))); b.add(mesh(new THREE.CylinderGeometry(0.03, 0.05, 0.08, 10), M(0x8fd3ff, { emissive: 0.5 }), 0, 0.16, 0)); }
+  b.position.y = 0.35; g.add(b);
+  const gl = glowSprite(type === 'battery' ? 0xb8ffb0 : 0x9fdcff, 0.8, 0.45); gl.position.y = 0.35; g.add(gl);
+  g.add(fxPad(0, 0, 0.35, 0xffffff, 0.12));
+  g.userData.b = b; scene.add(g); return g;
+}
+function abDropsTick() {
+  const taken = new Set(AB.took);
+  for (const o of others.values()) if (o.v3) for (const id of o.v3.dt) { taken.add(id); const i = AB.drops.findIndex((d) => d.id === id); if (i >= 0) AB.drops.splice(i, 1); }
+  const vis = new Map();
+  for (const d of AB.drops) vis.set(d.id, d);
+  for (const o of others.values()) if (o.v3) for (const [id, type, x, z] of o.v3.dp) if (!taken.has(id) && !vis.has(id)) vis.set(id, { id, type, x, z, who: o.name });
+  if (!AB.dropG) AB.dropG = new Map();
+  for (const [id, g] of AB.dropG) if (!vis.has(id)) { scene.remove(g); AB.dropG.delete(id); }
+  for (const d of vis.values()) {
+    let g = AB.dropG.get(d.id); if (!g) { g = abDropMesh(d.type); AB.dropG.set(d.id, g); }
+    g.position.set(d.x, LEVEL === 3 ? Math.max(0, groundAt(d.x, d.z)) : 0, d.z); g.userData.b.rotation.y = time * 1.6;
+    if (state !== 'playing' || P.hidden || Math.hypot(d.x - P.x, d.z - P.z) > 1.0 || (d.mine && time - d.t0 < 2)) continue;
+    if (d.type === 'battery') inv.battery++; else inv.fizz++;
+    sfx.pickup();
+    toast(`${d.who ? `${d.who}'s ` : ''}${d.type === 'battery' ? 'battery' : 'Fizz Water'}. Picked up.`, 'good', 2.2);
+    if (d.mine) AB.drops.splice(AB.drops.indexOf(d), 1); else { AB.took.push(d.id); if (AB.took.length > 40) AB.took.shift(); }
+    scene.remove(g); AB.dropG.delete(d.id);
+    if (MP.game) mpSend();
+  }
+}
+// ---------- ability cards ----------
+function abMaxQ(id) { return id === 'ab_scare' || id === 'ab_wall' ? cardLv(id) : 1; }
+function abQTick() {
+  for (const id of cardAbil()) {
+    const m = abMaxQ(id);
+    if (AB.q[id] == null || AB.q[id] > m) AB.q[id] = m;
+    if (AB.q[id] < m && time >= (AB.at[id] || 0)) { AB.q[id]++; if (AB.q[id] < m) AB.at[id] = time + CARD_BY[id].cd; }
+  }
+}
+function abSpend(id, cd) {
+  const full = AB.q[id] >= abMaxQ(id); AB.q[id]--;
+  if (full || time >= (AB.at[id] || 0)) { AB.at[id] = time + (cd || CARD_BY[id].cd); AB.cdOf = AB.cdOf || {}; AB.cdOf[id] = cd || CARD_BY[id].cd; }
+}
+function abUse(i) {
+  if (HAUNT || state !== 'playing' || paused || overlay || scareS) return;
+  const id = cardAbil()[i];
+  if (!id) { toast(`No ability card in slot ${i + 1}. Equip one under Cards in your journal.`, '', 3); return; }
+  abQTick();
+  const c = CARD_BY[id];
+  if (AB.q[id] <= 0) { toast(`${c.name} is recharging: ${Math.ceil((AB.at[id] || 0) - time)}s.`, '', 1.6); return; }
+  if (P.hidden && id !== 'ab_heal' && id !== 'ab_scare') { toast('Not from inside a hiding spot.', '', 1.8); return; }
+  const r = AB_FN[id](cardLv(id));
+  if (r) { abSpend(id, typeof r === 'number' ? r : 0); abHud(true); }
+}
+AB_FN.ab_speed = () => { AB.speedT = time + 10; tone(300, 0.3, 0.06, { f2: 900, type: 'triangle' }); toast('Sugar Rush: 20% faster for 10 seconds.', 'good', 2.5); return true; };
+AB_FN.ab_heal = () => {
+  if (P.hp >= hpMax()) { toast('You are already at full health.', '', 1.8); return false; }
+  P.hp = Math.min(hpMax(), P.hp + 15); sfx.drink(); toast('Pocket Medkit: +15 health.', 'good', 2); return true;
+};
+AB_FN.ab_scare = () => {
+  let best = null, bd = 1e9;
+  for (const o of others.values()) { if (o.dead) continue; const d = Math.hypot(o.x - P.x, o.z - P.z); if (d < bd) { bd = d; best = o; } }
+  if (!best) { toast('Nobody to prank. This one needs a teammate in your room.', '', 3); return false; }
+  abEmit('sc', [best.peer]); sfx.click(); toast(`Prank Call sent to ${best.name}. Give it a few seconds.`, 'good', 3); return true;
+};
+AB_FN.ab_roll = () => {
+  if (cardRand() < 0.5) { tone(220, 0.25, 0.06, { f2: 140, type: 'triangle' }); toast('Grab Bag: empty this time.', '', 2.2); return true; }
+  const r = cardRand();
+  if (r < 0.3) { inv.fizz++; sfx.pickup(); toast('Grab Bag: Fizz Water.', 'good', 2.5); }
+  else if (r < 0.6) { inv.battery++; sfx.pickup(); toast('Grab Bag: a battery.', 'good', 2.5); }
+  else if (r < 0.82) { inv.coins += 1 + runAdd('token'); sfx.coin(); toast(`Grab Bag: a blue card token. (${inv.coins})`, 'good', 2.5); }
+  else if (r < 0.95) {
+    if (LEVEL === 0) { inv.vtok++; sfx.coin(); toast('Grab Bag: a red vending token.', 'good', 2.5); }
+    else if (LEVEL === 2 && !inv.popper && status.comeplay !== 3) { inv.conf = (inv.conf | 0) + 1; sfx.pickup(); toast('Grab Bag: a handful of confetti for the popper.', 'good', 2.5); }
+    else { inv.fizz++; inv.battery++; sfx.pickup(); toast('Grab Bag: Fizz Water and a battery.', 'good', 2.5); }
+  } else { const c = cardPick(cardRoll()), res = cardGive(c.id); sfx.chime(); cardReveal(c, res, { lucky: true }); cardsHud(); }
+  return true;
+};
+AB_FN.ab_track = () => {
+  const e = abEntities()[0];
+  let tgt = null;
+  if (e) tgt = { g: e.g, x: e.g.position.x, z: e.g.position.z, text: e.name.toUpperCase() };
+  else {
+    let best = null, bd = 1e9, bestUn = null, bu = 1e9;
+    for (const it of items) {
+      if (it.type !== 'note' || !it.alive) continue;
+      const n = NOTES[it.note], d = Math.hypot(it.x - P.x, it.z - P.z);
+      if (n && n.ent && status[n.ent] < 3 && d < bu) { bu = d; bestUn = it; }
+      if (d < bd) { bd = d; best = it; }
+    }
+    const it = bestUn || best;
+    if (it) { const n = NOTES[it.note]; tgt = { x: it.x, z: it.z, text: n && n.ent && ENT[n.ent] && status[n.ent] < 3 ? `CLUE: ${ENT[n.ent].name.toUpperCase()}` : 'CLUE' }; }
+  }
+  if (!tgt) { toast('The rod does not move. Nothing left to find on this level.', '', 3); return false; }
+  const b = fxBeacon(tgt.x, tgt.z, 0xff5050, 3.2); if (tgt.g) b.visible = false; scene.add(b); later(20, () => scene.remove(b));
+  abMark(tgt.x, 1.8, tgt.z, tgt.text, '#ff6a5a', 20, { g: tgt.g || null });
+  tone(420, 0.5, 0.06, { f2: 640, type: 'sine' }); toast(`Dowsing Rod: ${tgt.text.toLowerCase()}, ${dirWords(tgt.x, tgt.z).replace(/<[^>]+>/g, '').replace('↑', '').trim()}.`, 'good', 4);
+  return true;
+};
+AB_FN.ab_jam = () => {
+  if (!active || active.done || active.downed) { toast('No entity to switch off right now. Use it in a fight.', '', 2.5); return false; }
+  active.jamT = time + 10; abEmit('jm', [active.key, 10]); sfx.zap(); hiss(0.6, 0.12, { type: 'bandpass', f: 2200, q: 0.6 });
+  toast(`Static Burst: ${ENT[active.id].name} can't move or hurt anyone for 10 seconds.`, 'good', 3.5); return true;
+};
+AB_FN.ab_wall = () => {
+  const f = fwdVec(), x = P.x + f.x * 1.6, z = P.z + f.z * 1.6;
+  if (!abOpen(x, z)) { toast('No room for a wall there.', '', 1.8); return false; }
+  const ang = Math.atan2(f.x, f.z); abWall(x, z, ang, 5); abEmit('wl', [+x.toFixed(2), +z.toFixed(2), +ang.toFixed(3), 5]); return true;
+};
+function abWall(x, z, ang, dur) {
+  const w = { x, z, px: Math.cos(ang), pz: -Math.sin(ang), h: 1.6, until: time + dur, g: new THREE.Group() };
+  w.g.add(mesh(new THREE.BoxGeometry(3.2, 2.2, 0.14), basic(0x52ff7a, { transparent: true, opacity: 0.42, depthWrite: false, fog: false }), 0, 1.1, 0));
+  w.g.add(mesh(new THREE.BoxGeometry(3.3, 0.06, 0.18), basic(0xb8ffc8, { fog: false }), 0, 2.2, 0));
+  w.g.add(mesh(new THREE.BoxGeometry(3.3, 0.06, 0.18), basic(0xb8ffc8, { fog: false }), 0, 0.03, 0));
+  w.g.position.set(x, LEVEL === 3 ? Math.max(0, groundAt(x, z)) : 0, z); w.g.rotation.y = ang; scene.add(w.g);
+  AB.walls.push(w); tone(160, 0.3, 0.07, { f2: 320, type: 'square' });
+}
+AB_FN.ab_invis = (L) => {
+  AB.invisT = time + 7 * L; AB.invisAt = { x: P.x, z: P.z };
+  if (LEVEL < 2) RM.stun = Math.max(RM.stun || 0, AB.invisT);
+  if (LEVEL === 2 && CP) CP.stun = Math.max(CP.stun || 0, AB.invisT);
+  hiss(0.5, 0.1, { type: 'highpass', f: 3000 }); toast(`Vanish: invisible for ${7 * L} seconds.`, 'good', 2.5);
+  if (MP.game) mpSend();
+  return true;
+};
+AB_FN.ab_fake = () => {
+  const h = abAim(25.5);
+  if (h.hit === 'air' || h.t > 25) { toast('Aim at a spot within 25 m.', '', 2); return false; }
+  abDecoy(h.x, h.z, 6, null); abEmit('dc', [+h.x.toFixed(2), +h.z.toFixed(2), 6]); return true;
+};
+function abDecoy(x, z, dur, who) {
+  if (AB.decoy && AB.decoy.g) scene.remove(AB.decoy.g);
+  const g = fxBeacon(x, z, 0xff7040, 2.4); scene.add(g);
+  AB.decoy = { x, z, until: time + dur, g, beep: 0 };
+  abMark(x, 1.6, z, who ? `${who}'s decoy` : 'Decoy', '#ff9a60', dur);
+  later(dur, () => { if (AB.decoy && AB.decoy.g === g) { scene.remove(g); AB.decoy = null; } });
+}
+AB_FN.ab_arrow = () => {
+  const e = abEntities()[0];
+  if (!e) { toast('No entity is out right now.', '', 2.2); return false; }
+  abArrowEnd();
+  const gl = glowSprite(0xff2a2a, 3.4, 0.55); gl.position.y = 1.3; e.g.add(gl);
+  AB.arrow = { g: e.g, name: e.name, until: time + 8, gl }; tone(520, 0.2, 0.06, { type: 'triangle' });
+  return true;
+};
+function abArrowEnd() { if (AB.arrow) { if (AB.arrow.gl.parent) AB.arrow.gl.parent.remove(AB.arrow.gl); AB.arrow = null; } const a = el('abArrow'); if (a) a.hidden = true; }
+AB_FN.ab_shop = () => {
+  AB.shop = { x: P.x, z: P.z, until: time + 60 }; sfx.chime(); later(0.2, () => sfx.coin());
+  toast('Pop-Up Shop: the card shop is open here for 60 seconds. Anyone can use it [E].', 'good', 4);
+  if (MP.game) mpSend();
+  return true;
+};
+function abShopMesh() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.BoxGeometry(0.9, 1.3, 0.6), M(0x3b2550, { emissive: 0.25 }), 0, 0.65, 0));
+  g.add(mesh(new THREE.BoxGeometry(1.1, 0.1, 0.8), M(0xff7ac6, { emissive: 0.6 }), 0, 1.35, 0));
+  const s = labelSprite('CARD SHOP', '#ff7ac6'); s.position.y = 1.9; g.add(s);
+  const gl = glowSprite(0xff7ac6, 2.2, 0.4); gl.position.y = 1; g.add(gl);
+  scene.add(g); return g;
+}
+function abAllShops() {
+  const out = [];
+  if (AB.shop && AB.shop.until > time) out.push(Object.assign({ key: 'me' }, AB.shop));
+  for (const o of others.values()) if (o.v3 && o.v3.sh && o.v3.sh.until > time) out.push(Object.assign({ key: o.peer, who: o.name }, o.v3.sh));
+  return out;
+}
+AB_FN.ab_tele = (L) => {
+  const okHere = abOpen(P.x, P.z);
+  if (!okHere) { toast('Stand on open floor to place a pad.', '', 2); return false; }
+  if (!AB.padA) { AB.padA = { x: P.x, z: P.z }; tone(600, 0.15, 0.06, { type: 'triangle' }); toast('First pad down. Walk up to 10 m away and press again for the second.', 'good', 3.5); return false; }
+  const d = Math.hypot(P.x - AB.padA.x, P.z - AB.padA.z);
+  if (d > 10) { toast(`Too far: ${abM(d)}. The second pad has to be within 10 m of the first.`, 'bad', 2.5); return false; }
+  if (d < 2) { toast('Too close to the first pad. Walk at least 2 m away.', '', 2); return false; }
+  AB.pads.push({ id: ++AB.padN || (AB.padN = 1), a: AB.padA, b: { x: P.x, z: P.z } }); AB.padA = null;
+  while (AB.pads.length > L) AB.pads.shift();
+  sfx.zap(); toast(`Pads linked, ${abM(d)} apart. Stand on one and press E.`, 'good', 3);
+  if (MP.game) mpSend();
+  return 3;
+};
+function abAllPads() {
+  const out = AB.pads.map((p) => ({ key: 'me:' + p.id, a: p.a, b: p.b }));
+  for (const o of others.values()) if (o.v3) for (const [id, ax, az, bx, bz] of o.v3.tp) out.push({ key: o.peer + ':' + id, a: { x: ax, z: az }, b: { x: bx, z: bz }, who: o.name });
+  return out;
+}
+function abPadAt() {
+  for (const p of abAllPads()) for (const [e, f] of [[p.a, p.b], [p.b, p.a]]) if (Math.hypot(e.x - P.x, e.z - P.z) < 1.1) return { p, e, f };
+  return null;
+}
+function abShopAt() { return abAllShops().find((s) => Math.hypot(s.x - P.x, s.z - P.z) < 2) || null; }
+function abPrompt() {
+  if (HAUNT || state !== 'playing') return '';
+  const pd = abPadAt(), s = abShopAt(), cd = pd ? Math.max(0, (AB.padUse[pd.p.key] || 0) - time) : 0;
+  if (pd && !cd) return `<b>E</b> Teleport to the other pad · ${abM(Math.hypot(pd.f.x - P.x, pd.f.z - P.z))}`;
+  if (s) return `<b>E</b> Open the card shop · ${Math.ceil(s.until - time)}s left`;
+  return pd ? `Teleport pad · recharging ${Math.ceil(cd)}s` : '';
+}
+function abUseSpot() {
+  const pd = abPadAt(), cd = pd ? Math.max(0, (AB.padUse[pd.p.key] || 0) - time) : 0;
+  if (pd && (!cd || !abShopAt())) {
+    if (cd > 0) { toast(`This pad pair is recharging: ${Math.ceil(cd)}s.`, '', 1.6); return true; }
+    P.x = pd.f.x; P.z = pd.f.z; P.vx = P.vz = P.ex = P.ez = P.kx = P.kz = 0;
+    if (LEVEL === 3) { P.y = Math.max(0, groundAt(P.x, P.z)); P.vy = 0; P.air = false; }
+    AB.padUse[pd.p.key] = time + 20; sfx.zap(); el('flash').animate([{ opacity: 0.35 }, { opacity: 0 }], { duration: 260 });
+    return true;
+  }
+  const s = abShopAt();
+  if (s) { openJournal(); UI.cardMode = 'shop'; uiShop('shopBody'); el('shopOv').hidden = false; sfx.click(); return true; }
+  return false;
+}
+// ---------- what the newest cards do to entities: freeze, lose you, chase a decoy, slow down, stop at a wall ----------
+function abMovers() {
+  const out = [];
+  if (active && active.g && !active.done && !active.downed && (!MP.game || coop.auth || active.local)) out.push(active.g);
+  const drv = cpDriver();
+  if (drv && LEVEL < 2 && RM.g && RM.g.visible && !(active && active.g === RM.g)) out.push(RM.g);
+  if (drv && LEVEL === 2 && CP && !CP.dead && CP.g) out.push(CP.g);
+  return out;
+}
+function abSnap() {
+  if (HAUNT) { AB.snap = null; return; }
+  AB.snap = abMovers().map((g) => ({ g, x: g.position.x, z: g.position.z }));
+}
+function abMove(dt) {
+  const snap = AB.snap; AB.snap = null;
+  if (!snap || !snap.length) return;
+  AB.walls = AB.walls.filter((w) => { if (w.until > time) return true; scene.remove(w.g); return false; });
+  const jam = active && (active.jamT || 0) > time, inv2 = abInvis(), dec = AB.decoy && AB.decoy.until > time ? AB.decoy : null, slow = runMul('entSlow');
+  for (const s of snap) {
+    const g = s.g, p = g.position; if (!g.parent) continue;
+    let dx = p.x - s.x, dz = p.z - s.z; const d = Math.hypot(dx, dz);
+    if (d > 2.5) continue;
+    if (jam && active && g === active.g) { p.x = s.x; p.z = s.z; continue; }
+    const goal = dec && Math.hypot(dec.x - s.x, dec.z - s.z) < 45 ? dec : inv2 && AB.invisAt ? AB.invisAt : null;
+    if (d < 1e-5 && !goal) continue;
+    if (!goal && slow === 1 && !AB.walls.length) continue;
+    // an entity that was standing still still walks over to a decoy, or to where you vanished
+    const nd = goal ? Math.max(d, 2 * dt) * slow : d * slow;
+    if (goal) { const gx = goal.x - s.x, gz = goal.z - s.z, gl = Math.hypot(gx, gz); if (gl < 0.7) { dx = 0; dz = 0; } else { dx = gx / gl * nd; dz = gz / gl * nd; } }
+    else { dx *= slow; dz *= slow; }
+    p.x = s.x; p.z = s.z;
+    if (dx || dz) moveCircle(p, dx, dz, 0.35);
+    for (const w of AB.walls) if (abSegD(w, p.x, p.z) < 0.75 && abSegD(w, p.x, p.z) < abSegD(w, s.x, s.z)) { p.x = s.x; p.z = s.z; }
+  }
+}
+function abChips() {
+  if (!active) return '';
+  const c = [];
+  if ((active.jamT || 0) > time) c.push(`<b class="ab-chip">POWER OFF ${Math.ceil(active.jamT - time)}s</b>`);
+  if (abInvis()) c.push(`<b class="ab-chip v">INVISIBLE ${Math.ceil(AB.invisT - time)}s</b>`);
+  if (AB.decoy && AB.decoy.until > time) c.push(`<b class="ab-chip d">DECOY ${Math.ceil(AB.decoy.until - time)}s</b>`);
+  return c.join(' ') + (c.length ? ' ' : '');
+}
+// ---------- HUD: ability boxes, flash charges, the entity arrow, teammates' distances ----------
+function abHud(force) {
+  if (HAUNT) return;
+  const ab = cardAbil();
+  for (let i = 0; i < 2; i++) {
+    const box = el('tAb' + (i + 1)); if (!box) continue;
+    const id = ab[i]; box.hidden = !id; if (!id) continue;
+    const c = CARD_BY[id], q = AB.q[id] == null ? abMaxQ(id) : AB.q[id], m = abMaxQ(id);
+    const left = q > 0 ? 0 : Math.max(0, (AB.at[id] || 0) - time) / ((AB.cdOf && AB.cdOf[id]) || c.cd);
+    el('tAb' + (i + 1) + 'Cd').style.height = (left * 100).toFixed(0) + '%';
+    box.classList.toggle('off', q <= 0);
+    if (force || box._id !== id) { box._id = id; setText(el('tAb' + (i + 1) + 'n'), c.name.split(' ').slice(-1)[0]); setText(el('tAb' + (i + 1) + 'k'), kbName(kbGet('ab' + (i + 1)))); box.title = `${c.name}: ${cardTxt(c, cardLv(id))}`; }
+    setText(el('tAb' + (i + 1) + 'q'), id === 'ab_tele' && AB.padA ? '1/2' : m > 1 ? `×${q}` : q <= 0 ? String(Math.ceil((AB.at[id] || 0) - time)) : '');
+  }
+  const fm = flashMax(); setText(el('tFlash').querySelector('span'), fm > 1 ? `Flash ×${UI.fq == null ? fm : UI.fq}` : 'Flash');
+}
+function abArrowTick() {
+  const a = el('abArrow'); if (!a) return;
+  const ar = AB.arrow;
+  if (!ar || ar.until < time || !ar.g.parent || state !== 'playing') { if (ar) abArrowEnd(); else a.hidden = true; return; }
+  const x = ar.g.position.x, z = ar.g.position.z, dx = x - P.x, dz = z - P.z, f = fwdVec(), ang = Math.atan2(dx * -f.z + dz * f.x, dx * f.x + dz * f.z) * 180 / Math.PI;
+  a.hidden = false; a.firstChild.style.transform = `rotate(${ang.toFixed(0)}deg)`;
+  setText(a.lastChild, `${ar.name} · ${abM(Math.hypot(dx, dz))} · ${Math.ceil(ar.until - time)}s`);
+}
+function abPartyTick() {
+  const t = el('partyTag'); if (!t) return;
+  if (!others.size || HAUNT) { t.hidden = true; return; }
+  t.hidden = false;
+  setHTML(t, [...others.values()].map((o) => `<span style="--c:${safeColor(o.color)}">${escHtml(o.name)} ${o.dead ? 'down' : abM(Math.hypot(o.x - P.x, o.z - P.z))}</span>`).join(''));
+}
+function abPadsDraw() {
+  if (!AB.padG) AB.padG = new Map();
+  const want = new Map();
+  for (const p of abAllPads()) { want.set(p.key + 'a' + p.a.x.toFixed(1) + p.a.z.toFixed(1), p.a); want.set(p.key + 'b' + p.b.x.toFixed(1) + p.b.z.toFixed(1), p.b); }
+  if (AB.padA) want.set('pending' + AB.padA.x.toFixed(1) + AB.padA.z.toFixed(1), AB.padA);
+  for (const [k, g] of AB.padG) if (!want.has(k)) { scene.remove(g); AB.padG.delete(k); }
+  for (const [k, e] of want) {
+    let g = AB.padG.get(k);
+    if (!g) { g = fxPad(e.x, e.z, 0.7, 0x7fe3ff, k.startsWith('pending') ? 0.12 : 0.28); const gl = glowSprite(0x7fe3ff, 1.4, 0.4); gl.position.y = 0.3; g.add(gl); g.position.y = LEVEL === 3 ? Math.max(0, groundAt(e.x, e.z)) : 0; scene.add(g); AB.padG.set(k, g); }
+    g.rotation.y = time * 0.8;
+  }
+  if (!AB.shopG) AB.shopG = new Map();
+  const shops = abAllShops(), keys = new Set(shops.map((s) => s.key));
+  for (const [k, g] of AB.shopG) if (!keys.has(k)) { scene.remove(g); AB.shopG.delete(k); }
+  for (const s of shops) { let g = AB.shopG.get(s.key); if (!g) { g = abShopMesh(); AB.shopG.set(s.key, g); } g.position.set(s.x, LEVEL === 3 ? Math.max(0, groundAt(s.x, s.z)) : 0, s.z); }
+}
+function abTick(dt) {
+  if (HAUNT) return;
+  flashTick(); abQTick();
+  if (!scene) return;
+  abDropsTick(); abPadsDraw(); abArrowTick();
+  if (AB.decoy && AB.decoy.until > time) { AB.decoy.beep -= dt; if (AB.decoy.beep <= 0) { AB.decoy.beep = 0.7; if (Math.hypot(AB.decoy.x - P.x, AB.decoy.z - P.z) < 30) tone(1100, 0.06, 0.04, { type: 'square' }); } }
+  const veil = el('abVeil'); if (veil) veil.classList.toggle('on', abInvis());
+  if (AB.prank) {
+    if (time - AB.prank.at > 25) AB.prank = null;
+    else if (state === 'playing' && !active && !scareS && !overlay && !paused && RS.phase !== 'quiet') { const who = AB.prank.from; AB.prank = null; rsQuiet(); RS.until = performance.now() + 1600; later(4.5, () => toast(`That was ${who}'s Prank Call.`, 'say', 4)); }
+  }
+  AB.hudT = (AB.hudT || 0) - dt;
+  if (AB.hudT <= 0) { AB.hudT = 0.25; abPartyTick(); }
+  abHud(false); abMarksDraw();
+}
+
 function mpSend(extra) {
   if (!MP.game) return;
-  const flags = (P.crouch ? 1 : 0) | (lightOn() ? 2 : 0) | (state === 'dead' ? 4 : 0) | (P.sprinting ? 8 : 0) | (P.hidden ? 16 : 0) | (P.speed > 0.3 ? 32 : 0);
+  const flags = (abInvis() ? 64 : 0) | (P.crouch ? 1 : 0) | (lightOn() ? 2 : 0) | (state === 'dead' ? 4 : 0) | (P.sprinting ? 8 : 0) | (P.hidden ? 16 : 0) | (P.speed > 0.3 ? 32 : 0);
   const patch = Object.assign({ p: [+P.x.toFixed(2), +P.z.toFixed(2), +P.yaw.toFixed(2), flags, +(P.y || 0).toFixed(2)] }, extra || {});
   const ac = active, holding = !!(ac && ac.key && CH[ac.id] && coop.auth && !ac.downed), g = holding && ac.g && !ac.done && ENT[ac.id] ? ac.g : null;
   if (g) {
@@ -12025,6 +12714,7 @@ function mpSend(extra) {
   const drv = cpDriver();
   patch.dr = null;
   if (LEVEL < 2) { if (!drv || patch.rm === undefined) patch.rm = drv && patch.rm ? patch.rm : null; patch.rmt = drv ? RM.target || '' : null; patch.rmn = drv && RM.ask ? [RM.ask.at, RM.ask.peer] : null; }
+  Object.assign(patch, v30Pub());
   MP.game.presence(patch).catch(() => {});
 }
 function mpTick(dt) {
@@ -12035,7 +12725,7 @@ function mpTick(dt) {
     const u = o.g.userData, crouch = o.flags & 1, lit = !!(o.flags & 2);
     u.body.scale.y = lerp(u.body.scale.y, crouch ? 0.62 : 1, k);
     u.beam.visible = lit; u.glow.visible = lit;
-    o.g.visible = !(o.flags & 4);
+    o.g.visible = !(o.flags & 4); u.body.visible = !(o.flags & 64);
     if (o.ent && o.et) { const t = o.et; o.ent.position.set(lerp(o.ent.position.x, t.x, k), lerp(o.ent.position.y, t.y, k), lerp(o.ent.position.z, t.z, k)); o.ent.rotation.y = angLerp(o.ent.rotation.y, t.ry, k); o.ent.visible = t.vis; o.ent.scale.setScalar(t.s); }
     if (o.ent && o.ent.userData.anim) o.ent.userData.anim(time);
     if (o.bubbleT > 0) { o.bubbleT -= dt; if (o.bubbleT <= 0 && o.bubble) { o.g.remove(o.bubble); o.bubble = null; } }
@@ -12301,7 +12991,7 @@ function hauntInit() {
   if (LEVEL === 1) openGate(true);
   const far = allOpen.filter((t) => spawnField[t] >= 30 && spawnField[t] <= 58), near = allOpen.filter((t) => spawnField[t] >= 3 && spawnField[t] <= 14);
   const t = HA.role === 'hunter' ? pick(far.length ? far : allOpen) : pick(near.length ? near : allOpen);
-  P.x = tc(t % W); P.z = tc((t / W) | 0); P.yaw = rng() * TAU; P.pitch = 0; P.hp = 100; P.bat = 100; P.st = 100; P.light = true; lastTile = -1;
+  P.x = tc(t % W); P.z = tc((t / W) | 0); P.yaw = rng() * TAU; P.pitch = 0; P.hp = hpMax(); P.bat = 100; P.st = 100; P.light = true; lastTile = -1;
   for (const b of HM.bots) { const bt = b.u === s.hu ? pick(far.length ? far : allOpen) : pick(near.length ? near : allOpen); b.pos = { x: tc(bt % W), z: tc((bt / W) | 0) }; b.ca = -1; b.rd = s.r; b.goal = null; b.goalT = 0; b.stuck = 0; b.ph = 0; b.tripped = new Set(); b.p = [b.pos.x, b.pos.z, 0, 2]; }
   HM.me.rd = s.r; HM.me.p = [+P.x.toFixed(2), +P.z.toFixed(2), +P.yaw.toFixed(2), 2];
   Object.assign(HA, { held: 0, freeT: 0, lockT: 0, stunT: 0, blinkFree: 0, blinkT: 0, noLight: 0, freezeT: 0, revealT: 0, slowT: 0, mult: 1, isHeld: false, door: null, charge: null, trapT: 4, canT: 2, papT: 25, knockT: 1, flSeen: {}, copies: [], cans: [], doorG: null, doorT: 0, flashAt: 0 });
@@ -12744,7 +13434,7 @@ function runSnapshot() {
   return {
     v: 1, active: true, savedAt: Date.now(), level: LEVEL, seed, gateOpen, picked: [...picked], status: Object.assign({}, status), inv: Object.assign({}, inv),
     noteRead: noteRead.slice(), deaths, playTime: Math.round(playTime), quackers: !!quackers, documented: documented(), total: TOTAL,
-    lastUsed: RUN.last, drops: RUN.drops.map((d) => ({ x: +d.x.toFixed(2), z: +d.z.toFixed(2), c: d.c })),
+    lastUsed: RUN.last, rolls: RUN.rolls | 0, drops: RUN.drops.map((d) => ({ x: +d.x.toFixed(2), z: +d.z.toFixed(2), c: d.c })),
     P: alive ? { x: +P.x.toFixed(2), z: +P.z.toFixed(2), yaw: +P.yaw.toFixed(3), pitch: 0, hp: Math.max(1, Math.round(P.hp)), bat: Math.round(P.bat) } : null,
   };
 }
@@ -12807,7 +13497,7 @@ setupTitle();
 if (saved.seed && !saved.resumed && state === 'title') el('startBtn').textContent = 'Resume tape';
 
 // debugging handle for testing in the console
-window.__bfn = { kit: { buildStillman, buildGrinner, buildHound, buildConfetti, buildKnockDoor, buildEcho, buildVending, buildManager, buildDuck, buildCrate, buildMoth, buildAttendant, buildSmog, buildCopy, buildValet, buildLifeguard, buildFloatie, buildChalkKid, buildLurker, buildTideSpirit, buildUndertow, buildDrowned, buildSun, buildMoon, buildPockets, buildBalloonMan, buildPaperRing, buildPusher, buildComePlay, buildWow, wowSky, poseStillman, fleshMat, eyeMat, THREE }, ui: () => ({ DIR, RM, TUT, UI, ENTS, KIND }), scareNow: () => active && caught(active, 1, 'Caught.'), darkTile: () => { for (let t = 0; t < N; t++) if (dark[t] && Lr[t] < 0.25 && reachable(t) && !solid[t]) return [t % W, (t / W) | 0]; return null; }, dbg: () => ({ mode: MU.mode, dread, A, timers, time, RUN, cardRoll, CARDS, cardDrop, upsRefund, picked, items, uiCursor, overlay, luckyRoll, luckyRarity, inv, cardsNow: () => JSON.parse(JSON.stringify(progress.cards || {})), TRD, rareScare: () => rsQuiet(), RS, l3kit: () => ({ stilt: buildStilt, rootmother: buildRootmother, brutalist: buildBrutalist, tallgrass: buildTallgrass, signal: buildSignal, groundskeeper: buildGroundskeeper, bloom: buildBloom, rushhour: buildCommuter, creeper: buildCreeper }) }), l2: () => ({ CP, R2, F, inv, popI, swingProp, interact, WOW, wowSpot, status }), audioTest: (id, dur = 1.3) => { audioInit(); if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); const bus = scareScream(id, dur); return { ctx: A.ctx, bus }; }, scareInfo: () => scareS && { t: scareS.t, drop: scareS.drop, dur: scareS.dur, hit: scareS.hit, cut: scareS.cut }, goLevel: (lv) => switchLevel(lv, true), start: (id) => startChallenge(id), win: () => active && succeed(active, null), coop: () => ({ auth: coop.auth, gen: coop.gen, me: coop.me, entSeq: coop.ent && coop.ent.seq, active: active && active.id, downed: !!(active && active.downed), key: active && active.key, exit: !!exitObj, ex: exitObj && [exitObj.x, exitObj.z], gate: gateOpen, j: journalCode(), notes: noteCode(), hp: P.hp, state, banner: H_.bnObj.textContent, toasts: [...H_.toasts.children].map((t) => t.textContent) }), give: () => { inv.coins += 5; inv.fizz += 3; inv.battery += 3; inv.hat = true; inv.duck = true; }, doc: (id) => { status[id] = 3; }, tp: (x, y) => { P.x = tc(x); P.z = tc(y); }, set: (o) => Object.assign(P, o), keys, state: () => ({ state, paused, overlay, active: active && active.id, scare: !!scareS, status: Object.assign({}, status), inv: Object.assign({}, inv), hp: P.hp, x: P.x, z: P.z }),
+window.__bfn = { kit: { buildStillman, buildGrinner, buildHound, buildConfetti, buildKnockDoor, buildEcho, buildVending, buildManager, buildDuck, buildCrate, buildMoth, buildAttendant, buildSmog, buildCopy, buildValet, buildLifeguard, buildFloatie, buildChalkKid, buildLurker, buildTideSpirit, buildUndertow, buildDrowned, buildSun, buildMoon, buildPockets, buildBalloonMan, buildPaperRing, buildPusher, buildComePlay, buildWow, wowSky, poseStillman, fleshMat, eyeMat, THREE }, ui: () => ({ DIR, RM, TUT, UI, ENTS, KIND }), scareNow: () => active && caught(active, 1, 'Caught.'), darkTile: () => { for (let t = 0; t < N; t++) if (dark[t] && Lr[t] < 0.25 && reachable(t) && !solid[t]) return [t % W, (t / W) | 0]; return null; }, dbg: () => ({ AB, cardGive, cardCombine, cardLv, cardAbil, cardEquipped, cardSlots, abUse, abPing, abDrop, hpMax, flashMax, cardLoadSwap, cardShopRoll, cardOdds, runAdd, runMul, P, others, abSafe, active: () => active, v30Hear, mode: MU.mode, dread, A, timers, time, RUN, cardRoll, CARDS, cardDrop, upsRefund, picked, items, uiCursor, overlay, luckyRoll, luckyRarity, inv, cardsNow: () => JSON.parse(JSON.stringify(progress.cards || {})), TRD, rareScare: () => rsQuiet(), RS, l3kit: () => ({ stilt: buildStilt, rootmother: buildRootmother, brutalist: buildBrutalist, tallgrass: buildTallgrass, signal: buildSignal, groundskeeper: buildGroundskeeper, bloom: buildBloom, rushhour: buildCommuter, creeper: buildCreeper }) }), l2: () => ({ CP, R2, F, inv, popI, swingProp, interact, WOW, wowSpot, status }), audioTest: (id, dur = 1.3) => { audioInit(); if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); const bus = scareScream(id, dur); return { ctx: A.ctx, bus }; }, scareInfo: () => scareS && { t: scareS.t, drop: scareS.drop, dur: scareS.dur, hit: scareS.hit, cut: scareS.cut }, goLevel: (lv) => switchLevel(lv, true), start: (id) => startChallenge(id), win: () => active && succeed(active, null), coop: () => ({ auth: coop.auth, gen: coop.gen, me: coop.me, entSeq: coop.ent && coop.ent.seq, active: active && active.id, downed: !!(active && active.downed), key: active && active.key, exit: !!exitObj, ex: exitObj && [exitObj.x, exitObj.z], gate: gateOpen, j: journalCode(), notes: noteCode(), hp: P.hp, state, banner: H_.bnObj.textContent, toasts: [...H_.toasts.children].map((t) => t.textContent) }), give: () => { inv.coins += 5; inv.fizz += 3; inv.battery += 3; inv.hat = true; inv.duck = true; }, doc: (id) => { status[id] = 3; }, tp: (x, y) => { P.x = tc(x); P.z = tc(y); }, set: (o) => Object.assign(P, o), keys, state: () => ({ state, paused, overlay, active: active && active.id, scare: !!scareS, status: Object.assign({}, status), inv: Object.assign({}, inv), hp: P.hp, x: P.x, z: P.z }),
   ch: () => active, step: (n = 60, dt = 1 / 60) => { for (let i = 0; i < n; i++) if (state === 'playing' && (!paused || HAUNT) && !overlay) { if (scareS) { time += dt; updateScare(dt); } else update(dt); updateHUD(dt); } renderFrame(); },
   ent: () => active && active.g ? { x: active.g.position.x, z: active.g.position.z, d: distP(active.g) } : null, face: () => { if (active && active.g) P.yaw = Math.atan2(-(active.g.position.x - P.x), -(active.g.position.z - P.z)); }, info: () => ({ P: { x: P.x, z: P.z, hp: P.hp }, active: active && active.id, F, documented: documented() }) };
 
@@ -12837,7 +13527,7 @@ updateCamera(0.016);
 kitPrecompile();
 revealAround();
 rafId = requestAnimationFrame(frame);
-Object.assign(window.__bfn, { hm: HM, ha: HA, lockMove: () => P.lockMove, cpDriver, others, isSolid, openTiles: () => allOpen.length, itemCount: () => items.filter((i) => i.alive).length, hmNextRound, hmTick, museumPlay, hauntPower, hauntModel, haunters: HAUNTERS, scareTick: (dt = 1 / 45) => { if (scareS) { time += dt; updateScare(dt); } renderFrame(); }, level: LEVEL, gate: () => openGate(), progress, menu: () => switchLevel(LEVEL, false), end: (ok) => active && endChallenge(active, !!ok, null), hp: () => { P.hp = 100; }, three: { scene, camera, renderer, U }, duck: () => buildDuck(1.6), time: () => time, seed, others: () => [...others.values()].map((o) => ({ name: o.name, x: +o.x.toFixed(2), z: +o.z.toFixed(2), ent: o.entId, visible: o.g.visible, bubble: !!o.bubble })) });
+Object.assign(window.__bfn, { hm: HM, ha: HA, lockMove: () => P.lockMove, cpDriver, others, isSolid, openTiles: () => allOpen.length, itemCount: () => items.filter((i) => i.alive).length, hmNextRound, hmTick, museumPlay, hauntPower, hauntModel, haunters: HAUNTERS, scareTick: (dt = 1 / 45) => { if (scareS) { time += dt; updateScare(dt); } renderFrame(); }, level: LEVEL, gate: () => openGate(), progress, menu: () => switchLevel(LEVEL, false), end: (ok) => active && endChallenge(active, !!ok, null), hp: () => { P.hp = hpMax(); }, three: { scene, camera, renderer, U }, duck: () => buildDuck(1.6), time: () => time, seed, others: () => [...others.values()].map((o) => ({ name: o.name, x: +o.x.toFixed(2), z: +o.z.toFixed(2), ent: o.entId, visible: o.g.visible, bubble: !!o.bubble })) });
 
 // Leaving this level: stop the loop and every listener, free the GPU, and put the menu back.
 teardown = () => {
