@@ -1037,6 +1037,13 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
 /* levels not reached yet: only the picture goes grey, the Start button stays bright */
 .ls-panel.ls-locked{filter:none;background-color:#4a4a46;background-blend-mode:luminosity}
 .ls-panel.ls-locked .ls-body h3{color:#cfcabb}
+/* v40: teammates' markers: a name with an arrow under it pointing at their head */
+.pmark.tmark{flex-direction:column-reverse;gap:1px;margin:-30px 0 0 -80px;width:160px;z-index:1}
+.pmark.tmark i{width:0;height:0;border:6px solid transparent;border-top:8px solid var(--c);border-bottom:0;background:none;transform:none;transform-origin:50% 30%}
+.pmark.tmark span{font-size:12px;border-bottom:2px solid var(--c)}
+.pmark.tmark.hid{opacity:.6}
+.pmark.tmark.off{margin-top:-14px}
+.pmark.tmark.down span{color:#ffb3a8;border-bottom-color:#c0392b}.pmark.tmark.down i{border-top-color:#c0392b}
 </style>
 
 <canvas id="c" tabindex="-1" aria-label="Level 0, first-person view"></canvas>
@@ -1169,7 +1176,12 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
   <div class="pane" id="pane-museum" role="tabpanel" hidden><h2 class="pane-h">Journal</h2><div class="subtabs" role="group" aria-label="Journal sections"><button type="button" data-sub="ents">Entities</button><button type="button" data-sub="museum">Scare museum</button></div><p class="panep">Every jumpscare you have met, on request, with the sound on. Meet an entity to unlock its exhibit.</p><div id="museumBox" class="bestiary"></div></div>
   <div class="pane" id="pane-ups" role="tabpanel" hidden><h2 class="pane-h">Cards</h2><div id="upsBox"></div></div>
   <div class="pane" id="pane-news" role="tabpanel" hidden><h2 class="pane-h">Updates</h2>
-    <article class="news"><h3>v39 · A big round of fixes <span>Latest</span></h3><ul>
+    <article class="news"><h3>v40 · Teammate markers fixed <span>Latest</span></h3><ul>
+      <li><b>Teammates' names</b> are now flat markers on your screen: always the same size, never cut off by walls or ceilings, a little dimmer when a wall is between you, and pinned to the edge of the screen with an arrow when they are off to the side or behind you. They also say when a teammate is down or hiding.</li>
+      <li><b>Teammates move smoothly.</b> They used to lurch and stutter when their updates arrived unevenly, and slide through walls after a respawn. Now they glide between the places we last heard they were, and jump straight to a new spot after a respawn or a door.</li>
+      <li><b>Pings</b> and other markers more than 60 m away no longer flip to the wrong side of the screen.</li>
+    </ul></article>
+    <article class="news"><h3>v39 · A big round of fixes</h3><ul>
       <li><b>The map</b> shows the doors between rooms (red while shut, green once open), the name of every room you have been in, and a star on the room the next entity is in.</li>
       <li><b>The Journal</b> now has Level 3 (it said 0 of 31 when there are 40), and every level lists its entities in the order you face them. The Scare Museum has Level 3 and the Flesh Stealer too.</li>
       <li>On screens that are not very wide, your health no longer sits on top of the tool bar, and in the tutorial messages no longer cover the tutorial card.</li>
@@ -9448,6 +9460,7 @@ CH.creeper = () => {
 
 function startChallenge(id, key, pose, force) {
   if (HAUNT) return false;
+  if (!CH[id]) return false;
   if (active || state !== 'playing' || (status[id] === 3 && !force)) return false;
   if (!key && !force && !orderOk(id)) { orderSay(id); return false; }
   const k = key || coopKey(), own = { x: P.x, z: P.z, yaw: P.yaw };
@@ -12307,7 +12320,7 @@ function showTab(name) {
   document.querySelectorAll('#title .tab').forEach((b) => { const on = b.dataset.tab === grp; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
   document.querySelectorAll('#title [data-sub]').forEach((b) => { const on = b.dataset.sub === name; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   ['play', 'ents', 'runs', 'museum', 'keys', 'ups', 'acct', 'news'].forEach((n) => { el('pane-' + n).hidden = n !== name; });
-  if (name === 'news') { try { localStorage.setItem('bfn-news', '39'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
+  if (name === 'news') { try { localStorage.setItem('bfn-news', '40'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
   if (name === 'acct') renderProfiles();
   el('title').classList.toggle('sub', name !== 'play');
   if (name === 'keys') { el('paneSet').appendChild(el('setRows')); uiSyncSet(); }
@@ -12328,7 +12341,7 @@ function setupTitle() {
   el('lvl0Best').textContent = bestText(0);
   el('lvl1Best').textContent = bestText(1); el('lvl2Best').textContent = bestText(2); el('lvl3Best').textContent = bestText(3);
   showTab(PROF.reopen ? 'acct' : 'play'); PROF.reopen = false;
-  try { if (localStorage.getItem('bfn-news') === '39') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
+  try { if (localStorage.getItem('bfn-news') === '40') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
   renderAccount();
   uiTitle(); uiNudge();
 }
@@ -12417,14 +12430,15 @@ function upsertOther(p) {
   if (!o) {
     o = { peer: p.peer, name, color, g: buildAvatar(color), x: 0, z: 0, yaw: 0, tx: 0, tz: 0, tyaw: 0, flags: 0, ent: null, entId: '', bubble: null, bubbleT: 0,
       said: pr.say && typeof pr.say.t === 'number' ? pr.say.t : 0, doc: pr.d | 0, dead: false, won: !!pr.w, first: true };
-    o.tag = labelSprite(name, color); o.tag.position.y = 2.05; o.g.add(o.tag); scene.add(o.g); others.set(p.peer, o);
+    o.tag = labelSprite(name, color); o.tag.position.y = 2.05; o.tag.visible = false; o.g.add(o.tag); scene.add(o.g); others.set(p.peer, o);
     toast(`${name} is here.`, 'good', 4);
   }
   if (pr.hb !== o.hb) { o.hb = pr.hb; o.heard = performance.now(); }
-  if (name !== o.name) { o.name = name; o.g.remove(o.tag); o.tag = labelSprite(name, color); o.tag.position.y = 2.05; o.g.add(o.tag); }
+  if (name !== o.name) { o.name = name; o.g.remove(o.tag); o.tag = labelSprite(name, color); o.tag.position.y = 2.05; o.tag.visible = false; o.g.add(o.tag); }
   if (Array.isArray(pr.p) && pr.p.length >= 4) {
     o.tx = +pr.p[0] || 0; o.tz = +pr.p[1] || 0; o.tyaw = +pr.p[2] || 0; o.flags = pr.p[3] | 0; o.ty = +pr.p[4] || 0;
     if (o.first) { o.x = o.tx; o.z = o.tz; o.yaw = o.tyaw; o.first = false; }
+    netSample(o);
   }
   const fromDriver = p.peer === coopDriverPeer();
   if (fromDriver && Array.isArray(pr.dr) && typeof pr.dr[0] === 'string') { DIR.net = [pr.dr[0], +pr.dr[1] || 0, pr.dr[2] == null ? null : +pr.dr[2] || 0, +pr.dr[3] || 1]; DIR.fresh = true; DIR.netAt = performance.now(); }
@@ -12738,12 +12752,7 @@ function abMarksDraw() {
     const m = list[i];
     if (!m || state !== 'playing') { d.hidden = true; return; }
     d.hidden = false;
-    AB.v.set(m.x, m.y, m.z).project(camera);
-    let x = AB.v.x, y = AB.v.y; const behind = AB.v.z > 1;
-    if (behind) { x = -x; y = -y; }
-    const off = behind || Math.abs(x) > 0.95 || Math.abs(y) > 0.9;
-    if (off) { const k = 0.95 / Math.max(Math.abs(x), Math.abs(y) / 0.9 * 0.95, 1e-3); x *= k; y *= k; if (behind) y = Math.min(y, -0.6); }
-    const sx = (x * 0.5 + 0.5) * W2, sy = (-y * 0.5 + 0.5) * H2;
+    const sp = scrPos(m.x, m.y, m.z), off = sp.off, sx = Math.min(W2 - 66, Math.max(66, sp.x * W2)), sy = Math.min(H2 - 130, Math.max(36, sp.y * H2));
     d.style.transform = `translate(${sx.toFixed(0)}px,${sy.toFixed(0)}px)`;
     d.style.setProperty('--c', m.col || '#f3eedf');
     d.classList.toggle('off', off); d.classList.toggle('small', !!m.small);
@@ -13134,7 +13143,7 @@ function abTick(dt) {
   }
   AB.hudT = (AB.hudT || 0) - dt;
   if (AB.hudT <= 0) { AB.hudT = 0.25; abPartyTick(); }
-  abHud(false); abMarksDraw();
+  abHud(false); abMarksDraw(); v40Marks();
 }
 
 /* ---------- the Flesh Stealers: three of them walk the parking garage on Level 1 ----------
@@ -13793,6 +13802,71 @@ function mapExtra(g, s) {
   }
 }
 
+/* ---------- v40: teammates' markers. Flat on the screen, never cut off by walls, never huge, and pointing the right way ---------- */
+const V40 = { v: new THREE.Vector3(), pool: [] };
+// where a point in the world lands on the screen (0..1). Anything off screen, behind you or past the edge of the view
+// is pinned to the screen's edge on the side it is really on. (The old way read anything further than 60 m as
+// 'behind you' and flipped it to the wrong side.)
+function scrPos(x, y, z) {
+  const v = V40.v.set(x, y, z).applyMatrix4(camera.matrixWorldInverse);
+  const t = Math.tan(camera.fov * Math.PI / 360), a = camera.aspect, XM = 0.92, YM = 0.82;
+  let nx, ny, off = false;
+  if (v.z < -0.05) { nx = v.x / (-v.z * t * a); ny = v.y / (-v.z * t); }
+  else { nx = (v.x >= 0 ? 1 : -1) * 10; ny = Math.max(-0.4, Math.min(0.4, v.y * 0.2)); }
+  if (Math.abs(nx) > XM || Math.abs(ny) > YM) { off = true; const k = Math.min(XM / Math.max(Math.abs(nx), 1e-4), YM / Math.max(Math.abs(ny), 1e-4)); nx *= k; ny *= k; }
+  return { x: nx * 0.5 + 0.5, y: -ny * 0.5 + 0.5, off, ang: Math.atan2(-ny, nx) * 180 / Math.PI - 90 };
+}
+// a name over each teammate's head, the same size at any distance, dimmer when a wall is in the way.
+// Off screen it sits on the edge with an arrow pointing at them
+function v40Marks() {
+  const box = el('pmarks'); if (!box) return;
+  const list = [];
+  if (state === 'playing' && !HAUNT) for (const o of others.values()) if (!o.first) list.push(o);
+  while (V40.pool.length < list.length) { const d = document.createElement('div'); d.className = 'pmark tmark'; d.innerHTML = '<i></i><span></span>'; box.appendChild(d); V40.pool.push(d); }
+  const W2 = innerWidth, H2 = innerHeight;
+  V40.pool.forEach((d, i) => {
+    const o = list[i]; if (!o) { d.hidden = true; return; }
+    const dist = Math.hypot(o.x - P.x, o.z - P.z), down = !!o.dead, sp = scrPos(o.x, (o.y || 0) + ((o.flags & 1) ? 1.5 : 1.95), o.z);
+    if (!sp.off && dist < 1.4) { d.hidden = true; return; }
+    d.hidden = false;
+    // the whole label stays on screen, clear of the tool bar at the bottom
+    const sx = Math.min(W2 - 86, Math.max(86, sp.x * W2)), sy = Math.min(H2 - 130, Math.max(48, sp.y * H2));
+    d.style.transform = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px)`;
+    if (d._c !== o.color) { d._c = o.color; d.style.setProperty('--c', safeColor(o.color)); }
+    d.classList.toggle('off', sp.off); d.classList.toggle('down', down);
+    d.classList.toggle('hid', !sp.off && !los(P.x, P.z, o.x, o.z));
+    d.firstChild.style.transform = sp.off ? `rotate(${sp.ang.toFixed(0)}deg)` : '';
+    const t = `${o.name} · ${down ? 'down' : (o.flags & 16) ? 'hiding' : abM(dist)}`;
+    if (d._t !== t) { d._t = t; d.lastChild.textContent = t; }
+  });
+}
+// teammates move smoothly: their updates arrive unevenly over the internet, so each teammate is shown a moment
+// in the past, sliding between the last two places we heard they were. A jump of more than 8 m (a respawn, a door)
+// snaps instead of sliding through the walls
+function netSample(o) {
+  const now = performance.now() / 1000, b = o.nb || (o.nb = []), last = b[b.length - 1];
+  if (last && last.x === o.tx && last.z === o.tz && last.yaw === o.tyaw && last.y === (o.ty || 0)) return;
+  if (last) {
+    const gap = now - last.t;
+    if (gap < 0.6) o.nGap = o.nGap ? o.nGap * 0.85 + gap * 0.15 : gap;
+    else b.push(Object.assign({}, last, { t: now - Math.min(0.12, o.nGap || 0.1) }));
+  }
+  b.push({ t: now, x: o.tx, z: o.tz, yaw: o.tyaw, y: o.ty || 0 });
+  while (b.length > 8) b.shift();
+}
+function netPos(o, k) {
+  const b = o.nb;
+  if (!b || !b.length) { o.x += (o.tx - o.x) * k; o.z += (o.tz - o.z) * k; o.yaw = angLerp(o.yaw, o.tyaw, k); return; }
+  const rt = performance.now() / 1000 - Math.max(0.1, Math.min(0.35, (o.nGap || 0.1) * 1.6));
+  let a = b[0], c = b[b.length - 1];
+  if (rt <= a.t) c = a;
+  else if (rt >= c.t) a = c;
+  else for (let i = 1; i < b.length; i++) if (b[i].t >= rt) { a = b[i - 1]; c = b[i]; break; }
+  let f = c.t > a.t ? (rt - a.t) / (c.t - a.t) : 1;
+  if (Math.hypot(c.x - a.x, c.z - a.z) > 8) f = f < 1 ? 0 : 1;
+  o.x = a.x + (c.x - a.x) * f; o.z = a.z + (c.z - a.z) * f; o.yaw = angLerp(a.yaw, c.yaw, f); o.iy = a.y + (c.y - a.y) * f;
+}
+
 function mpSend(extra) {
   if (!MP.game) return;
   const flags = (abInvis() ? 64 : 0) | (P.crouch ? 1 : 0) | (lightOn() ? 2 : 0) | (state === 'dead' ? 4 : 0) | (P.sprinting ? 8 : 0) | (P.hidden ? 16 : 0) | (P.speed > 0.3 ? 32 : 0);
@@ -13820,8 +13894,8 @@ function mpSend(extra) {
 function mpTick(dt) {
   const k = 1 - Math.exp(-dt * 10);
   for (const o of others.values()) {
-    o.x += (o.tx - o.x) * k; o.z += (o.tz - o.z) * k; o.yaw = angLerp(o.yaw, o.tyaw, k);
-    o.y = lerp(o.y || 0, o.ty || 0, 0.25); o.g.position.set(o.x, o.y, o.z); o.g.rotation.y = o.yaw + Math.PI;
+    netPos(o, k);
+    o.y = lerp(o.y || 0, o.iy != null ? o.iy : o.ty || 0, 0.25); o.g.position.set(o.x, o.y, o.z); o.g.rotation.y = o.yaw + Math.PI;
     const u = o.g.userData, crouch = o.flags & 1, lit = !!(o.flags & 2);
     u.body.scale.y = lerp(u.body.scale.y, crouch ? 0.62 : 1, k);
     u.beam.visible = lit; u.glow.visible = lit;
@@ -14621,6 +14695,7 @@ function frame(nowT) {
     else update(dt);
     updateHUD(dt);
   } else if (overlay === 'vend') renderVend();
+  { const pm = el('pmarks'), off = state !== 'playing' || !!overlay || (paused && !HAUNT); if (pm && pm.hidden !== off) pm.hidden = off; }
   renderFrame();
   if ((noiseT -= dt) <= 0) { noiseT = 0.07; grain(); }
 }
