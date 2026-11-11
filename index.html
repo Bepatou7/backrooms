@@ -1020,6 +1020,23 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
 .ls-lock b{font-family:var(--f-osd);font-size:26px;letter-spacing:.06em;text-transform:uppercase}
 .ls-lock span{font-size:15px;color:#d8d1bc}
 #mpBox [data-host]:disabled{opacity:.5;cursor:not-allowed}
+/* v39: locked things look locked */
+#mpBox [data-host]:disabled,.mp-row #mpBox .btn:disabled{opacity:1;background:#2b2820;color:#8a8372;box-shadow:inset 0 0 0 1px #4a4434;filter:none;cursor:not-allowed}
+.tool.locked{opacity:.42;filter:grayscale(1)}.tool.locked kbd{color:#8a8372}
+.tbtns button.locked{opacity:.35;filter:grayscale(1)}
+.legend i.star{font-style:normal;font-size:12px;line-height:10px;text-align:center;width:10px}
+/* v39: when the health box would sit on the tool bar, it goes above it, and the cards in the middle move up to make room */
+@media (min-width:761px) and (min-height:481px){
+  body.hud-stack #vitals,body.hud-stack #coins{bottom:var(--hudB,110px)}
+  body.hud-stack #toasts,body.hud-stack #intro,body.hud-stack #result,body.hud-stack #tutCard,body.hud-stack #tryMove{bottom:var(--hudC,200px)}
+}
+body.in-tut #toasts{bottom:var(--tutB,250px)}
+#map{image-rendering:auto}
+.ls-l0{margin:8px 0 0;font-size:14px;line-height:1.35;color:#d8d1bc;max-width:340px}
+#mpBox [data-host][hidden]{display:none}
+/* levels not reached yet: only the picture goes grey, the Start button stays bright */
+.ls-panel.ls-locked{filter:none;background-color:#4a4a46;background-blend-mode:luminosity}
+.ls-panel.ls-locked .ls-body h3{color:#cfcabb}
 </style>
 
 <canvas id="c" tabindex="-1" aria-label="Level 0, first-person view"></canvas>
@@ -1135,7 +1152,7 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
       <button class="lvl" id="lvl0" type="button"><span class="lv-in"><span class="lv-tag">LEVEL 0</span><b>The Yellow Rooms</b><span class="lv-row"><span class="lv-bar"><em id="lvl0Bar"></em></span><span id="lvl0Count"></span></span></span><i id="lvl0Best"></i></button>
       <button class="lvl" id="lvl1" type="button"><span class="lv-in"><span class="lv-tag">LEVEL 1</span><b>Garage and Poolrooms</b><span class="lv-row"><span class="lv-bar"><em id="lvl1Bar"></em></span><span id="lvl1Count"></span></span></span><i id="lvl1Best"></i></button>
       <button class="lvl" id="lvl2" type="button"><span class="lv-in"><span class="lv-tag">LEVEL 2</span><b>The Playground</b><span class="lv-row"><span class="lv-bar"><em id="lvl2Bar"></em></span><span id="lvl2Count"></span></span></span><i id="lvl2Best"></i></button>
-      <button class="lvl" id="lvl3" type="button"><span class="lv-in"><span class="lv-tag">LEVEL 3 · NEW</span><b>The Concrete Garden</b><span class="lv-row"><span class="lv-bar"><em id="lvl3Bar"></em></span><span id="lvl3Count"></span></span></span><i id="lvl3Best"></i></button>
+      <button class="lvl" id="lvl3" type="button"><span class="lv-in"><span class="lv-tag">LEVEL 3</span><b>The Concrete Garden</b><span class="lv-row"><span class="lv-bar"><em id="lvl3Bar"></em></span><span id="lvl3Count"></span></span></span><i id="lvl3Best"></i></button>
     </div>
   </div>
   <div class="pane" id="pane-ents" role="tabpanel" hidden>
@@ -1152,7 +1169,22 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
   <div class="pane" id="pane-museum" role="tabpanel" hidden><h2 class="pane-h">Journal</h2><div class="subtabs" role="group" aria-label="Journal sections"><button type="button" data-sub="ents">Entities</button><button type="button" data-sub="museum">Scare museum</button></div><p class="panep">Every jumpscare you have met, on request, with the sound on. Meet an entity to unlock its exhibit.</p><div id="museumBox" class="bestiary"></div></div>
   <div class="pane" id="pane-ups" role="tabpanel" hidden><h2 class="pane-h">Cards</h2><div id="upsBox"></div></div>
   <div class="pane" id="pane-news" role="tabpanel" hidden><h2 class="pane-h">Updates</h2>
-    <article class="news"><h3>v37 · One level at a time <span>Latest</span></h3><ul>
+    <article class="news"><h3>v39 · A big round of fixes <span>Latest</span></h3><ul>
+      <li><b>The map</b> shows the doors between rooms (red while shut, green once open), the name of every room you have been in, and a star on the room the next entity is in.</li>
+      <li><b>The Journal</b> now has Level 3 (it said 0 of 31 when there are 40), and every level lists its entities in the order you face them. The Scare Museum has Level 3 and the Flesh Stealer too.</li>
+      <li>On screens that are not very wide, your health no longer sits on top of the tool bar, and in the tutorial messages no longer cover the tutorial card.</li>
+      <li>Dash shows as locked until Snackbot teaches it to you.</li>
+      <li>The tutorial's Stillman fight is practice now. It used to put him in your Journal out of order.</li>
+      <li><b>Every run starts at Level 0.</b> The level picker still shows every level and your best times, but starting always drops you into Level 0. Escape each level to go down to the next one. Co-op games start at Level 0 too, and you can still join a friend wherever they are.</li>
+      <li>Level 1's gate to the Poolrooms stays shut until you beat the Valet, like every other door. It used to be open from the start.</li>
+      <li>A lot of old text was brought up to date.</li>
+    </ul></article>
+    <article class="news"><h3>v38 · Everyone starts again</h3><ul>
+      <li><b>All progress was reset</b> for every player: levels, moves, cards, tokens, the journal and records. Everyone starts at Level 0 with no sprint, dash or jump. Settings, controls and names were kept. Save codes from before this update no longer load.</li>
+      <li><b>Fix:</b> the Static Hound's radios, and anything else a fight puts down, could land on the far side of a wall, in an area that was still locked. They now always go somewhere you can walk to.</li>
+      <li>Jump stays locked until Mr. Confetti teaches it to you, on every level.</li>
+    </ul></article>
+    <article class="news"><h3>v37 · One level at a time</h3><ul>
       <li><b>Levels open in order.</b> Level 0 is always open. Escape it to open Level 1, escape that to open Level 2, and so on. Once a level is open you can start there from the main menu any time.</li>
       <li>If you have already escaped a level before, the levels after it are open for you.</li>
       <li>You can still join a friend's game on any level. Hosting needs the level open.</li>
@@ -1327,14 +1359,14 @@ body.rv-shake #c{animation:rvBody .09s linear 7}
         <h4>Notes found · <span id="jnotes"></span></h4>
         <div class="notes-list" id="notesList"></div>
         <h4>Tips</h4>
-        <p class="small">Every entity comes only when you call it with its ritual, and the notes give you clues. The one exception is Come-Play on Level 2, which is always out there. If something catches you, you lose health and carry on. Your Journal and items stay with you.</p>
+        <p class="small">Entities come one at a time, in order, and only when you call them with their ritual. The notes give you clues. Beat the one in a room and the door to the next room opens. Come-Play on Level 2 and the Flesh Stealers on Level 1 come looking on their own. If something catches you, you lose health and wake at the door of the room you were in. Your Journal, moves and cards stay with you.</p>
       </div>
     </div>
     <div class="page">
       <div id="jdetail" class="jdbox"></div>
       <div id="jMapBox" hidden>
         <div class="jhead"><h2>Map</h2></div>
-        <canvas id="map" width="336" height="336"></canvas>
+        <canvas id="map" width="672" height="672"></canvas>
         <div class="legend">
           <span><i style="background:#c0392b"></i>You</span>
           <span><i style="background:#8f8466"></i>Dark sector</span>
@@ -1610,6 +1642,14 @@ if (!progress.seen || typeof progress.seen !== 'object') progress.seen = {};
 if (!Array.isArray(progress.runs)) progress.runs = [];
 const saveProgress = () => { try { localStorage.setItem('bfn-progress', JSON.stringify(progress)); } catch (e) {} };
 let teardown = null;
+const SAVE_EP = 2;
+if (progress.ep !== SAVE_EP) {
+  const had = (Array.isArray(progress.runs) && progress.runs.length) || Object.keys(progress.seen || {}).length || (progress.cards && Object.keys(progress.cards).length);
+  for (const k of Object.keys(progress)) delete progress[k];
+  Object.assign(progress, { level1: true, seen: {}, runs: [], lastRun: 0, ep: SAVE_EP });
+  try { localStorage.removeItem('bfn-run'); for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith('bfn-acct-') && k !== 'bfn-acct-blocked') localStorage.removeItem(k); } } catch (e) {}
+  saveProgress(); window.__bfnReset = !!had;
+}
 function lvMax() { let m = progress.maxLv | 0; for (const r of Array.isArray(progress.runs) ? progress.runs : []) if (r && Number.isFinite(r.lv)) m = Math.max(m, (r.lv | 0) + 1); return Math.min(3, m); }
 const lvOpen = (n) => (n | 0) <= lvMax();
 let adminOpen = false, adminPending = null;
@@ -1625,10 +1665,10 @@ const LOCAL_RUN = 'bfn-run';
 const readLocalRun = () => { try { return JSON.parse(localStorage.getItem(LOCAL_RUN) || 'null'); } catch (e) { return null; } };
 const writeLocalRun = (r) => { try { if (r) localStorage.setItem(LOCAL_RUN, JSON.stringify(r)); else localStorage.removeItem(LOCAL_RUN); } catch (e) {} };
 const acctChanged = () => ACCT.listeners.forEach((f) => { try { f(); } catch (e) {} });
-const progressDoc = () => JSON.parse(JSON.stringify({ level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {}, cards: progress.cards || {}, maxLv: progress.maxLv | 0, equip: progress.equip || [], abil: progress.abil || [], lv: progress.lv || {}, rolls: progress.rolls | 0, daily: progress.daily || null, loads: progress.loads || [], ld: progress.ld | 0, jump: !!progress.jump, sprint: !!progress.sprint, dash: !!progress.dash, slide: !!progress.slide, swim: !!progress.swim, abGot: progress.abGot || {}, lucky: progress.lucky | 0 }));
+const progressDoc = () => JSON.parse(JSON.stringify({ ep: SAVE_EP, level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {}, cards: progress.cards || {}, maxLv: progress.maxLv | 0, equip: progress.equip || [], abil: progress.abil || [], lv: progress.lv || {}, rolls: progress.rolls | 0, daily: progress.daily || null, loads: progress.loads || [], ld: progress.ld | 0, jump: !!progress.jump, sprint: !!progress.sprint, dash: !!progress.dash, slide: !!progress.slide, swim: !!progress.swim, abGot: progress.abGot || {}, lucky: progress.lucky | 0 }));
 const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej({ code: 'timeout' }), ms))]);
 function mergeProgress(p) {
-  if (!p) return;
+  if (!p || p.ep !== SAVE_EP) return;
   if (p.level1) progress.level1 = true;
   if (typeof p.cash === 'number' && p.cash > (progress.cash | 0)) progress.cash = p.cash;
   if (p.jump) progress.jump = true;
@@ -1667,11 +1707,12 @@ ACCT.ready = (async () => {
     const d = prof.data() || {};
     ACCT.player = String(d.player || '').slice(0, 20);
     ACCT.lastProg = JSON.stringify(d.progress || null);
+    if (d.progress && d.progress.ep !== SAVE_EP) window.__bfnReset = true;
     mergeProgress(d.progress); saveProgress();
     const rs = await withTimeout(db.doc(base + '/run').get(), 10000);
     const cloudRun = rs.exists ? JSON.parse(JSON.stringify(rs.data())) : null;
     ACCT.lastRunJ = JSON.stringify(cloudRun);
-    const local = ACCT.run && ACCT.run.active ? ACCT.run : null, remote = cloudRun && cloudRun.active && !(cloudRun.level > 2) ? cloudRun : null;
+    const local = ACCT.run && ACCT.run.active ? ACCT.run : null, remote = cloudRun && cloudRun.active && cloudRun.ep === SAVE_EP && !(cloudRun.level > 2) ? cloudRun : null;
     if (local && (!remote || (local.savedAt || 0) > (remote.savedAt || 0))) { ACCT.pendingRun = local; }
     else { ACCT.run = remote; writeLocalRun(remote); }
     ACCT.mode = 'cloud';
@@ -1776,6 +1817,7 @@ function mpMove(level, run) {
 }
 function mpHost(level) {
   if (!MP.room) return;
+  level = 0;
   let code = ''; while (code.length < 4) code += 'abcdefghjkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 31)];
   if (teardown) teardown(); teardown = null;
   boot({ level, seed: (Math.random() * 2 ** 31) | 0, mp: { code, host: true }, autostart: true, audio: true });
@@ -2121,7 +2163,7 @@ const okNum = (v, a, b, d = 0) => (typeof v === 'number' && isFinite(v) ? clamp(
 function cleanProgress(p) {
   const out = { level1: true, seen: {}, runs: [], lastRun: 0, cash: 0, ups: {}, cards: {}, equip: [], abil: [], lv: {}, loads: [], ld: 0, rolls: 0, daily: null, jump: false, lucky: 0 };
   if (p && typeof p === 'object') { out.rolls = okNum(p.rolls, 0, 3) | 0; if (p.daily && typeof p.daily === 'object' && typeof p.daily.d === 'string' && /^\d{4}-\d\d-\d\d$/.test(p.daily.d) && Array.isArray(p.daily.b)) out.daily = { d: p.daily.d, b: p.daily.b.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 3) }; }
-  if (p && typeof p === 'object') { out.maxLv = okNum(p.maxLv, 0, 3) | 0; out.jump = !!p.jump; out.lucky = okNum(p.lucky, 0, 1e6) | 0; for (const k of ['sprint', 'dash', 'slide', 'swim']) out[k] = !!p[k]; out.abGot = {}; if (p.abGot && typeof p.abGot === 'object') for (const k of Object.keys(p.abGot)) if (okKey(k)) out.abGot[k] = 1; }
+  if (p && typeof p === 'object') { out.ep = p.ep === SAVE_EP ? SAVE_EP : 0; out.maxLv = okNum(p.maxLv, 0, 3) | 0; out.jump = !!p.jump; out.lucky = okNum(p.lucky, 0, 1e6) | 0; for (const k of ['sprint', 'dash', 'slide', 'swim']) out[k] = !!p[k]; out.abGot = {}; if (p.abGot && typeof p.abGot === 'object') for (const k of Object.keys(p.abGot)) if (okKey(k)) out.abGot[k] = 1; }
   if (!p || typeof p !== 'object') return out;
   if (p.seen && typeof p.seen === 'object') for (const [k, v] of Object.entries(p.seen)) if (okKey(k) && typeof v === 'number') out.seen[k] = clamp(v | 0, 0, 3);
   if (Array.isArray(p.runs)) for (const r of p.runs.slice(-80)) { if (!r || typeof r !== 'object' || typeof r.t !== 'number' || !isFinite(r.t) || !(r.lv === 0 || r.lv === 1 || r.lv === 2 || r.lv === 3)) continue; out.runs.push({ lv: r.lv, t: clamp(r.t, 0, 1e7), d: okNum(r.d, 0, 1e5) | 0, at: okNum(r.at, 0, 9e15) }); }
@@ -2148,7 +2190,7 @@ function cleanRun(r) {
     deaths: okNum(r.deaths, 0, 1e5) | 0, playTime: okNum(r.playTime, 0, 1e7), quackers: !!r.quackers, documented: okNum(r.documented, 0, 99) | 0, total: okNum(r.total, 0, 99) | 0, P: null,
   };
   for (const k of Object.keys(out.status)) out.status[k] = clamp(out.status[k] | 0, 0, 3);
-  out.lastUsed = !!r.lastUsed; out.rolls = okNum(r.rolls, 0, 3) | 0;
+  out.lastUsed = !!r.lastUsed; out.rolls = okNum(r.rolls, 0, 3) | 0; out.ep = r.ep === SAVE_EP ? SAVE_EP : 0;
   out.drops = Array.isArray(r.drops) ? r.drops.filter((d) => d && finite(d.x) && finite(d.z) && typeof d.c === 'string' && /^[a-z0-9_]{1,24}$/.test(d.c)).slice(0, 20).map((d) => ({ x: d.x, z: d.z, c: d.c })) : [];
   if (r.P && typeof r.P === 'object' && finite(r.P.x) && finite(r.P.z)) out.P = { x: r.P.x, z: r.P.z, yaw: okNum(r.P.yaw, -1e3, 1e3), pitch: 0, hp: okNum(r.P.hp, 1, 200, 100), bat: okNum(r.P.bat, 0, 100, 100) };
   return out;
@@ -2194,6 +2236,7 @@ async function saveCodeRead(text) {
     doc = JSON.parse(new TextDecoder().decode(u8));
   } catch (e) { throw new Error(e && e.message === 'old' ? 'This browser is too old to open that code. Try updating it.' : 'That code could not be read. Copy the whole thing and try again.'); }
   if (!doc || typeof doc !== 'object' || doc.v !== 1) throw new Error('That code is from a version of the game this one cannot read.');
+  if (!doc.p || doc.p.ep !== SAVE_EP) throw new Error('That code is from before everyone started again in v38, so it no longer loads.');
   return { id: typeof doc.id === 'string' && /^[a-z0-9]{4,20}$/.test(doc.id) ? doc.id : profId(), name: cleanText(doc.n, 16) || 'Player', color: safeColor(doc.c), t: okNum(doc.t, 0, 9e15), p: cleanProgress(doc.p), r: cleanRun(doc.r) };
 }
 const newerRun = (a, b) => (a && b ? ((a.savedAt || 0) >= (b.savedAt || 0) ? a : b) : a || b || null);
@@ -2287,7 +2330,7 @@ const ENTS3 = [
 ];
 const NOTES3 = [
   { ent: null, text: "The ceiling's gone. That's the first thing. Real sky, the colour of a dirty window, and grass growing up through the street.\n\nThere is a city here. Nobody has lived in it for a very long time. Something still does." },
-  { ent: 'stilt', text: "Three manhole covers down the middle of the main street. I stepped on one and the ground hummed. I stepped on the second and something a long way off stood up.\n\nDon't step on the third. Or do, if you want to learn to jump. It's the only way I found." },
+  { ent: 'stilt', text: "Three manhole covers down the middle of the main street. I stepped on one and the ground hummed. I stepped on the second and something a long way off stood up.\n\nDon't step on the third. Or do, if you're ready. Whatever stands up is all legs, and if you take them off it you'll jump higher than you ever have." },
   { ent: 'stilt', text: "Its stomps go out along the ground like ripples. Standing on a bench or a kerb is enough to let them roll under you.\n\nIf a stomp lands on a manhole, the leg goes straight through. That's your chance. There's a spring in there. Take it." },
   { ent: 'rootmother', text: "The fountain in the middle plaza is full of weeds. One of them is thicker than my arm and it goes down a very long way.\n\nWhen she comes, watch the cracks. Roots come up along them a second later. She has patterns, and they get faster." },
   { ent: 'brutalist', text: "One apartment on the south row still has its light on. The doorbell works. I rang it once and the whole street went quiet.\n\nIt walks like a building would walk. You can't stop it. But things fall here, all the time, and they fall on whatever is underneath." },
@@ -2301,7 +2344,7 @@ const NOTES3 = [
   { ent: null, text: "There are flowers in the cracks. Real ones. I picked one and it screamed, very quietly, like a kettle a few rooms away.\n\nI didn't pick another." },
 ];
 LV_NAMES.push('The Concrete Garden');
-LV_BLURB.push('A city that nature took back. Moss on the concrete, grass in the streets, and things that grew up out of both. You cannot jump yet. You will need to.');
+LV_BLURB.push('A city that nature took back. Moss on the concrete, grass in the streets, and things that grew up out of both.');
 Object.assign(FIGHT_TXT, {
   stilt: 'Its stomps send a shockwave along the ground: get up onto anything raised. Lure a stomp onto a manhole cover, then pull the spring out of its leg [hold E]. Three times.',
   rootmother: 'Cracks first, then roots. Stay off the lines. Cut her three root hearts [hold E]. The roots she leaves block the way for a while.',
@@ -2622,7 +2665,7 @@ function groundAt(x, z) {
 }
 function jumpPress() {
   if (HAUNT) return;
-  if (!progress.jump) { hintOnce('nojump', LEVEL === 3 ? 'Your legs will not do it. Not yet. Something in this place is holding the ground down. The notes mention a spring.' : 'Your legs will not do it yet. Somebody in the Party Room on Level 0 knows how.', 'say'); return; }
+  if (!progress.jump) { hintOnce('nojump', LEVEL === 3 ? 'Your legs will not do it yet. Mr. Confetti teaches it in the Party Room on Level 0, and the Stilt out on Main Street can too.' : 'Your legs will not do it yet. Somebody in the Party Room on Level 0 knows how.', 'say'); return; }
   // a moment's grace after stepping off an edge, so a late jump still counts
   if (P.hidden || P.lockMove) return;
   let dj = false;
@@ -3826,12 +3869,15 @@ function steer(pos, gx, gz, speed, dt, rad = 0.35) {
 }
 function findSpot({ minD = 6, maxD = 14, dir = null, cone = -1, filter = null, needLOS = false, avoidLOS = false, from = null } = {}) {
   const fx = from ? from.x : P.x, fz = from ? from.z : P.z, r = Math.ceil(maxD / T) + 1, cx = tileX(fx), cy = tileX(fz);
+  const sf = HAUNT || LEVEL === 3 ? null : from ? fieldFor(tileAt(fx, fz)) : (updatePlayerField(), playerField);
   const c1 = [], c2 = [];
   for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) {
     if (!inb(x, y)) continue;
     const t = idx(x, y); if (!reachable(t)) continue;
     const wx = tc(x), wz = tc(y), dx = wx - fx, dz = wz - fz, d = Math.hypot(dx, dz);
     if (d < minD || d > maxD) continue;
+    if (sf && (sf[t] < 0 || sf[t] * T > Math.max(d * 2.5, d + 12))) continue;
+    if (spotLocked(x, y)) continue;
     if (dir && (dx * dir.x + dz * dir.z) / d < cone) continue;
     if (filter && !filter(t)) continue;
     const l = los(fx, fz, wx, wz);
@@ -5119,7 +5165,7 @@ function uiFightEnd(ch, success, msg) {
   }
 }
 function uiRetryNow() {
-  const r = UI.retry;
+  const r = UI.retry; if (r && !orderOk(r.id)) { UI.retry = null; return false; }
   if (!r || time > r.until || active || scareS || status[r.id] === 3) return false;
   UI.retry = null; el('result').hidden = true;
   return startChallenge(r.id);
@@ -5429,7 +5475,7 @@ function tutTick(dt) {
   if (!TUT.on) return;
   TUT.moved += Math.hypot(P.x - TUT.x0, P.z - TUT.z0); TUT.x0 = P.x; TUT.z0 = P.z; TUT.t += dt;
   const s = TUT.steps[TUT.i];
-  if (s.tag === 'Survive' && !TUT.fight) { TUT.fight = true; if (!startChallenge('stillman', undefined, undefined, true)) TUT.fight = false, tutSet(TUT.i + 1); return; }
+  if (s.tag === 'Survive' && !TUT.fight) { TUT.fight = true; if (startChallenge('stillman', undefined, undefined, true)) active.practice = true; else TUT.fight = false, tutSet(TUT.i + 1); return; }
   if (s.done()) { sfx.chime(); if (TUT.i + 1 >= TUT.steps.length) tutEnd(true); else tutSet(TUT.i + 1); }
 }
 function uiTutStart() {
@@ -5441,6 +5487,7 @@ function uiTutStart() {
 }
 function uiStart() {
   upsRefund(); cardsRecalc(); movesGrandfather(); l0SafeStart();
+  if (window.__bfnReset && !HAUNT) { window.__bfnReset = false; later(1.2, () => toast('Everyone starts again in v38: levels, moves, cards, tokens and records were all reset. Good luck down there.', 'say', 8)); }
   if (!saved.resumed && !HAUNT) P.hp = hpMax();
   if (!saved.resumed && !HAUNT) { const b = runAdd('startBatt'), f = runAdd('startFizz'); if (b) inv.battery += b; if (f) inv.fizz += f; }
   later(0.1, cardsHud);
@@ -5459,26 +5506,26 @@ function uiTitle() {
     setText(el('lvl' + i + 'Count'), `${c.n} of ${c.of}`); el('lvl' + i + 'Bar').style.width = ((c.n / c.of) * 100).toFixed(0) + '%';
   });
   const run = ACCT.run && ACCT.run.active ? ACCT.run : null, sb = el('startBtn');
-  if (!run && (!startArm || performance.now() - startArm > 4000)) sb.innerHTML = `PLAY<small>Level ${LVN} · ${LV_NAMES[LEVEL]}</small>`;
+  if (!run && (!startArm || performance.now() - startArm > 4000)) sb.innerHTML = `PLAY<small>Level 0 · ${LV_NAMES[0]}</small>`;
   if (run) { const cb = el('continueBtn'), tx = cb.textContent.replace(/^Continue\s*·?\s*/, ''); if (tx && !cb.querySelector('small')) cb.innerHTML = `CONTINUE<small>${escHtml(tx)}</small>`; }
   document.querySelectorAll('.diffs [data-diff]').forEach((b) => { const on = +b.dataset.diff === (settings.diff == null ? 1 : settings.diff); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   setText(el('diffNote'), uiDiff().note);
+  for (let i = 0; i < 4; i++) { const b = el('lvl' + i); if (b) { b.classList.toggle('on', i === 0); b.setAttribute('aria-pressed', String(i === 0)); } }
 }
 function uiLsPick(n) {
   UI.lsel = n;
   document.querySelectorAll('#lsList .ls-panel').forEach((p, i) => { const on = i === n; p.classList.toggle('on', on); p.setAttribute('aria-current', on ? 'true' : 'false'); });
 }
 function uiLsGo() {
-  if (!lvOpen(UI.lsel)) { sfx.click(); return; }
   el('levelSel').hidden = true;
-  if (UI.lsel !== LEVEL) switchLevel(UI.lsel, true); else tryStart();
+  if (LEVEL !== 0) switchLevel(0, true); else tryStart();
 }
 function uiLevelSel(n) {
   const lists = [ENTS0, ENTS1, ENTS2, ENTS3], cats = ['ritual', 'roaming', 'time'], seenOf = (e, lv) => Math.max(progress.seen[e.id] || 0, lv === LEVEL ? status[e.id] || 0 : 0);
   setHTML(el('lsList'), lists.map((l, i) => {
     const c = uiCounts(l), cnt = (k) => l.filter((e) => KIND[e.id] === k).length, run = ACCT.run && ACCT.run.active && ACCT.run.level === i;
     const faces = l.filter((e) => !e.secret).map((e) => { const known = seenOf(e, i) >= 2; return `<img src="${known ? UI_IMG.p[e.id] : uiSilhouette(e.id)}" ${known ? '' : `data-sil="${e.id}"`} alt="" title="${known ? escHtml(e.name) : 'Not met yet'}">`; }).join('');
-    return `<article class="ls-panel${lvOpen(i) ? '' : ' ls-locked'}" data-ls="${i}" style="background-image:url(${UI_IMG.lv[i]})"><div class="ls-body"><span class="ls-tag">LEVEL ${i}${c.n >= c.of ? ' · ALL FOUND' : ''}</span><h3>${LV_NAMES[i]}</h3><span class="lv-row"><span class="lv-bar"><em style="width:${((c.n / c.of) * 100).toFixed(0)}%"></em></span><span>${c.n} of ${c.of}</span></span><div class="ls-more"><p>${LV_BLURB[i]}</p><div class="ls-faces">${faces}</div><div class="ls-cats">${cats.filter((k) => cnt(k) > 0).map((k) => `<span class="ls-cat ${KIND_INFO[k].cls}"><b>${cnt(k)}</b>${k === 'ritual' ? 'Summoned' : 'Always out there'}</span>`).join('')}</div><div class="ls-go">${lvOpen(i) ? `<button class="btn" type="button" data-go="${i}">${run ? 'New run' : 'Enter level'}</button><div class="ls-best">${bestText(i)}</div>` : `<div class="ls-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v10H6z M8 11V7a4 4 0 0 1 8 0v4"/></svg><b>Locked</b><span>Escape Level ${i - 1} to open it.</span></div>`}</div></div></div></article>`;
+    return `<article class="ls-panel${lvOpen(i) ? '' : ' ls-locked'}" data-ls="${i}" style="background-image:url(${UI_IMG.lv[i]})"><div class="ls-body"><span class="ls-tag">LEVEL ${i}${c.n >= c.of ? ' · ALL FOUND' : ''}</span><h3>${LV_NAMES[i]}</h3><span class="lv-row"><span class="lv-bar"><em style="width:${((c.n / c.of) * 100).toFixed(0)}%"></em></span><span>${c.n} of ${c.of}</span></span><div class="ls-more"><p>${LV_BLURB[i]}</p><div class="ls-faces">${faces}</div><div class="ls-cats">${cats.filter((k) => cnt(k) > 0).map((k) => `<span class="ls-cat ${KIND_INFO[k].cls}"><b>${cnt(k)}</b>${k === 'ritual' ? 'Summoned' : 'Always out there'}</span>`).join('')}</div><div class="ls-go">${i === 0 ? `<button class="btn" type="button" data-go="0">${run ? 'New run' : 'Enter level'}</button><div class="ls-best">${bestText(i)}</div>` : `<button class="btn" type="button" data-go="0">Start at Level 0</button><div class="ls-best">${lvOpen(i) ? bestText(i) : 'Not reached yet'}</div><p class="ls-l0">Every run starts at Level 0. Escape Level ${i - 1} in a run to get down here.</p>`}</div></div></div></article>`;
   }).join(''));
   uiLsPick(n);
   el('levelSel').hidden = false;
@@ -5536,7 +5583,7 @@ function renderJournal2() {
   const fs = [['all', 'All'], ['ritual', 'Ritual'], ['roaming', 'Roaming'], ['time', 'Time-based']];
   setHTML(el('jbarV'), [['ents', 'Entities'], ['map', 'Map and notes']].map(([k, t]) => `<button type="button" data-jv="${k}" class="${UI.jv === k ? 'on' : ''}">${t}</button>`).join(''));
   setHTML(el('jbarF'), fs.map(([k, t]) => `<button type="button" data-jf="${k}" class="${UI.jf === k ? 'on' : ''}">${t}</button>`).join(''));
-  const list = ENTS.filter((e) => UI.jf === 'all' || KIND[e.id] === UI.jf);
+  const list = orderSort(ENTS, LEVEL).filter((e) => UI.jf === 'all' || KIND[e.id] === UI.jf);
   el('entries').innerHTML = list.map((e) => {
     const s = status[e.id] | 0, k = uiKind(e.id), secret = e.secret && s === 0, known = s >= 2;
     const img = secret ? uiSilhouette(e.id) : known ? UI_IMG.p[e.id] : uiSilhouette(e.id), name = secret ? 'A torn page' : s >= 1 ? e.name : '???';
@@ -5553,7 +5600,7 @@ function renderJournal2() {
 }
 function uiJDetail(id) {
   const e = id && ENT[id];
-  if (!e) return `<div class="jd empty"><h3>How they come</h3><h4>You call them</h4><p>Every entity here only comes when you do its ritual. The notes give you clues about what to do, so you choose when to face each one.</p><h4>Except one</h4><p>On Level 2, Come-Play is already walking around, looking for you.</p><p style="margin-top:14px">Pick a card to read more.</p></div>`;
+  if (!e) return `<div class="jd empty"><h3>How they come</h3><h4>One at a time</h4><p>Each level has an order. The card at the top left always says who is next and which room they are in. Call it with its ritual (the notes give you clues), survive it, and the door to the next room opens.</p><h4>What they teach you</h4><p>Some of them teach you a move you keep for good: sprint, dash, jump, slide and swim. Others give you an ability card.</p><h4>If one gets you</h4><p>You come to at the door of the room you were in, and you can try again.</p><h4>Not everything waits</h4><p>Come-Play walks Level 2 looking for you, and Flesh Stealers roam the garage on Level 1.</p><p style="margin-top:14px">Pick a card to read more.</p></div>`;
   const s = status[id] | 0, k = uiKind(id), kk = KIND[id];
   if (e.secret && s === 0) return `<div class="jd"><h3>A page is torn out here</h3><p style="margin-top:8px">${e.doodle || 'Someone doodled a little yellow bird in the margin.'}</p>${e.hint ? `<p style="margin-top:8px">${e.hint}</p>` : ''}</div>`;
   let how;
@@ -5567,11 +5614,11 @@ function uiJDetail(id) {
     ${s >= 3 ? `<p class="lore">${e.lore}</p>` : ''}</div>`;
 }
 function renderBestiary2() {
-  const groups = [{ lv: 0, title: 'Level 0 · The Yellow Rooms', list: ENTS0 }, { lv: 1, title: 'Level 1 · Garage and Poolrooms', list: ENTS1 }, { lv: 2, title: 'Level 2 · The Playground', list: ENTS2 }];
+  const groups = [{ lv: 0, title: 'Level 0 · The Yellow Rooms', list: ENTS0 }, { lv: 1, title: 'Level 1 · Garage and Poolrooms', list: ENTS1 }, { lv: 2, title: 'Level 2 · The Playground', list: ENTS2 }, { lv: 3, title: 'Level 3 · The Concrete Garden', list: ENTS3 }].map((gp) => Object.assign(gp, { list: orderSort(gp.list, gp.lv) }));
   setHTML(el('bFilters'), [['all', 'All'], ['ritual', 'Ritual'], ['roaming', 'Roaming'], ['time', 'Time-based']].map(([k, t]) => `<button type="button" data-bf="${k}" class="${UI.bf === k ? 'on' : ''}">${t}</button>`).join(''));
   let total = 0, docd = 0, html = '';
   for (const gp of groups) {
-    const st = (e) => Math.max(progress.seen[e.id] || 0, gp.list === ENTS ? status[e.id] || 0 : 0);
+    const st = (e) => Math.max(progress.seen[e.id] || 0, gp.lv === LEVEL ? status[e.id] || 0 : 0);
     const shown = gp.list.filter((e) => UI.bf === 'all' || KIND[e.id] === UI.bf), n = gp.list.filter((e) => st(e) >= 3).length;
     total += gp.list.length; docd += n;
     if (!shown.length) continue;
@@ -7204,7 +7251,7 @@ const NOTES1 = [
   { ent: 'attendant', text: "Pressed the intercom at the ticket booth three times. The Attendant came out with numbers on its face.\n\nIt flashes a code once. Type it back on the number keys. Don't guess." },
   { ent: 'exhaust', text: "DO NOT honk the car horns. Three honks and the garage fills with smog.\n\nRun between the green vents to breathe. Crouch; the smoke rises." },
   { ent: 'copycat', text: "Stood in a puddle staring at my reflection. It kept staring after I stopped.\n\nIt mirrors everything you do. Walk it onto a drain grate. Never let it reach you." },
-  { ent: 'valet', text: "The valet stand where you woke up has a set of keys. Only take them after the other five are in your notes.\n\nThe lights go out. The breakers are red. Hold [E] on each one. Keep your flashlight charged." },
+  { ent: 'valet', text: "The valet stand in the Valet Lot has a set of keys. Only take them after the other five are in your notes.\n\nThe lights go out. The breakers are red. Hold [E] on each one. Keep your flashlight charged." },
   { ent: 'lifeguard', text: "There are NO RUNNING signs in the Poolrooms. They mean it.\n\nRun past one and the Lifeguard climbs its chair. Get its whistle without crossing the searchlight. Walls block it." },
   { ent: 'floatie', text: "Found a pool ring on the tiles in the big pool room. Blew into it three times to see if it held air.\n\nIt held a lot of air. It bounces. It gets faster. Dodge it." },
   { ent: 'drain', text: "The deep end is warm. Don't crouch in the middle of it.\n\nIf you do, the current pulls you toward the drain, and the ladders are no good while the water is moving. There's a plug going round in there. Catch it, let the current take you in, and jam it in the hole. Then run. It doesn't hold for long." },
@@ -8568,16 +8615,17 @@ function drawMap() {
     const t = idx(x, y); if (!seen[t]) continue;
     g.fillStyle = LEVEL === 1
       ? (solid[t] === 1 ? (x <= 41 ? '#3d3f3c' : '#7f9aa0') : solid[t] === 2 ? '#7a5a2a' : water[t] ? '#4fb3cc' : zone[t] === 8 ? '#e7e0b8' : zone[t] === 9 ? '#b9c9d6' : x < 41 ? '#a8aba4' : '#eef4f2')
-      : (solid[t] === 1 ? '#4a3f28' : solid[t] === 2 ? '#7a5a2a' : dark[t] ? '#8f8466' : zone[t] === 2 ? '#c99a7e' : zone[t] === 1 ? '#9fb3a0' : zone[t] === 3 ? '#a9bfd6' : '#f1e8c9');
+      : (solid[t] === 1 ? '#4a3f28' : solid[t] === 2 ? '#7a5a2a' : dark[t] ? '#8f8466' : zone[t] === 2 ? '#c99a7e' : zone[t] === 1 ? '#9fb3a0' : zone[t] === 3 ? '#a9bfd6' : (LEVEL === 0 && MAPZ[zone[t]]) || '#f1e8c9');
     g.fillRect(x * s, y * s, s, s);
   }
   for (const d of doors) if (seen[d.c.t]) { g.fillStyle = '#6b4a2b'; g.fillRect(d.c.x * s + 0.5, d.c.y * s + 0.5, s - 1, s - 1); }
-  if (LEVEL === 1 && seen[gateTiles[0]]) { g.fillStyle = gateOpen ? '#1aa34a' : '#c0392b'; g.fillRect(41 * s - 1, GATE_Y * s - 1, s + 2, 2 * s + 2); }
+  if (LEVEL === 1 && seen[gateTiles[0]]) { if (gateOpen) { g.strokeStyle = '#1aa34a'; g.lineWidth = 2; g.strokeRect(41 * s, GATE_Y * s, s, 2 * s); } else { g.fillStyle = '#c0392b'; g.fillRect(41 * s - 1, GATE_Y * s - 1, s + 2, 2 * s + 2); } }
   if (vending && seen[vending.t]) { g.fillStyle = '#2f6fb0'; g.fillRect(F.vend.x * s - 1, F.vend.y * s - 1, s + 2, s + 2); }
   if (exitObj) { g.fillStyle = '#1aa34a'; g.fillRect(exitObj.c.x * s - 2, exitObj.c.y * s - 2, s + 4, s + 4); }
-  for (const o of others.values()) { g.fillStyle = o.color; g.beginPath(); g.arc(o.x / T * s, o.z / T * s, 3.5, 0, TAU); g.fill(); }
+  for (const o of others.values()) { g.fillStyle = o.color || '#3d7fd1'; g.beginPath(); g.arc(o.x / T * s, o.z / T * s, 3.5 * s / 4, 0, TAU); g.fill(); }
+  mapExtra(g, s);
   const px = P.x / T * s, pz = P.z / T * s;
-  g.save(); g.translate(px, pz); g.rotate(-P.yaw); g.fillStyle = '#c0392b';
+  g.save(); g.translate(px, pz); g.rotate(-P.yaw); g.scale(s / 4, s / 4); g.fillStyle = '#c0392b';
   g.beginPath(); g.moveTo(0, -7); g.lineTo(5, 5); g.lineTo(0, 2); g.lineTo(-5, 5); g.closePath(); g.fill(); g.restore();
 }
 function showNote(i) {
@@ -8908,7 +8956,7 @@ CH.stilt = () => {
         if (w.r > 11) { scene.remove(w.ring); waves.splice(i, 1); }
       }
     },
-    cleanup(won) { scene.remove(pad); waves.forEach((w) => scene.remove(w.ring)); removeLater(g); if (won) setTimeout(jumpUnlock, 2200); },
+    cleanup(won) { scene.remove(pad); waves.forEach((w) => scene.remove(w.ring)); removeLater(g); },
   };
   return ch;
 };
@@ -9428,6 +9476,7 @@ function endChallenge(ch, success, msg) {
   try { if (ch.cleanup) ch.cleanup(success); } catch (e) { console.error(e); }
   later(1.5, () => { if (ch.g && !ch.g.parent) disposeKit(ch.g); });
   H_.banner.hidden = true; H_.arrow.hidden = true; document.body.classList.remove('has-banner');
+  if (ch.practice) { practiceEnd(ch, success, msg); return; }
   flawEnd(ch, success);
   if (success) {
     status[ch.id] = 3; sfx.chime(); lastDocId = ch.id; syncSeen();
@@ -9439,7 +9488,7 @@ function endChallenge(ch, success, msg) {
 }
 function docHints(id) {
   const e1 = ENT[id];
-  if (LEVEL === 1 && e1.sector === 'A' && !e1.boss && docSector('A') === 5 && status.valet < 3) later(2, () => toast('Five documented. The keys at the valet stand where you woke up are waiting.', 'say', 6));
+  if (LEVEL === 1 && e1.sector === 'A' && !e1.boss && docSector('A') === 5 && status.valet < 3) later(2, () => toast('Five documented. The keys at the valet stand in the Valet Lot are waiting.', 'say', 6));
   if (LEVEL === 1 && e1.sector === 'B' && !e1.boss && docSector('B') === 6 && status.undertow < 3) later(2, () => toast('Six documented. The chain in the main pool is waiting.', 'say', 6));
   if (LEVEL === 3 && !e1.boss && ENTS.filter((e) => !e.boss && status[e.id] === 3).length === 5 && status.groundskeeper < 3) later(2, () => toast('Five documented. In the garden shed, the mower is waiting.', 'say', 6));
   if (LEVEL === 0 && documented() === 7 && status.manager < 3) later(2, () => toast('Seven documented. Somewhere on this level, a bell is waiting.', 'say', 6));
@@ -10173,7 +10222,7 @@ function escape(ch) {
   cardsSweep(); if (!HAUNT) { progress.rolls = 0; saveProgress(); } if (!HAUNT) setTimeout(() => { if (alive) luckyRoll(); }, 1400); state = 'won'; sfx.win(); musicStop(); H_.arrow.hidden = true; mpSend({ w: 1 });
   if (document.pointerLockElement) document.exitPointerLock();
   if (LEVEL === 0) progress.level1 = true;
-  if (!HAUNT && LEVEL < 3 && (progress.maxLv | 0) < LEVEL + 1) { progress.maxLv = LEVEL + 1; saveProgress(); requestSave(); later(2.5, () => toast(`Level ${LEVEL + 1} is open now. You can start there from the main menu any time.`, 'good', 6)); }
+  if (!HAUNT && LEVEL < 3 && (progress.maxLv | 0) < LEVEL + 1) { progress.maxLv = LEVEL + 1; saveProgress(); requestSave(); }
   el('winRun').textContent = (ACCT.mode === 'cloud' && ACCT.player ? ACCT.player + ' · ' : '') + recordRun();
   const mm = Math.floor(playTime / 60), ss = Math.floor(playTime % 60);
   el('winH').textContent = LEVEL === 0 ? 'You found the exit.' : LEVEL === 1 ? 'You reached the surface. Almost.' : LEVEL === 3 ? 'The bus doors close behind you.' : 'The party is over.';
@@ -12196,7 +12245,7 @@ function update(dt) {
   updateQuackers(dt);
   updateWorldFx(dt);
   updateFocus();
-  abMove(dt); abTick(dt); orderTick(dt); v36Tick();
+  abMove(dt); abTick(dt); orderTick(dt); v36Tick(); v39Tick(dt);
   lookRate = lookDelta / dt; lookDelta = 0;
 }
 
@@ -12239,7 +12288,7 @@ function grain() { const a = nImg.data; for (let i = 0; i < a.length; i += 4) { 
 /* ---------- restore a hot-reloaded session ---------- */
 if (saved.P && Number.isFinite(saved.P.x) && Number.isFinite(saved.P.z)) { Object.assign(P, saved.P, { lockMove: false, shake: 0, hurt: 0 }); if (!Number.isFinite(P.yaw)) P.yaw = 0; if (!Number.isFinite(P.pitch)) P.pitch = 0; resolve(P, 0.32); }
 if (saved.quackers) spawnQuackers();
-if (LEVEL === 1) openGate(true);
+if (LEVEL === 1 && (saved.gateOpen || status.valet === 3)) openGate(true);
 if (hot && hot.snapshot) {
   try { hot.snapshot(() => ({ level: LEVEL, gateOpen, seed, picked: [...picked], status: Object.assign({}, status), inv: Object.assign({}, inv), noteRead: noteRead.slice(), deaths, playTime, quackers: !!quackers, P: { x: P.x, z: P.z, yaw: P.yaw, pitch: P.pitch, hp: P.hp, bat: P.bat } })); } catch (e) {}
 }
@@ -12258,7 +12307,7 @@ function showTab(name) {
   document.querySelectorAll('#title .tab').forEach((b) => { const on = b.dataset.tab === grp; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
   document.querySelectorAll('#title [data-sub]').forEach((b) => { const on = b.dataset.sub === name; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   ['play', 'ents', 'runs', 'museum', 'keys', 'ups', 'acct', 'news'].forEach((n) => { el('pane-' + n).hidden = n !== name; });
-  if (name === 'news') { try { localStorage.setItem('bfn-news', '37'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
+  if (name === 'news') { try { localStorage.setItem('bfn-news', '39'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
   if (name === 'acct') renderProfiles();
   el('title').classList.toggle('sub', name !== 'play');
   if (name === 'keys') { el('paneSet').appendChild(el('setRows')); uiSyncSet(); }
@@ -12279,7 +12328,7 @@ function setupTitle() {
   el('lvl0Best').textContent = bestText(0);
   el('lvl1Best').textContent = bestText(1); el('lvl2Best').textContent = bestText(2); el('lvl3Best').textContent = bestText(3);
   showTab(PROF.reopen ? 'acct' : 'play'); PROF.reopen = false;
-  try { if (localStorage.getItem('bfn-news') === '37') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
+  try { if (localStorage.getItem('bfn-news') === '39') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
   renderAccount();
   uiTitle(); uiNudge();
 }
@@ -13629,6 +13678,121 @@ function checkpointTile(px, pz) {
   return null;
 }
 
+function spotLocked(x, y) {
+  if (HAUNT) return false;
+  if (LEVEL === 0 && F.gates && V32.gates.length) { const k = l0SecOf(x, y); let reach = 0; for (const o of V32.gates) { if (o.open) reach = o.g.k + 1; else break; } return k > reach; }
+  return F.chain ? chainLocked(x, y) : false;
+}
+/* ---------- v39: the journal in order, a map with doors and room names, a HUD that never overlaps itself ---------- */
+const V39 = { hudT: 0, dashL: null, jumpL: null };
+// a level's entities in the order you have to face them; anything outside the order goes last
+function orderSort(list, lv) {
+  const o = ORDER[lv] || [], rank = (e, i) => { const k = o.indexOf(e.id); return k < 0 ? 100 + i : k; };
+  return list.map((e, i) => [rank(e, i), e]).sort((a, b) => a[0] - b[0]).map((p) => p[1]);
+}
+function v39Tick(dt) {
+  if (LEVEL === 1 && !HAUNT && !gateOpen && status.valet === 3) openGate();
+  V39.hudT -= dt; if (V39.hudT > 0) return; V39.hudT = 0.25;
+  hudFit(); moveLocks();
+}
+// on screens too narrow for the health box and the tool bar side by side, the health box (and tokens) go above the bar
+function hudFit() {
+  const b = document.body, inv = el('inv'), vit = el('vitals'), co = el('coins'), tut = el('tutCard');
+  if (inv && vit) {
+    const was = b.classList.contains('hud-stack');
+    b.classList.remove('hud-stack');
+    const r = inv.getBoundingClientRect(), v = vit.getBoundingClientRect(), c = co ? co.getBoundingClientRect() : null;
+    const hit = (q) => q && q.width > 0 && q.right > r.left - 10 && q.left < r.right + 10 && q.bottom > r.top - 6 && q.top < r.bottom + 6;
+    const stack = r.width > 0 && innerWidth > 760 && innerHeight > 480 && (hit(v) || hit(c));
+    if (stack) {
+      const base = Math.round(innerHeight - r.top + 12);
+      b.style.setProperty('--hudB', base + 'px');
+      b.style.setProperty('--hudC', (base + Math.round(Math.max(v.height, c ? c.height : 0)) + 14) + 'px');
+      b.classList.add('hud-stack');
+    }
+    if (was !== stack) V39.hudT = 0;
+  }
+  // in the tutorial, messages sit above the tutorial card instead of on top of it
+  if (TUT.on && tut && !tut.hidden) { const t = tut.getBoundingClientRect(); if (t.height) b.style.setProperty('--tutB', Math.round(innerHeight - t.top + 10) + 'px'); }
+}
+// Dash (and the touch Jump button) say they are locked until you have earned them
+function moveLocks() {
+  const d = !hasMove('dash'), j = !hasMove('jump');
+  if (V39.dashL === d && V39.jumpL === j) return;
+  V39.dashL = d; V39.jumpL = j;
+  const t = el('tDash');
+  if (t) { t.classList.toggle('locked', d); const sp = t.querySelector('span'); if (sp) setText(sp, d ? 'Locked' : 'Dash'); t.title = d ? 'Locked. Snackbot on Level 0 teaches you to dash.' : ''; }
+  document.querySelectorAll('.tbtns [data-t="dash"],.tbtns [data-t="jump"]').forEach((bt) => bt.classList.toggle('locked', bt.dataset.t === 'dash' ? d : j));
+}
+// the tutorial's fight is practice: it does not count, so it cannot jump the queue
+function practiceEnd(ch, success, msg) {
+  V36.fight = null; UI.retry = null; el('intro').hidden = true;
+  const e = ENT[ch.id];
+  if (success) { sfx.chime(); uiCard(false, ch.id, `You survived ${e.name}`, 'That was practice. It comes back for real later on, and now you know what to do.', '', 'Practice · it is not in your Journal yet', 5); }
+  else uiCard(true, ch.id, msg || `${e.name} got you`, `Tip: ${e.survive}`, '', 'Practice · it comes back for real later', 6);
+  requestSave();
+}
+
+/* ---------- the map: doors, room names, where to go next ---------- */
+const MAPZ = { 4: '#efe3b0', 5: '#cbbfe2', 6: '#f0bfd1', 7: '#dcc796', 8: '#e9dca6' };
+function mapAreas() {
+  if (LEVEL === 0 && F.gates) return ROOM0.map((name, k) => ({ name, k, b: l0Box(k) }));
+  if (F.chain) return F.chain.areas.map((a, k) => ({ name: a.name, k, b: a.rects[0] }));
+  return [];
+}
+function mapNextArea() {
+  const id = orderNext(); if (!id) return -1;
+  if (LEVEL === 0) { const i = ORDER[0].indexOf(id); return i < 0 ? -1 : i + 1; }
+  return F.chain ? F.chain.areas.findIndex((a) => a.ents.includes(id)) : -1;
+}
+function mapWrap(g, text, maxW) {
+  const words = text.split(' '), lines = []; let cur = '';
+  for (const w of words) { const t = cur ? cur + ' ' + w : w; if (cur && g.measureText(t).width > maxW) { lines.push(cur); cur = w; } else cur = t; }
+  if (cur) lines.push(cur);
+  return lines;
+}
+function mapExtra(g, s) {
+  if (HAUNT) return;
+  const gates = LEVEL === 0 ? V32.gates : V35.doors;
+  for (const o of gates) {
+    const ts = o.g.tiles; if (!ts || !ts.length) continue;
+    if (!ts.some((t) => seen[t]) && !seen[o.g.inA] && !seen[o.g.inB]) continue;
+    let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+    for (const t of ts) { const x = t % W, y = (t / W) | 0; x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+    const rx = x0 * s - 1, ry = y0 * s - 1, rw = (x1 - x0 + 1) * s + 2, rh = (y1 - y0 + 1) * s + 2;
+    if (o.open) { g.strokeStyle = '#1aa34a'; g.lineWidth = 2; g.strokeRect(rx + 1, ry + 1, rw - 2, rh - 2); }
+    else { g.fillStyle = '#c0392b'; g.fillRect(rx, ry, rw, rh); }
+  }
+  const areas = mapAreas(), next = mapNextArea();
+  g.save(); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+  g.font = `bold ${Math.max(8, Math.round(s * 2.3))}px "Courier New", monospace`;
+  for (const a of areas) {
+    const b = a.b; let any = false;
+    for (let y = b.y0; y <= b.y1 && !any; y += 2) for (let x = b.x0; x <= b.x1; x += 2) if (seen[idx(x, y)]) { any = true; break; }
+    const isNext = a.k === next;
+    if (!any && !isNext) continue;
+    const lines = mapWrap(g, (isNext ? '★ ' : '') + a.name, (b.x1 - b.x0 + 1) * s - 6), lh = Math.max(9, s * 2.6);
+    // names sit along the top of each room, clear of the middle where you usually are
+    const cx = ((b.x0 + b.x1 + 1) / 2) * s, cy = (b.y0 + 1) * s + lh / 2 + 2;
+    lines.forEach((ln, i) => {
+      g.lineWidth = Math.max(3, s * 0.55); g.strokeStyle = 'rgba(255,250,235,.92)'; g.strokeText(ln, cx, cy + i * lh);
+      g.fillStyle = isNext ? '#b02a1c' : any ? '#2b2416' : '#7d7563'; g.fillText(ln, cx, cy + i * lh);
+    });
+  }
+  g.restore();
+  const lg = document.querySelector('#jMapBox .legend');
+  if (lg) {
+    const it = [['#c0392b', 'You'], ['#c0392b', 'Door, shut', 'sq'], ['#1aa34a', 'Door, open', 'open']];
+    if (next >= 0) it.push(['#b02a1c', 'Next entity', 'star']);
+    if (others.size) it.push(['#3d7fd1', 'Teammate']);
+    if (vending) it.push(['#2f6fb0', 'Vending']);
+    if (doors.length) it.push(['#6b4a2b', 'Wooden door']);
+    if (exitObj) it.push(['#1aa34a', 'Exit']);
+    const html = it.map(([c, t, k]) => `<span><i class="${k || ''}" style="${k === 'open' ? `border:2px solid ${c};background:none` : k === 'star' ? `color:${c};background:none` : `background:${c}`}">${k === 'star' ? '★' : ''}</i>${t}</span>`).join('');
+    if (lg._h !== html) { lg._h = html; lg.innerHTML = html; }
+  }
+}
+
 function mpSend(extra) {
   if (!MP.game) return;
   const flags = (abInvis() ? 64 : 0) | (P.crouch ? 1 : 0) | (lightOn() ? 2 : 0) | (state === 'dead' ? 4 : 0) | (P.sprinting ? 8 : 0) | (P.hidden ? 16 : 0) | (P.speed > 0.3 ? 32 : 0);
@@ -13894,7 +14058,7 @@ function renderMp() {
     <p class="panep"><b>Co-op rules:</b> when anyone summons an entity, it pulls everyone in the room to them. There is one of it, you all see the same one, and it hunts whoever is closest. Only one of you has to survive it. You all share one field journal.</p>`;
     el('mpNick').value = mpName();
   }
-  document.querySelectorAll('#mpBox [data-host]').forEach((b) => { const n = +b.dataset.host, open = lvOpen(n); b.disabled = !open; b.title = open ? '' : `Escape Level ${n - 1} to open`; b.textContent = open ? `Host Level ${n}` : `Level ${n} · locked`; });
+  document.querySelectorAll('#mpBox [data-host]').forEach((b) => { const n = +b.dataset.host; b.hidden = n > 0; b.disabled = false; b.title = 'Every game starts at Level 0'; if (!n) b.textContent = 'Host a game · Level 0'; });
   const games = MP.room.p2p ? [] : mpGames().filter((gm) => !gm.mine);
   el('mpGames').innerHTML = games.length ? games.map((gm) => `<div class="mp-game"><div><b>${escHtml(gm.host)}</b><span>Level ${gm.lv} · room ${escHtml(gm.code.toUpperCase())} · ${gm.players} playing</span></div><button class="btn" type="button" data-join="${escHtml(gm.code)}" data-lv="${gm.lv}" data-sd="${gm.sd}">Join</button></div>`).join('')
     : `<div class="runs"><div class="empty">${MP.room.p2p ? 'Host a game, then tell your friends the room code. They open this same game, go to Multiplayer and type the code in. Nobody needs an account.' : 'No open games right now. Host one and tell your friends the room code.'}</div></div>`;
@@ -14333,11 +14497,11 @@ listen(el('hauntBoard'), 'click', (e) => {
   if (t.id === 'hbLeave') { hauntLeave(); switchLevel(0, false); }
 });
 /* ---------- the Scare Museum: every jumpscare you have met, on request ---------- */
-const MUSEUM_CAP = { stillman: 'A slideshow, in silence. It is closer each time.', grinner: 'Nothing but teeth in the dark.', hound: 'No signal.', confetti: 'It was full of something.', knock: 'All of them, and they pull.', echo: 'And the one behind it, and the one behind that.', snack: 'Thank you.', manager: 'The only light in the world.', mimic: 'Down into the rings.', moth: 'It lands on your face.', attendant: 'Invalid.', exhaust: 'You cannot breathe.', copycat: 'Which one are you?', valet: 'High beams, coming fast.', lifeguard: 'You are under. It takes its time.', floatie: 'Stripes and vinyl.', drain: 'The whole room goes down the plughole.', hopscotch: 'Your turn.', lurker: 'You are in the locker.', tide: 'A wall of water, and somebody in it.', undertow: 'One by one, its eyes open.', sun: 'It keeps on smiling.', moon: 'One eye, until there is nothing else.', clown: 'Pop.', balloon: 'It just keeps getting bigger.', ring: 'Hold hands.', swing: 'On the way back, it pushes.', comeplay: 'You are it.', wow: 'Wow.' };
+const MUSEUM_CAP = { creeper: 'It was on the wall the whole time.', stilt: 'All the way up. Then all the way down.', brutalist: 'Concrete does not blink.', rushhour: 'Headlights, then nothing.', bloom: 'It opened right in front of you.', signal: 'Red light. You moved.', tallgrass: 'It heard the grass move.', rootmother: 'Roots, all the way up.', groundskeeper: 'The mower never stops.', fleshstealer: 'It already knew what you look like.', stillman: 'A slideshow, in silence. It is closer each time.', grinner: 'Nothing but teeth in the dark.', hound: 'No signal.', confetti: 'It was full of something.', knock: 'All of them, and they pull.', echo: 'And the one behind it, and the one behind that.', snack: 'Thank you.', manager: 'The only light in the world.', mimic: 'Down into the rings.', moth: 'It lands on your face.', attendant: 'Invalid.', exhaust: 'You cannot breathe.', copycat: 'Which one are you?', valet: 'High beams, coming fast.', lifeguard: 'You are under. It takes its time.', floatie: 'Stripes and vinyl.', drain: 'The whole room goes down the plughole.', hopscotch: 'Your turn.', lurker: 'You are in the locker.', tide: 'A wall of water, and somebody in it.', undertow: 'One by one, its eyes open.', sun: 'It keeps on smiling.', moon: 'One eye, until there is nothing else.', clown: 'Pop.', balloon: 'It just keeps getting bigger.', ring: 'Hold hands.', swing: 'On the way back, it pushes.', comeplay: 'You are it.', wow: 'Wow.' };
 function renderMuseum() {
   const box = el('museumBox'); if (!box) return;
   wowLoad();
-  const groups = [{ title: 'Level 0 · The Yellow Rooms', list: ENTS0 }, { title: 'Level 1 · Garage & Poolrooms', list: ENTS1 }, { title: 'Level 2 · The Playground', list: ENTS2 }];
+  const groups = [{ lv: 0, title: 'Level 0 · The Yellow Rooms', list: ENTS0 }, { lv: 1, title: 'Level 1 · Garage & Poolrooms', list: ENTS1 }, { lv: 2, title: 'Level 2 · The Playground', list: ENTS2 }, { lv: 3, title: 'Level 3 · The Concrete Garden', list: ENTS3 }].map((gp) => Object.assign(gp, { list: orderSort(gp.list, gp.lv) }));
   let html = '', total = 0, open = 0;
   for (const gp of groups) {
     const list = gp.list.filter((e) => MUSEUM_CAP[e.id]);
@@ -14370,7 +14534,7 @@ function runSnapshot() {
   return {
     v: 1, active: true, savedAt: Date.now(), level: LEVEL, seed, gateOpen, picked: [...picked], status: Object.assign({}, status), inv: Object.assign({}, inv),
     noteRead: noteRead.slice(), deaths, playTime: Math.round(playTime), quackers: !!quackers, documented: documented(), total: TOTAL,
-    lastUsed: RUN.last, rolls: RUN.rolls | 0, drops: RUN.drops.map((d) => ({ x: +d.x.toFixed(2), z: +d.z.toFixed(2), c: d.c })),
+    ep: SAVE_EP, lastUsed: RUN.last, rolls: RUN.rolls | 0, drops: RUN.drops.map((d) => ({ x: +d.x.toFixed(2), z: +d.z.toFixed(2), c: d.c })),
     P: alive ? { x: +P.x.toFixed(2), z: +P.z.toFixed(2), yaw: +P.yaw.toFixed(3), pitch: 0, hp: Math.max(1, Math.round(P.hp)), bat: Math.round(P.bat) } : null,
   };
 }
@@ -14403,7 +14567,7 @@ function renderAccount() {
   const pt = Math.round(run ? run.playTime || 0 : 0);
   if (run) cb.textContent = `Continue · Level ${run.level} · ${Math.floor(pt / 60)}:${String(pt % 60).padStart(2, '0')} · ${run.documented || 0}/${run.total || (run.level ? 13 : 8)} documented`;
   el('startBtn').classList.toggle('ghost', !!run); el('startBtn').classList.toggle('btn', !run);
-  el('startBtn').textContent = run ? `New run` : `Enter Level ${LVN}`; uiTitle();
+  el('startBtn').textContent = run ? `New run` : `Enter Level 0`; uiTitle();
   for (let i = 1; i < 4; i++) { const b = el('lvl' + i); if (!b) continue; b.classList.toggle('locked', !lvOpen(i)); b.setAttribute('aria-disabled', String(!lvOpen(i))); b.title = lvOpen(i) ? '' : `Escape Level ${i - 1} to open`; }
   el('lvl0Best').textContent = bestText(0);
   el('lvl1Best').textContent = bestText(1); el('lvl2Best').textContent = bestText(2); el('lvl3Best').textContent = bestText(3);
@@ -14420,13 +14584,13 @@ function renderSaveStatus() {
 ACCT.listeners.add(renderAccount);
 function tryStart() {
   if (state !== 'title') return;
-  if (!HAUNT && !saved.mp && !saved.resumed && !lvOpen(LEVEL)) { el('startBtn').innerHTML = `LOCKED<small>Escape Level ${LEVEL - 1} first</small>`; sfx.click(); return; }
   const run = ACCT.run && ACCT.run.active ? ACCT.run : null;
   if (run && !saved.resumed && performance.now() - startArm > 4000) {
     startArm = performance.now(); el('startBtn').textContent = 'Click again: this replaces your saved run';
     setTimeout(() => { if (alive && state === 'title') renderAccount(); }, 4000);
     return;
   }
+  if (!HAUNT && !saved.mp && !saved.resumed && LEVEL !== 0) { switchLevel(0, true); return; }
   startGame();
 }
 
