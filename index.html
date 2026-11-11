@@ -1044,6 +1044,46 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
 .pmark.tmark.hid{opacity:.6}
 .pmark.tmark.off{margin-top:-14px}
 .pmark.tmark.down span{color:#ffb3a8;border-bottom-color:#c0392b}.pmark.tmark.down i{border-top-color:#c0392b}
+/* v41: gift codes and the admin panel */
+#title .tab[hidden]{display:none}
+.gift-redeem{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 18px;padding:12px 16px;border:1px dashed rgba(255,122,198,.55);border-radius:6px;background:rgba(255,122,198,.06)}
+.gift-redeem label{font-family:var(--f-osd);font-size:20px;letter-spacing:.04em;color:#ffd0ea}
+.gift-row{display:flex;gap:8px}
+#giftCode{width:150px;font-family:var(--f-mono);font-size:18px;letter-spacing:.12em;text-transform:uppercase;padding:8px 10px;background:#0f0d09;color:#f3eedf;border:1px solid #5a5040;border-radius:4px}
+.gift-redeem .btn{font-size:20px;min-height:40px;padding:6px 16px}
+#giftMsg{font-size:15px;color:#d8d1bc}#giftMsg.good{color:#9fffb0}#giftMsg.bad{color:#ffb3a8}
+.adm-intro{margin:0 0 14px;color:#d8d1bc}
+.adm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:16px;align-items:start}
+.adm-sec{padding:14px 16px;border:1px solid rgba(243,238,223,.16);border-radius:6px;background:rgba(10,9,6,.6)}
+.adm-sec h3{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-family:var(--f-osd);font-size:24px;letter-spacing:.03em;color:#f3eedf}
+.adm-sec h3 i{font-style:normal;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#e8c75a;color:#1c1608;font-size:16px;flex:none}
+.adm-sec h4{margin:14px 0 8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#bdb49c}
+.adm-pick{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.adm-prev{flex:none}
+.adm-form{flex:1 1 200px;display:grid;gap:10px}
+.adm-form label,.adm-row label{display:grid;gap:4px;font-size:14px;color:#d8d1bc}
+.adm-form select,.adm-form input,.adm-row select{font:inherit;font-size:16px;padding:8px 10px;background:#0f0d09;color:#f3eedf;border:1px solid #5a5040;border-radius:4px;min-height:40px;box-sizing:border-box;width:100%}
+.adm-row{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin:10px 0}
+.adm-row label{min-width:140px}
+.adm-row .btn,.adm-people .btn{font-size:20px;min-height:40px;padding:6px 16px}
+.adm-people,.adm-codes,.adm-log{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.adm-people li,.adm-codes li{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:8px 10px;background:rgba(243,238,223,.05);border-radius:4px}
+.adm-who{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;min-width:0}
+.adm-who b{font-size:16px;color:#f3eedf;overflow:hidden;text-overflow:ellipsis}
+.adm-who em{font-style:normal;font-size:12px;padding:1px 6px;border-radius:3px;background:#e8c75a;color:#1c1608}
+.adm-who small,.adm-codes small{display:block;width:100%;font-size:13px;color:#a9a08a}
+.adm-codes code{font-family:var(--f-mono);font-size:16px;letter-spacing:.08em;color:#ffd0ea;flex:none}
+.adm-codes span{flex:1;min-width:0;font-size:15px;color:#f3eedf}
+.adm-codes li.adm-dead{opacity:.5}
+.adm-made{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0;padding:10px 12px;border:1px solid #ff7ac6;border-radius:6px;background:rgba(255,122,198,.08)}
+.adm-made span{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#ffd0ea}
+.adm-made input{font-family:var(--f-mono);font-size:22px;letter-spacing:.14em;width:10ch;padding:6px 8px;background:#0f0d09;color:#fff;border:1px solid #5a5040;border-radius:4px}
+.adm-note{margin:0 0 8px;font-size:14px;line-height:1.4;color:#d8d1bc}
+.adm-dim{margin:8px 0 0;font-size:13px;line-height:1.4;color:#958c76}
+.adm-msg{min-height:1.3em;margin:8px 0 0;font-size:15px;color:#9fffb0}
+.adm-log li{font-size:14px;color:#d8d1bc}.adm-log time{color:#958c76;margin-right:6px;font-family:var(--f-mono);font-size:12px}
+.adm-made input{width:13.5ch}
+.adm-opt{font-style:normal;color:#958c76}
 </style>
 
 <canvas id="c" tabindex="-1" aria-label="Level 0, first-person view"></canvas>
@@ -1144,6 +1184,7 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
     <button class="tab" data-tab="ups" role="tab" aria-selected="false">Cards</button>
     <button class="tab" data-tab="news" role="tab" aria-selected="false">Updates <i class="tab-new">NEW</i></button>
     <button class="tab" data-tab="acct" role="tab" aria-selected="false">Profile</button>
+    <button class="tab" data-tab="admin" role="tab" aria-selected="false" hidden>Admin</button>
   </nav>
   <div class="pane" id="pane-play" role="tabpanel">
     <aside class="pp-friends" id="pane-mp" aria-label="Play together"><h2 class="pp-h">Play together</h2><div class="mode-bar" role="group" aria-label="Multiplayer mode"><button class="mode on" type="button" data-mode="story" aria-pressed="true"><b>Story Mode</b><i>Play the levels together</i></button><button class="mode" type="button" data-mode="vs" aria-pressed="false"><b>VS Mode</b><i>One of you is the entity. First to 3 wins.</i></button></div><div id="mpBox"></div><div id="hauntBox" hidden></div></aside>
@@ -1174,9 +1215,16 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
   </div>
   
   <div class="pane" id="pane-museum" role="tabpanel" hidden><h2 class="pane-h">Journal</h2><div class="subtabs" role="group" aria-label="Journal sections"><button type="button" data-sub="ents">Entities</button><button type="button" data-sub="museum">Scare museum</button></div><p class="panep">Every jumpscare you have met, on request, with the sound on. Meet an entity to unlock its exhibit.</p><div id="museumBox" class="bestiary"></div></div>
-  <div class="pane" id="pane-ups" role="tabpanel" hidden><h2 class="pane-h">Cards</h2><div id="upsBox"></div></div>
+  <div class="pane" id="pane-ups" role="tabpanel" hidden><h2 class="pane-h">Cards</h2>
+    <div class="gift-redeem"><label for="giftCode">Got a gift code?</label><div class="gift-row"><input id="giftCode" maxlength="9" placeholder="ABCD-2345" spellcheck="false" autocomplete="off" autocapitalize="characters"><button class="btn" id="giftGo" type="button">Redeem</button></div><span id="giftMsg" role="status"></span></div>
+    <div id="upsBox"></div></div>
+  <div class="pane" id="pane-admin" role="tabpanel" hidden><h2 class="pane-h">Admin</h2><p class="adm-intro">Give people cards. Only you and the game’s editors can see this tab.</p><div id="adminBox"></div></div>
   <div class="pane" id="pane-news" role="tabpanel" hidden><h2 class="pane-h">Updates</h2>
-    <article class="news"><h3>v40 · Teammate markers fixed <span>Latest</span></h3><ul>
+    <article class="news"><h3>v41 · Gift codes <span>Latest</span></h3><ul>
+      <li><b>Gift codes.</b> Got a code from the game’s owner? Type it under <b>Cards</b> on the main menu to get the card it holds. Each code works once for each player.</li>
+      <li>The owner can also hand out cards live to people who are playing right now.</li>
+    </ul></article>
+    <article class="news"><h3>v40 · Teammate markers fixed</h3><ul>
       <li><b>Teammates' names</b> are now flat markers on your screen: always the same size, never cut off by walls or ceilings, a little dimmer when a wall is between you, and pinned to the edge of the screen with an arrow when they are off to the side or behind you. They also say when a teammate is down or hiding.</li>
       <li><b>Teammates move smoothly.</b> They used to lurch and stutter when their updates arrived unevenly, and slide through walls after a respawn. Now they glide between the places we last heard they were, and jump straight to a new spot after a respawn or a door.</li>
       <li><b>Pings</b> and other markers more than 60 m away no longer flip to the wrong side of the screen.</li>
@@ -1677,10 +1725,11 @@ const LOCAL_RUN = 'bfn-run';
 const readLocalRun = () => { try { return JSON.parse(localStorage.getItem(LOCAL_RUN) || 'null'); } catch (e) { return null; } };
 const writeLocalRun = (r) => { try { if (r) localStorage.setItem(LOCAL_RUN, JSON.stringify(r)); else localStorage.removeItem(LOCAL_RUN); } catch (e) {} };
 const acctChanged = () => ACCT.listeners.forEach((f) => { try { f(); } catch (e) {} });
-const progressDoc = () => JSON.parse(JSON.stringify({ ep: SAVE_EP, level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {}, cards: progress.cards || {}, maxLv: progress.maxLv | 0, equip: progress.equip || [], abil: progress.abil || [], lv: progress.lv || {}, rolls: progress.rolls | 0, daily: progress.daily || null, loads: progress.loads || [], ld: progress.ld | 0, jump: !!progress.jump, sprint: !!progress.sprint, dash: !!progress.dash, slide: !!progress.slide, swim: !!progress.swim, abGot: progress.abGot || {}, lucky: progress.lucky | 0 }));
+const progressDoc = () => JSON.parse(JSON.stringify({ ep: SAVE_EP, level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {}, cards: progress.cards || {}, maxLv: progress.maxLv | 0, equip: progress.equip || [], abil: progress.abil || [], lv: progress.lv || {}, rolls: progress.rolls | 0, gu: Array.isArray(progress.gu) ? progress.gu.slice(-200) : [], daily: progress.daily || null, loads: progress.loads || [], ld: progress.ld | 0, jump: !!progress.jump, sprint: !!progress.sprint, dash: !!progress.dash, slide: !!progress.slide, swim: !!progress.swim, abGot: progress.abGot || {}, lucky: progress.lucky | 0 }));
 const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej({ code: 'timeout' }), ms))]);
 function mergeProgress(p) {
   if (!p || p.ep !== SAVE_EP) return;
+  if (Array.isArray(p.gu)) { const s = new Set(Array.isArray(progress.gu) ? progress.gu : []); for (const c of p.gu) if (typeof c === 'string' && /^[A-Z0-9]{8}$/.test(c)) s.add(c); progress.gu = [...s].slice(-200); }
   if (p.level1) progress.level1 = true;
   if (typeof p.cash === 'number' && p.cash > (progress.cash | 0)) progress.cash = p.cash;
   if (p.jump) progress.jump = true;
@@ -1794,10 +1843,17 @@ const cleanText = (s, n) => String(s == null ? '' : s).replace(/[\u0000-\u001f\u
 const safeColor = (c) => (typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c) ? c : '#e8c75a');
 const escHtml = (t) => String(t).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 const mpName = () => cleanText(MP.nick || ACCT.player || 'Wanderer', 16) || 'Wanderer';
+const GIFT = { fn: null, q: [], seen: new Set(), admin: false, onAdmin: null };
+function giftIn(m) { if (GIFT.fn) GIFT.fn(m); else if (GIFT.q.length < 20) GIFT.q.push(m); }
+(async () => {
+  try { const u = window.claude && window.claude.use ? await window.claude.use('user') : null; GIFT.admin = !!(u && (await u.canEdit())); } catch (e) { GIFT.admin = false; }
+  if (GIFT.onAdmin) GIFT.onAdmin();
+})();
 (async () => {
   try { if (window.claude && window.claude.use) MP.room = await window.claude.use('room'); } catch (e) { MP.room = null; }
   MP.resolved = true;
   if (MP.room) MP.room.onPeers(() => mpChanged(), () => { MP.room = null; mpChanged(); });
+  if (MP.room) { MP.room.on('gift', giftIn); MP.room.presence({ n: mpName() }).catch(() => {}); }
   mpChanged();
 })();
 // Open games, from what every player in a game advertises in the lobby.
@@ -2174,6 +2230,7 @@ const okNum = (v, a, b, d = 0) => (typeof v === 'number' && isFinite(v) ? clamp(
 // a code can come from anywhere, so only the fields and shapes this game writes get through
 function cleanProgress(p) {
   const out = { level1: true, seen: {}, runs: [], lastRun: 0, cash: 0, ups: {}, cards: {}, equip: [], abil: [], lv: {}, loads: [], ld: 0, rolls: 0, daily: null, jump: false, lucky: 0 };
+  if (p && typeof p === 'object' && Array.isArray(p.gu)) out.gu = p.gu.filter((c) => typeof c === 'string' && /^[A-Z0-9]{8}$/.test(c)).slice(-200);
   if (p && typeof p === 'object') { out.rolls = okNum(p.rolls, 0, 3) | 0; if (p.daily && typeof p.daily === 'object' && typeof p.daily.d === 'string' && /^\d{4}-\d\d-\d\d$/.test(p.daily.d) && Array.isArray(p.daily.b)) out.daily = { d: p.daily.d, b: p.daily.b.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 3) }; }
   if (p && typeof p === 'object') { out.ep = p.ep === SAVE_EP ? SAVE_EP : 0; out.maxLv = okNum(p.maxLv, 0, 3) | 0; out.jump = !!p.jump; out.lucky = okNum(p.lucky, 0, 1e6) | 0; for (const k of ['sprint', 'dash', 'slide', 'swim']) out[k] = !!p[k]; out.abGot = {}; if (p.abGot && typeof p.abGot === 'object') for (const k of Object.keys(p.abGot)) if (okKey(k)) out.abGot[k] = 1; }
   if (!p || typeof p !== 'object') return out;
@@ -7823,7 +7880,7 @@ function rvNext() {
   const it = RV.q.shift(); if (!it) { RV.busy = false; box.hidden = true; box.className = ''; document.body.classList.remove('rv-shake'); return; }
   RV.busy = true;
   const { c, res, opt } = it, r = c.r, T = RV_TIER[r], calm = settings.calm || reduceMotion;
-  const head = opt.lucky ? 'Lucky Roll' : opt.bought ? 'From the card shop' : opt.traded ? 'From a trade' : res && !res.first ? `Another one · ×${cardCount(c.id)}` : res && res.equipped ? 'New card · equipped' : 'New card · in your inventory';
+  const head = opt.gift ? 'A gift for you' : opt.lucky ? 'Lucky Roll' : opt.bought ? 'From the card shop' : opt.traded ? 'From a trade' : res && !res.first ? `Another one · ×${cardCount(c.id)}` : res && res.equipped ? 'New card · equipped' : 'New card · in your inventory';
   box.innerHTML = `<div class="rv-bg"></div><div class="rv-rays"></div><div class="rv-flash"></div><div class="rv-stage"><div class="rv-card"><div class="rv-back"><b>?</b></div><div class="rv-front">${cardHTML(c)}</div></div></div><div class="rv-label"></div><div class="rv-sub">${escHtml(head)}</div><div class="rv-bits"></div>`;
   box.hidden = false; box.className = 'rv-on rv-build rt-' + T.steps[0];
   try { audioInit(); if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); } catch (e) {}
@@ -12319,9 +12376,11 @@ function showTab(name) {
   const grp = { museum: 'ents', keys: 'acct', runs: 'acct' }[name] || name;
   document.querySelectorAll('#title .tab').forEach((b) => { const on = b.dataset.tab === grp; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
   document.querySelectorAll('#title [data-sub]').forEach((b) => { const on = b.dataset.sub === name; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-  ['play', 'ents', 'runs', 'museum', 'keys', 'ups', 'acct', 'news'].forEach((n) => { el('pane-' + n).hidden = n !== name; });
-  if (name === 'news') { try { localStorage.setItem('bfn-news', '40'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
+  ['play', 'ents', 'runs', 'museum', 'keys', 'ups', 'acct', 'news', 'admin'].forEach((n) => { el('pane-' + n).hidden = n !== name; });
+  if (name === 'news') { try { localStorage.setItem('bfn-news', '41'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
   if (name === 'acct') renderProfiles();
+  if (name === 'admin') adminRender();
+  if (name === 'ups') { const gm = el('giftMsg'); if (gm) gm.textContent = ''; }
   el('title').classList.toggle('sub', name !== 'play');
   if (name === 'keys') { el('paneSet').appendChild(el('setRows')); uiSyncSet(); }
   if (name === 'ups') uiShop('upsBox');
@@ -12341,7 +12400,7 @@ function setupTitle() {
   el('lvl0Best').textContent = bestText(0);
   el('lvl1Best').textContent = bestText(1); el('lvl2Best').textContent = bestText(2); el('lvl3Best').textContent = bestText(3);
   showTab(PROF.reopen ? 'acct' : 'play'); PROF.reopen = false;
-  try { if (localStorage.getItem('bfn-news') === '40') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
+  try { if (localStorage.getItem('bfn-news') === '41') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
   renderAccount();
   uiTitle(); uiNudge();
 }
@@ -13866,6 +13925,163 @@ function netPos(o, k) {
   if (Math.hypot(c.x - a.x, c.z - a.z) > 8) f = f < 1 ? 0 : 1;
   o.x = a.x + (c.x - a.x) * f; o.z = a.z + (c.z - a.z) * f; o.yaw = angLerp(a.yaw, c.yaw, f); o.iy = a.y + (c.y - a.y) * f;
 }
+
+/* ---------- v41: the admin panel. The game's owner and editors give people cards, live or with a gift code ----------
+   Live gifts travel on the room's 'gift' topic, which only the owner and editors can send on (the platform refuses
+   everyone else), so nobody can fake one. Gift codes live in the shared database under 'gifts', which only the owner
+   and editors can write; anyone signed in can read one to redeem it, once per player. */
+const ADM = { card: '', n: 1, note: '', days: 7, codes: null, codesMsg: '', made: '', msg: '', log: [] };
+const RLAB = { common: 'Common', rare: 'Rare', legendary: 'Legendary', godly: 'Godly', entity: 'Entity' };
+const GIFT_CODE = /^[A-Z0-9]{8}$/;
+const giftFmt = (c) => c.slice(0, 4) + '-' + c.slice(4);
+function giftGrant(cardId, n, note) {
+  const c = CARD_BY[cardId]; if (!c) return false;
+  n = Math.max(1, Math.min(10, n | 0));
+  let res = null; for (let i = 0; i < n; i++) res = cardGive(c.id);
+  try { cardsHud(); } catch (e) {}
+  const nt = cleanText(note || '', 60);
+  toast(`A gift for you: ${n > 1 ? n + ' × ' : ''}${c.name}${nt ? ` · “${nt}”` : ''}`, 'good', 7);
+  if (state === 'title') cardReveal(c, res, { gift: true }); else cardPop(c, res);
+  const up = el('pane-ups'); if (up && !up.hidden) uiShop('upsBox');
+  return true;
+}
+// a gift on the room: for everyone online, or for this one open game
+function giftHear(m) {
+  const d = m && m.data; if (!d || typeof d !== 'object' || Array.isArray(d)) return;
+  if (d.to === '*') { if (m.sameTab) return; }
+  else { const me = MP.room && MP.room.peers().find((p) => p.sameTab); if (!me || d.to !== me.peer) return; }
+  const id = typeof d.id === 'string' ? d.id.slice(0, 32) : ''; if (!id || GIFT.seen.has(id)) return; GIFT.seen.add(id);
+  giftGrant(String(d.card || ''), d.n, typeof d.note === 'string' ? d.note : '');
+}
+async function giftDb() { if (ACCT.db) return ACCT.db; try { return window.claude && window.claude.use ? await window.claude.use('db') : null; } catch (e) { return null; } }
+async function giftRedeem(raw) {
+  const code = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!GIFT_CODE.test(code)) return 'A gift code is 8 letters and numbers, like ABCD-2345.';
+  const used = Array.isArray(progress.gu) ? progress.gu : (progress.gu = []);
+  if (used.includes(code)) return 'You have already used that code.';
+  const db = await giftDb(); if (!db) return 'Gift codes work when the game is open on claude.ai and you are signed in.';
+  let snap; try { snap = await withTimeout(db.doc('gifts/' + code).get(), 10000); } catch (e) { return 'Could not check that code just now. Try again in a moment.'; }
+  if (!snap.exists) return 'That code does not exist, or it was deleted.';
+  const g = snap.data() || {};
+  if (g.exp && Date.now() > g.exp) return 'That code has run out.';
+  if (!CARD_BY[g.card]) return 'That code is for a card this version of the game does not have.';
+  used.push(code); if (used.length > 200) used.splice(0, used.length - 200); saveProgress(); requestSave();
+  giftGrant(g.card, g.n, g.note);
+  return '';
+}
+
+/* ----- the panel ----- */
+function admLog(t) { ADM.log.unshift({ at: Date.now(), t }); ADM.log.length = Math.min(ADM.log.length, 12); const b = el('admLog'); if (b) b.innerHTML = admLogHTML(); }
+function admLogHTML() { return ADM.log.length ? ADM.log.map((x) => `<li><time>${new Date(x.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</time> ${escHtml(x.t)}</li>`).join('') : '<li class="adm-dim">Nothing yet.</li>'; }
+function admWhat() { const c = CARD_BY[ADM.card]; return `${ADM.n > 1 ? ADM.n + ' × ' : ''}${c ? c.name : '?'}`; }
+function adminRender() {
+  const box = el('adminBox'); if (!box) return;
+  if (!GIFT.admin) { box.innerHTML = '<p class="adm-note">Only the game’s owner and editors can give cards.</p>'; return; }
+  if (!CARD_BY[ADM.card]) ADM.card = CARDS[0].id;
+  const opts = Object.keys(RLAB).map((r) => [r, CARDS.filter((c) => c.r === r)]).filter((g) => g[1].length)
+    .map(([r, l]) => `<optgroup label="${RLAB[r]}">${l.map((c) => `<option value="${escHtml(c.id)}"${c.id === ADM.card ? ' selected' : ''}>${escHtml(c.name)}${isAb(c) ? ' · ability' : ''}</option>`).join('')}</optgroup>`).join('');
+  const days = [[1, '1 day'], [7, '7 days'], [30, '30 days'], [0, 'Forever']].map(([d, t]) => `<option value="${d}"${d === ADM.days ? ' selected' : ''}>${t}</option>`).join('');
+  box.innerHTML = `<div class="adm-grid">
+    <section class="adm-sec adm-cardsec"><h3><i>1</i>Pick a card</h3>
+      <div class="adm-pick"><div class="adm-prev" id="admPrev">${cardHTML(CARD_BY[ADM.card])}</div>
+      <div class="adm-form">
+        <label>Card<select id="admCard">${opts}</select></label>
+        <label>How many<input id="admN" type="number" min="1" max="10" step="1" value="${ADM.n}"></label>
+        <label><span>Note with it <i class="adm-opt">(optional)</i></span><input id="admNote" maxlength="60" value="${escHtml(ADM.note)}" placeholder="Nice run!"></label>
+      </div></div>
+    </section>
+    <section class="adm-sec"><h3><i>2</i>Give it to someone online</h3>
+      <div id="admOnline"></div>
+      <p class="adm-msg" id="admMsg" role="status">${escHtml(ADM.msg)}</p>
+    </section>
+    <section class="adm-sec"><h3><i>2</i>Or make a gift code</h3>
+      <p class="adm-note">Works for anyone, any time, even if they are not online. They type it under <b>Cards</b> on the main menu. Each player can use a code once.</p>
+      <div class="adm-row"><label>Code lasts<select id="admDays">${days}</select></label><button class="btn" type="button" data-adm="code">Make a code</button></div>
+      <div id="admMade">${ADM.made ? admMadeHTML() : ''}</div>
+      <h4>Your gift codes</h4><div id="admCodes"><p class="adm-dim">Loading…</p></div>
+    </section>
+    <section class="adm-sec"><h4>Given this session</h4><ul class="adm-log" id="admLog">${admLogHTML()}</ul></section>
+  </div>`;
+  adminOnline(); adminCodes();
+}
+function admMadeHTML() { return `<div class="adm-made"><span>New code</span><input readonly value="${giftFmt(ADM.made)}" id="admMadeIn" aria-label="Gift code"><button class="ghost" type="button" data-adm="copy">Copy</button></div>`; }
+function adminOnline() {
+  const box = el('admOnline'); if (!box) return;
+  if (!MP.room) { box.innerHTML = '<p class="adm-note">Live gifts need the multiplayer room, which is not connected here. Make a gift code instead.</p>'; return; }
+  const ps = MP.room.peers().filter((p) => p.kind === 'viewer');
+  const rows = ps.map((p) => {
+    const pr = p.presence || {}, g = pr.g && typeof pr.g === 'object' ? pr.g : null;
+    const name = cleanText(pr.n || (g && g.n) || '', 16) || 'Someone', where = g ? `in a game · Level ${Math.max(0, Math.min(3, g.lv | 0))}` : 'on the menu';
+    return `<li><span class="adm-who"><b>${escHtml(name)}</b>${p.sameTab ? ' <em>you</em>' : ''}<small>${where}</small></span><button class="btn" type="button" data-adm="give" data-peer="${escHtml(p.peer)}" data-name="${escHtml(name)}">Give</button></li>`;
+  }).join('');
+  const others = ps.filter((p) => !p.sameTab).length;
+  const html = `<ul class="adm-people">${rows}</ul><div class="adm-row"><button class="ghost" type="button" data-adm="all"${others ? '' : ' disabled'}>Give to everyone online (${others})</button></div><p class="adm-dim">Only people playing right now show up here, and people who opened the game from a public link can’t join the live room. Give them a code instead.</p>`;
+  if (box._h !== html) { box._h = html; box.innerHTML = html; }
+}
+async function adminCodes() {
+  const box = el('admCodes'); if (!box) return;
+  const db = await giftDb();
+  if (!db) { box.innerHTML = '<p class="adm-note">Gift codes work when the game is open on claude.ai.</p>'; return; }
+  let snap; try { snap = await withTimeout(db.collection('gifts').orderBy('at', 'desc').limit(50).get(), 10000); } catch (e) { box.innerHTML = '<p class="adm-note">Could not load your codes just now.</p>'; return; }
+  const now = Date.now(), rows = snap.docs.map((d) => {
+    const g = d.data() || {}, c = CARD_BY[g.card], dead = g.exp && now > g.exp;
+    const left = !g.exp ? 'never runs out' : dead ? 'ran out' : `runs out in ${Math.max(1, Math.ceil((g.exp - now) / 864e5))} day${Math.ceil((g.exp - now) / 864e5) > 1 ? 's' : ''}`;
+    return `<li class="${dead ? 'adm-dead' : ''}"><code>${escHtml(giftFmt(d.id))}</code><span>${(g.n | 0) > 1 ? (g.n | 0) + ' × ' : ''}${escHtml(c ? c.name : String(g.card || '?'))}<small>${left}</small></span><button class="ghost" type="button" data-adm="del" data-code="${escHtml(d.id)}">Delete</button></li>`;
+  }).join('');
+  if (el('admCodes')) el('admCodes').innerHTML = rows ? `<ul class="adm-codes">${rows}</ul>` : '<p class="adm-dim">No codes yet.</p>';
+}
+function admSay(t) { ADM.msg = t; const m = el('admMsg'); if (m) m.textContent = t; }
+async function adminGive(to, name) {
+  if (!MP.room) return admSay('The live room is not connected.');
+  const id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36), what = admWhat();
+  try { await MP.room.emit('gift', { id, to, card: ADM.card, n: ADM.n, note: cleanText(ADM.note, 60) }); }
+  catch (e) { return admSay(e && e.code === 'not_permitted' ? 'Only the game’s owner and editors can send gifts.' : 'Could not send that just now. Try again.'); }
+  sfx.coin();
+  const who = to === '*' ? 'everyone online' : name;
+  admSay(`Sent ${what} to ${who}.`); admLog(`${what} → ${who}`);
+}
+async function adminMakeCode() {
+  const db = await giftDb(); if (!db) return admSay('Gift codes work when the game is open on claude.ai.');
+  const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', r = crypto.getRandomValues(new Uint32Array(8)); let code = ''; for (const v of r) code += A[v % A.length];
+  try { await db.doc('gifts/' + code).set({ card: ADM.card, n: ADM.n, note: cleanText(ADM.note, 60), exp: ADM.days ? Date.now() + ADM.days * 864e5 : 0, at: Date.now() }); }
+  catch (e) { return admSay(e && e.code === 'quota_exceeded' ? 'The game’s storage is full. Delete some old codes first.' : 'Could not save the code. Only the game’s owner and editors can make codes.'); }
+  ADM.made = code; sfx.coin();
+  const m = el('admMade'); if (m) m.innerHTML = admMadeHTML();
+  admLog(`Code ${giftFmt(code)} · ${admWhat()}`); admSay(`Made a code for ${admWhat()}. Send it to whoever you like.`);
+  adminCodes();
+}
+function adminInit() {
+  const t = document.querySelector('#title .tab[data-tab="admin"]'); if (t) t.hidden = !GIFT.admin;
+  if (!GIFT.admin && el('pane-admin') && !el('pane-admin').hidden) showTab('play');
+}
+GIFT.onAdmin = adminInit; adminInit();
+GIFT.fn = giftHear; while (GIFT.q.length) giftHear(GIFT.q.shift());
+if (MP.room && !HAUNT) MP.room.presence({ n: mpName() }).catch(() => {});
+listen(el('adminBox'), 'change', (e) => {
+  const t = e.target;
+  if (t.id === 'admCard' && CARD_BY[t.value]) { ADM.card = t.value; el('admPrev').innerHTML = cardHTML(CARD_BY[ADM.card]); }
+  if (t.id === 'admN') { ADM.n = Math.max(1, Math.min(10, Math.round(+t.value) || 1)); t.value = ADM.n; }
+  if (t.id === 'admDays') ADM.days = +t.value || 0;
+});
+listen(el('adminBox'), 'input', (e) => { if (e.target.id === 'admNote') ADM.note = e.target.value.slice(0, 60); if (e.target.id === 'admN') ADM.n = Math.max(1, Math.min(10, Math.round(+e.target.value) || 1)); });
+listen(el('adminBox'), 'click', (e) => {
+  const b = e.target.closest('[data-adm]'); if (!b || b.disabled) return;
+  const k = b.dataset.adm;
+  if (k === 'give') adminGive(b.dataset.peer, b.dataset.name || 'them');
+  else if (k === 'all') adminGive('*', '');
+  else if (k === 'code') { b.disabled = true; adminMakeCode().finally(() => { b.disabled = false; }); }
+  else if (k === 'copy') { const i = el('admMadeIn'); if (i) { i.select(); try { navigator.clipboard.writeText(i.value).then(() => admSay('Copied.'), () => admSay('Select the code and copy it.')); } catch (er) { admSay('Select the code and copy it.'); } } }
+  else if (k === 'del') { const code = b.dataset.code; if (!GIFT_CODE.test(code)) return; b.disabled = true; giftDb().then((db) => db && db.doc('gifts/' + code).delete()).then(() => { admSay(`Deleted ${giftFmt(code)}.`); adminCodes(); }, () => { b.disabled = false; admSay('Could not delete that code just now.'); }); }
+});
+const admTimer = setInterval(() => { if (!alive) { clearInterval(admTimer); return; } const p = el('pane-admin'); if (p && !p.hidden) adminOnline(); }, 1500);
+// players: redeem a gift code under Cards
+function giftRedeemUI() {
+  const i = el('giftCode'), m = el('giftMsg'), b = el('giftGo'); if (!i || !b || b.disabled) return;
+  b.disabled = true; m.textContent = 'Checking…'; m.className = '';
+  giftRedeem(i.value).then((err) => { b.disabled = false; m.textContent = err || 'Enjoy your gift!'; m.className = err ? 'bad' : 'good'; if (!err) i.value = ''; });
+}
+listen(el('giftGo'), 'click', giftRedeemUI);
+listen(el('giftCode'), 'keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); giftRedeemUI(); } e.stopPropagation(); });
 
 function mpSend(extra) {
   if (!MP.game) return;
