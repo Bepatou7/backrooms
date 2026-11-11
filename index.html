@@ -1084,6 +1084,12 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
 .adm-log li{font-size:14px;color:#d8d1bc}.adm-log time{color:#958c76;margin-right:6px;font-family:var(--f-mono);font-size:12px}
 .adm-made input{width:13.5ch}
 .adm-opt{font-style:normal;color:#958c76}
+/* v42: the player id, for gifts on the GitHub copy */
+.ac-pid{margin:0 0 16px;padding:12px 14px;border:1px dashed rgba(255,122,198,.55);border-radius:6px;background:rgba(255,122,198,.06)}
+.ac-pid-in{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.ac-pid-l{font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase}
+#acPid{font-family:var(--f-mono);font-size:18px;letter-spacing:.06em;padding:4px 8px;border-radius:4px;background:rgba(0,0,0,.25);user-select:all}
+.ac-pid .ac-fine{margin:6px 0 0}
 </style>
 
 <canvas id="c" tabindex="-1" aria-label="Level 0, first-person view"></canvas>
@@ -1220,7 +1226,11 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
     <div id="upsBox"></div></div>
   <div class="pane" id="pane-admin" role="tabpanel" hidden><h2 class="pane-h">Admin</h2><p class="adm-intro">Give people cards. Only you and the game’s editors can see this tab.</p><div id="adminBox"></div></div>
   <div class="pane" id="pane-news" role="tabpanel" hidden><h2 class="pane-h">Updates</h2>
-    <article class="news"><h3>v41 · Gift codes <span>Latest</span></h3><ul>
+    <article class="news"><h3>v42 · Gifts everywhere <span>Latest</span></h3><ul>
+      <li>Gift codes now work on the copy of the game hosted on GitHub too, and the owner can send live gifts there. They arrive within about a minute.</li>
+      <li>On that copy, your <b>Player id</b> is under Profile → Account. The owner can use it to send a card to just you.</li>
+    </ul></article>
+    <article class="news"><h3>v41 · Gift codes</h3><ul>
       <li><b>Gift codes.</b> Got a code from the game’s owner? Type it under <b>Cards</b> on the main menu to get the card it holds. Each code works once for each player.</li>
       <li>The owner can also hand out cards live to people who are playing right now.</li>
     </ul></article>
@@ -1845,6 +1855,50 @@ const escHtml = (t) => String(t).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<
 const mpName = () => cleanText(MP.nick || ACCT.player || 'Wanderer', 16) || 'Wanderer';
 const GIFT = { fn: null, q: [], seen: new Set(), admin: false, onAdmin: null };
 function giftIn(m) { if (GIFT.fn) GIFT.fn(m); else if (GIFT.q.length < 20) GIFT.q.push(m); }
+// v42: on the copy of the game outside claude.ai (the GitHub one, or a saved file) there is no claude.ai database and the
+// multiplayer relays are public, so gift codes and live gifts go through the game's gift server instead
+const GIFT_API = 'https://backrooms-gifts.backrooms-gifts.workers.dev', GIFT_OWNER_URL = GIFT_API + '/owner';
+GIFT.pend = []; GIFT.grant = null; GIFT.live = { busy: false, last: 0, done: new Set() };
+// who this player is to the gift server: their account id, or failing that a random id kept in this browser
+function giftPlayer() {
+  const ok = (s) => typeof s === 'string' && /^[A-Za-z0-9_-]{6,40}$/.test(s);
+  if (typeof PROF !== 'undefined' && ok(PROF.cur)) return PROF.cur;
+  let id = ''; try { id = localStorage.getItem('bfn-gift-player') || ''; } catch (e) {}
+  if (!ok(id)) { id = 'g' + Math.random().toString(36).slice(2, 12); try { localStorage.setItem('bfn-gift-player', id); } catch (e) {} }
+  return id;
+}
+async function giftApi(path, body) {
+  const ctl = typeof AbortController === 'function' ? new AbortController() : null, tm = setTimeout(() => { if (ctl) ctl.abort(); }, 10000);
+  try {
+    const opt = { signal: ctl ? ctl.signal : undefined, cache: 'no-store' };
+    if (body) Object.assign(opt, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    const r = await fetch(GIFT_API + path, opt);
+    let d = null; try { d = await r.json(); } catch (e) {}
+    return { status: r.status, d: d && typeof d === 'object' && !Array.isArray(d) ? d : null };
+  } finally { clearTimeout(tm); }
+}
+function giftGive(card, n, note) { if (GIFT.grant) GIFT.grant(card, n, note); else if (GIFT.pend.length < 20) GIFT.pend.push([card, n, note]); }
+// live gifts: ask the server once when the game opens, then once a minute while it is open
+async function giftPoll() {
+  const L = GIFT.live; if (!window.BFN_STANDALONE || L.busy || typeof fetch !== 'function') return;
+  if (L.last && (Date.now() - L.last < 58000 || document.hidden)) return;
+  L.busy = true; L.last = Date.now();
+  try {
+    const player = giftPlayer(), r = await giftApi('/live?player=' + encodeURIComponent(player));
+    if (r.status !== 200 || !r.d || !r.d.ok || !Array.isArray(r.d.gifts)) return;
+    for (const g of r.d.gifts.slice(0, 10)) {
+      if (!g || typeof g.id !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(g.id) || L.done.has(g.id)) continue;
+      L.done.add(g.id);
+      let c; try { c = await giftApi('/live/claim', { id: g.id, player }); } catch (e) { L.done.delete(g.id); continue; }
+      if (c.status === 200 && c.d && c.d.ok) giftGive(String(c.d.card || ''), c.d.n, typeof c.d.note === 'string' ? c.d.note : '');
+      else if (!(c.status === 404 || c.status === 409 || c.status === 410)) L.done.delete(g.id); // try again next time
+    }
+  } catch (e) {} finally { L.busy = false; }
+}
+if (window.BFN_STANDALONE) {
+  setTimeout(giftPoll, 3000); setInterval(giftPoll, 15000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) giftPoll(); });
+}
 (async () => {
   try { const u = window.claude && window.claude.use ? await window.claude.use('user') : null; GIFT.admin = !!(u && (await u.canEdit())); } catch (e) { GIFT.admin = false; }
   if (GIFT.onAdmin) GIFT.onAdmin();
@@ -5982,7 +6036,7 @@ function renderProfiles(msg, bad) {
   const accounts = cloud ? '' : `<h3 class="ac-h">Accounts on this device</h3>${PROF.storage ? '' : '<p class="ac-warn">This browser is blocking saves, so your progress only lasts until you close this tab. Copy your save code before you go.</p>'}<div class="ac-list">${PROF.list.map(card).join('')}</div><form class="ac-form" id="acNew" autocomplete="off"><label for="acNewName">New account</label><div class="ac-row"><input id="acNewName" maxlength="16" spellcheck="false" placeholder="Name"><button class="btn" type="submit">Create</button></div></form><p class="ac-fine">No sign-in, no email and no password. Anyone using this browser can open these accounts.</p>`;
   const file = window.BFN_STANDALONE ? '<button class="ghost" type="button" data-ac="file">Save as a file</button>' : '';
   const open = window.BFN_STANDALONE ? '<label class="ghost ac-file">Open a save file<input id="acFile" type="file" accept=".txt,text/plain"></label>' : '';
-  box.innerHTML = (`${msg ? `<p class="${bad ? 'ac-warn' : 'ac-good'}" role="status">${escHtml(msg)}</p>` : ''}${accounts}
+  box.innerHTML = (`${msg ? `<p class="${bad ? 'ac-warn' : 'ac-good'}" role="status">${escHtml(msg)}</p>` : ''}${acPidHTML()}${accounts}
     <details class="ac-adv"${UI.acOpen ? ' open' : ''}><summary>Move this account to another device (optional)</summary>
     <p class="ac-fine">You don't need this to keep your progress: it saves by itself. Use a save code only to carry an account to another browser or device.</p>
     <h3 class="ac-h">Your save code</h3>
@@ -6030,6 +6084,7 @@ function acClick(e) {
   const b = e.target.closest('[data-ac]'); if (!b) return;
   const k = b.dataset.ac, id = b.dataset.id;
   if (k === 'copy') acCopy();
+  else if (k === 'pid') acPidCopy();
   else if (k === 'file') acFile();
   else if (k === 'check') { const p = el('acPaste'); acCheck(p ? p.value : ''); }
   else if (k === 'apply') {
@@ -12377,7 +12432,7 @@ function showTab(name) {
   document.querySelectorAll('#title .tab').forEach((b) => { const on = b.dataset.tab === grp; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
   document.querySelectorAll('#title [data-sub]').forEach((b) => { const on = b.dataset.sub === name; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   ['play', 'ents', 'runs', 'museum', 'keys', 'ups', 'acct', 'news', 'admin'].forEach((n) => { el('pane-' + n).hidden = n !== name; });
-  if (name === 'news') { try { localStorage.setItem('bfn-news', '41'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
+  if (name === 'news') { try { localStorage.setItem('bfn-news', '42'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
   if (name === 'acct') renderProfiles();
   if (name === 'admin') adminRender();
   if (name === 'ups') { const gm = el('giftMsg'); if (gm) gm.textContent = ''; }
@@ -12400,7 +12455,7 @@ function setupTitle() {
   el('lvl0Best').textContent = bestText(0);
   el('lvl1Best').textContent = bestText(1); el('lvl2Best').textContent = bestText(2); el('lvl3Best').textContent = bestText(3);
   showTab(PROF.reopen ? 'acct' : 'play'); PROF.reopen = false;
-  try { if (localStorage.getItem('bfn-news') === '41') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
+  try { if (localStorage.getItem('bfn-news') === '42') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
   renderAccount();
   uiTitle(); uiNudge();
 }
@@ -13947,6 +14002,7 @@ function giftGrant(cardId, n, note) {
 }
 // a gift on the room: for everyone online, or for this one open game
 function giftHear(m) {
+  if (window.BFN_STANDALONE) return;
   const d = m && m.data; if (!d || typeof d !== 'object' || Array.isArray(d)) return;
   if (d.to === '*') { if (m.sameTab) return; }
   else { const me = MP.room && MP.room.peers().find((p) => p.sameTab); if (!me || d.to !== me.peer) return; }
@@ -13959,6 +14015,7 @@ async function giftRedeem(raw) {
   if (!GIFT_CODE.test(code)) return 'A gift code is 8 letters and numbers, like ABCD-2345.';
   const used = Array.isArray(progress.gu) ? progress.gu : (progress.gu = []);
   if (used.includes(code)) return 'You have already used that code.';
+  if (window.BFN_STANDALONE) return giftRedeemServer(code, used);
   const db = await giftDb(); if (!db) return 'Gift codes work when the game is open on claude.ai and you are signed in.';
   let snap; try { snap = await withTimeout(db.doc('gifts/' + code).get(), 10000); } catch (e) { return 'Could not check that code just now. Try again in a moment.'; }
   if (!snap.exists) return 'That code does not exist, or it was deleted.';
@@ -13976,6 +14033,7 @@ function admLogHTML() { return ADM.log.length ? ADM.log.map((x) => `<li><time>${
 function admWhat() { const c = CARD_BY[ADM.card]; return `${ADM.n > 1 ? ADM.n + ' × ' : ''}${c ? c.name : '?'}`; }
 function adminRender() {
   const box = el('adminBox'); if (!box) return;
+  if (window.BFN_STANDALONE) { adminRenderOwner(box); return; }
   if (!GIFT.admin) { box.innerHTML = '<p class="adm-note">Only the game’s owner and editors can give cards.</p>'; return; }
   if (!CARD_BY[ADM.card]) ADM.card = CARDS[0].id;
   const opts = Object.keys(RLAB).map((r) => [r, CARDS.filter((c) => c.r === r)]).filter((g) => g[1].length)
@@ -14051,8 +14109,8 @@ async function adminMakeCode() {
   adminCodes();
 }
 function adminInit() {
-  const t = document.querySelector('#title .tab[data-tab="admin"]'); if (t) t.hidden = !GIFT.admin;
-  if (!GIFT.admin && el('pane-admin') && !el('pane-admin').hidden) showTab('play');
+  const t = document.querySelector('#title .tab[data-tab="admin"]'); if (t) t.hidden = !(GIFT.admin || ownerUI());
+  if (!(GIFT.admin || ownerUI()) && el('pane-admin') && !el('pane-admin').hidden) showTab('play');
 }
 GIFT.onAdmin = adminInit; adminInit();
 GIFT.fn = giftHear; while (GIFT.q.length) giftHear(GIFT.q.shift());
@@ -14082,6 +14140,56 @@ function giftRedeemUI() {
 }
 listen(el('giftGo'), 'click', giftRedeemUI);
 listen(el('giftCode'), 'keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); giftRedeemUI(); } e.stopPropagation(); });
+
+/* ---------- v42: gifts on the copy of the game outside claude.ai, through the gift server ---------- */
+GIFT.grant = giftGrant; while (GIFT.pend.length) { const g = GIFT.pend.shift(); giftGrant(g[0], g[1], g[2]); }
+async function giftRedeemServer(code, used) {
+  if (typeof fetch !== 'function') return 'Gift codes need an internet connection.';
+  let r; try { r = await giftApi('/redeem', { code, player: giftPlayer() }); } catch (e) { return 'Could not check that code just now. Try again in a moment.'; }
+  const d = r.d || {};
+  if (r.status === 200 && d.ok) {
+    if (!CARD_BY[d.card]) return 'That code is for a card this version of the game does not have.';
+    used.push(code); if (used.length > 200) used.splice(0, used.length - 200); saveProgress(); requestSave();
+    giftGrant(d.card, d.n, typeof d.note === 'string' ? d.note : '');
+    return '';
+  }
+  if (r.status === 409 && !used.includes(code)) { used.push(code); saveProgress(); }
+  return typeof d.message === 'string' && d.message.trim() ? cleanText(d.message, 160) : 'Could not check that code just now. Try again in a moment.';
+}
+// the owner opens this copy with #owner once, and the Admin tab stays in their browser from then on
+function ownerUI() {
+  if (!window.BFN_STANDALONE) return false;
+  try { if (/owner/.test(location.hash)) localStorage.setItem('bfn-owner-ui', '1'); return localStorage.getItem('bfn-owner-ui') === '1'; } catch (e) { return /owner/.test(location.hash); }
+}
+function adminRenderOwner(box) {
+  const intro = document.querySelector('#pane-admin .adm-intro'); if (intro) intro.textContent = 'Owner tools for this copy of the game.';
+  box.innerHTML = `<div class="adm-grid"><section class="adm-sec"><h3>Give people cards</h3>
+    <p class="adm-note">On this copy of the game, gift codes and live gifts are made on the owner page. Your owner key stays on that page, in your own browser. It is never part of the game.</p>
+    <div class="adm-row"><a class="btn" href="${GIFT_OWNER_URL}" target="_blank" rel="noopener">Open the owner page</a></div>
+    <p class="adm-dim">Players type gift codes under <b>Cards</b> on the main menu. To send a card to one person, ask for their Player id (Profile → Account) and paste it on the owner page. Live gifts reach players within about a minute.</p>
+    <div class="adm-row"><button class="ghost" type="button" data-adm="hide">Hide this tab</button></div></section></div>`;
+}
+listen(el('adminBox'), 'click', (e) => {
+  const b = e.target.closest('[data-adm="hide"]'); if (!b) return;
+  try { localStorage.removeItem('bfn-owner-ui'); } catch (er) {}
+  adminInit();
+});
+if (window.BFN_STANDALONE && /owner/.test(location.hash) && !HAUNT) {
+  ownerUI(); adminInit();
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  setTimeout(() => { if (alive && state === 'title') showTab('admin'); }, 300);
+}
+// Profile → Account: the id the owner needs to send this player a card
+function acPidHTML() {
+  if (!window.BFN_STANDALONE) return '';
+  return `<div class="ac-pid"><div class="ac-pid-in"><span class="ac-pid-l">Player id</span><code id="acPid">${escHtml(giftPlayer())}</code><button class="ghost" type="button" data-ac="pid">Copy</button></div><p class="ac-fine" id="acPidMsg">The game’s owner can use this to send you a card.</p></div>`;
+}
+function acPidCopy() {
+  const c = el('acPid'), m = el('acPidMsg'); if (!c) return;
+  const sel = () => { try { const r = document.createRange(); r.selectNodeContents(c); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {} };
+  const done = (ok) => { if (!ok) sel(); if (m) m.textContent = ok ? 'Copied.' : 'Your browser blocked copying. The id is selected, so copy it yourself.'; sfx.click(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c.textContent).then(() => done(true), () => done(false)); else done(false);
+}
 
 function mpSend(extra) {
   if (!MP.game) return;
