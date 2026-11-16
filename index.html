@@ -1090,6 +1090,9 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
 .ac-pid-l{font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase}
 #acPid{font-family:var(--f-mono);font-size:18px;letter-spacing:.06em;padding:4px 8px;border-radius:4px;background:rgba(0,0,0,.25);user-select:all}
 .ac-pid .ac-fine{margin:6px 0 0}
+/* v43: Level 3 is gone, so three level buttons */
+#lvl3{display:none!important}
+.levels{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}
 </style>
 
 <canvas id="c" tabindex="-1" aria-label="Level 0, first-person view"></canvas>
@@ -1206,7 +1209,7 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
       <button class="lvl" id="lvl0" type="button"><span class="lv-in"><span class="lv-tag">LEVEL 0</span><b>The Yellow Rooms</b><span class="lv-row"><span class="lv-bar"><em id="lvl0Bar"></em></span><span id="lvl0Count"></span></span></span><i id="lvl0Best"></i></button>
       <button class="lvl" id="lvl1" type="button"><span class="lv-in"><span class="lv-tag">LEVEL 1</span><b>Garage and Poolrooms</b><span class="lv-row"><span class="lv-bar"><em id="lvl1Bar"></em></span><span id="lvl1Count"></span></span></span><i id="lvl1Best"></i></button>
       <button class="lvl" id="lvl2" type="button"><span class="lv-in"><span class="lv-tag">LEVEL 2</span><b>The Playground</b><span class="lv-row"><span class="lv-bar"><em id="lvl2Bar"></em></span><span id="lvl2Count"></span></span></span><i id="lvl2Best"></i></button>
-      <button class="lvl" id="lvl3" type="button"><span class="lv-in"><span class="lv-tag">LEVEL 3</span><b>The Concrete Garden</b><span class="lv-row"><span class="lv-bar"><em id="lvl3Bar"></em></span><span id="lvl3Count"></span></span></span><i id="lvl3Best"></i></button>
+      <button class="lvl" id="lvl3" type="button" hidden><span class="lv-in"><span class="lv-tag">LEVEL 3</span><b>The Concrete Garden</b><span class="lv-row"><span class="lv-bar"><em id="lvl3Bar"></em></span><span id="lvl3Count"></span></span></span><i id="lvl3Best"></i></button>
     </div>
   </div>
   <div class="pane" id="pane-ents" role="tabpanel" hidden>
@@ -1226,7 +1229,14 @@ body.in-tut #toasts{bottom:var(--tutB,250px)}
     <div id="upsBox"></div></div>
   <div class="pane" id="pane-admin" role="tabpanel" hidden><h2 class="pane-h">Admin</h2><p class="adm-intro">Give people cards. Only you and the game’s editors can see this tab.</p><div id="adminBox"></div></div>
   <div class="pane" id="pane-news" role="tabpanel" hidden><h2 class="pane-h">Updates</h2>
-    <article class="news"><h3>v42 · Gifts everywhere <span>Latest</span></h3><ul>
+    <article class="news"><h3>v43 · Cards, reworked <span>Latest</span></h3><ul>
+      <li><b>Every card was rebalanced.</b> Commons do one thing well, Rares do it better, Legendaries do two things and Godlies three. Nothing is free forever any more: no flashlight that never runs down and no dash every second.</li>
+      <li><b>Entity cards are stronger</b>, and their catches are smaller. The harder the entity, the better its card.</li>
+      <li><b>New drop odds:</b> Common 85%, Rare 13%, Legendary 1.75%, Godly 0.25%.</li>
+      <li><b>Everyone’s cards were swapped for card tokens</b>, at what selling them pays (Common 4, Rare 20, Legendary 100, Godly 500, Entity 50). A combined card counts every copy that went into it. Your levels, moves, journal, records and tokens are all still yours, and so are the ability cards entities gave you.</li>
+      <li><b>Level 3, the Concrete Garden, is gone.</b> Escape Level 2 and you are out of the Backrooms. Its ability cards now come from Level 2: Silent Steps from the Night-Light, High Jump from the Pusher and Ground Pound from Pockets.</li>
+    </ul></article>
+    <article class="news"><h3>v42 · Gifts everywhere</h3><ul>
       <li>Gift codes now work on the copy of the game hosted on GitHub too, and the owner can send live gifts there. They arrive within about a minute.</li>
       <li>On that copy, your <b>Player id</b> is under Profile → Account. The owner can use it to send a card to just you.</li>
     </ul></article>
@@ -1713,6 +1723,7 @@ if (!Array.isArray(progress.runs)) progress.runs = [];
 const saveProgress = () => { try { localStorage.setItem('bfn-progress', JSON.stringify(progress)); } catch (e) {} };
 let teardown = null;
 const SAVE_EP = 2;
+const CARD_EP = 1;
 if (progress.ep !== SAVE_EP) {
   const had = (Array.isArray(progress.runs) && progress.runs.length) || Object.keys(progress.seen || {}).length || (progress.cards && Object.keys(progress.cards).length);
   for (const k of Object.keys(progress)) delete progress[k];
@@ -1720,7 +1731,7 @@ if (progress.ep !== SAVE_EP) {
   try { localStorage.removeItem('bfn-run'); for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith('bfn-acct-') && k !== 'bfn-acct-blocked') localStorage.removeItem(k); } } catch (e) {}
   saveProgress(); window.__bfnReset = !!had;
 }
-function lvMax() { let m = progress.maxLv | 0; for (const r of Array.isArray(progress.runs) ? progress.runs : []) if (r && Number.isFinite(r.lv)) m = Math.max(m, (r.lv | 0) + 1); return Math.min(3, m); }
+function lvMax() { let m = progress.maxLv | 0; for (const r of Array.isArray(progress.runs) ? progress.runs : []) if (r && Number.isFinite(r.lv)) m = Math.max(m, (r.lv | 0) + 1); return Math.min(2, m); }
 const lvOpen = (n) => (n | 0) <= lvMax();
 let adminOpen = false, adminPending = null;
 function switchLevel(level, autostart) { if (teardown) teardown(); teardown = null; boot({ level, autostart, audio: true }); }
@@ -1735,7 +1746,7 @@ const LOCAL_RUN = 'bfn-run';
 const readLocalRun = () => { try { return JSON.parse(localStorage.getItem(LOCAL_RUN) || 'null'); } catch (e) { return null; } };
 const writeLocalRun = (r) => { try { if (r) localStorage.setItem(LOCAL_RUN, JSON.stringify(r)); else localStorage.removeItem(LOCAL_RUN); } catch (e) {} };
 const acctChanged = () => ACCT.listeners.forEach((f) => { try { f(); } catch (e) {} });
-const progressDoc = () => JSON.parse(JSON.stringify({ ep: SAVE_EP, level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {}, cards: progress.cards || {}, maxLv: progress.maxLv | 0, equip: progress.equip || [], abil: progress.abil || [], lv: progress.lv || {}, rolls: progress.rolls | 0, gu: Array.isArray(progress.gu) ? progress.gu.slice(-200) : [], daily: progress.daily || null, loads: progress.loads || [], ld: progress.ld | 0, jump: !!progress.jump, sprint: !!progress.sprint, dash: !!progress.dash, slide: !!progress.slide, swim: !!progress.swim, abGot: progress.abGot || {}, lucky: progress.lucky | 0 }));
+const progressDoc = () => JSON.parse(JSON.stringify({ ep: SAVE_EP, cep: progress.cep | 0, level1: !!progress.level1, seen: progress.seen, runs: progress.runs, lastRun: progress.lastRun || 0, cash: progress.cash | 0, ups: progress.ups || {}, cards: progress.cards || {}, maxLv: progress.maxLv | 0, equip: progress.equip || [], abil: progress.abil || [], lv: progress.lv || {}, rolls: progress.rolls | 0, gu: Array.isArray(progress.gu) ? progress.gu.slice(-200) : [], daily: progress.daily || null, loads: progress.loads || [], ld: progress.ld | 0, jump: !!progress.jump, sprint: !!progress.sprint, dash: !!progress.dash, slide: !!progress.slide, swim: !!progress.swim, abGot: progress.abGot || {}, lucky: progress.lucky | 0 }));
 const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej({ code: 'timeout' }), ms))]);
 function mergeProgress(p) {
   if (!p || p.ep !== SAVE_EP) return;
@@ -1743,17 +1754,20 @@ function mergeProgress(p) {
   if (p.level1) progress.level1 = true;
   if (typeof p.cash === 'number' && p.cash > (progress.cash | 0)) progress.cash = p.cash;
   if (p.jump) progress.jump = true;
-  if ((p.maxLv | 0) > (progress.maxLv | 0)) progress.maxLv = Math.min(3, p.maxLv | 0);
+  if ((p.maxLv | 0) > (progress.maxLv | 0)) progress.maxLv = Math.min(2, p.maxLv | 0);
   for (const k of ['sprint', 'dash', 'slide', 'swim']) if (p[k]) progress[k] = true;
   if (p.abGot && typeof p.abGot === 'object') { if (!progress.abGot || typeof progress.abGot !== 'object') progress.abGot = {}; for (const k of Object.keys(p.abGot)) if (okKey(k)) progress.abGot[k] = 1; }
   if ((p.rolls | 0) > (progress.rolls | 0)) progress.rolls = Math.min(3, p.rolls | 0);
   if (p.daily && typeof p.daily === 'object' && Array.isArray(p.daily.b) && typeof p.daily.d === 'string') { if (!progress.daily || progress.daily.d !== p.daily.d) progress.daily = { d: p.daily.d, b: [] }; for (const k of p.daily.b) if (typeof k === 'string' && okKey(k) && !progress.daily.b.includes(k)) progress.daily.b.push(k); }
   if ((p.lucky | 0) > (progress.lucky | 0)) progress.lucky = p.lucky | 0;
-  if (p.cards && typeof p.cards === 'object') { if (!progress.cards || typeof progress.cards !== 'object' || Array.isArray(progress.cards)) progress.cards = {}; for (const [k, v] of Object.entries(p.cards)) if (okKey(k) && typeof v === 'number' && (progress.cards[k] | 0) < v) progress.cards[k] = Math.min(9999, v | 0); }
-  if (Array.isArray(p.equip) && !(Array.isArray(progress.equip) && progress.equip.length)) progress.equip = p.equip.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 7);
-  if (Array.isArray(p.abil) && !(Array.isArray(progress.abil) && progress.abil.length)) progress.abil = p.abil.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 2);
-  if (p.lv && typeof p.lv === 'object') { if (!progress.lv || typeof progress.lv !== 'object' || Array.isArray(progress.lv)) progress.lv = {}; for (const [k, v] of Object.entries(p.lv)) if (okKey(k) && typeof v === 'number' && (progress.lv[k] | 0) < v) progress.lv[k] = Math.min(10, v | 0); }
-  if (Array.isArray(p.loads) && !(Array.isArray(progress.loads) && progress.loads.some((l) => l && l.c && l.c.length))) { progress.loads = p.loads.slice(0, 3); progress.ld = Math.max(0, Math.min(2, p.ld | 0)); }
+  const cepOld = (p.cep | 0) !== CARD_EP, cepMine = (progress.cep | 0) === CARD_EP;
+  if (!cepOld && !cepMine) { progress.cards = {}; progress.lv = {}; progress.equip = []; progress.abil = []; progress.loads = []; progress.ld = 0; progress.cep = CARD_EP; }
+  const skipCards = cepOld && cepMine;
+  if (!skipCards && p.cards && typeof p.cards === 'object') { if (!progress.cards || typeof progress.cards !== 'object' || Array.isArray(progress.cards)) progress.cards = {}; for (const [k, v] of Object.entries(p.cards)) if (okKey(k) && typeof v === 'number' && (progress.cards[k] | 0) < v) progress.cards[k] = Math.min(9999, v | 0); }
+  if (!skipCards && Array.isArray(p.equip) && !(Array.isArray(progress.equip) && progress.equip.length)) progress.equip = p.equip.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 7);
+  if (!skipCards && Array.isArray(p.abil) && !(Array.isArray(progress.abil) && progress.abil.length)) progress.abil = p.abil.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 2);
+  if (!skipCards && p.lv && typeof p.lv === 'object') { if (!progress.lv || typeof progress.lv !== 'object' || Array.isArray(progress.lv)) progress.lv = {}; for (const [k, v] of Object.entries(p.lv)) if (okKey(k) && typeof v === 'number' && (progress.lv[k] | 0) < v) progress.lv[k] = Math.min(10, v | 0); }
+  if (!skipCards && Array.isArray(p.loads) && !(Array.isArray(progress.loads) && progress.loads.some((l) => l && l.c && l.c.length))) { progress.loads = p.loads.slice(0, 3); progress.ld = Math.max(0, Math.min(2, p.ld | 0)); }
   for (const [k, v] of Object.entries(p.seen || {})) if (typeof v === 'number' && (progress.seen[k] || 0) < v) progress.seen[k] = v;
   const have = new Set(progress.runs.map((r) => r.at));
   for (const r of Array.isArray(p.runs) ? p.runs : []) if (r && typeof r.t === 'number' && !have.has(r.at)) { progress.runs.push(r); have.add(r.at); }
@@ -1917,7 +1931,7 @@ function mpGames() {
   for (const p of MP.room.peers()) {
     const g = p.presence && p.presence.g;
     if (!g || typeof g.code !== 'string' || !/^[a-z0-9]{4,8}$/.test(g.code)) continue;
-    const e = by.get(g.code) || { code: g.code, lv: g.lv === 3 ? 3 : g.lv === 2 ? 2 : g.lv === 1 ? 1 : 0, sd: Number(g.sd) | 0, host: '', names: [], players: 0, mine: false };
+    const e = by.get(g.code) || { code: g.code, lv: g.lv === 2 ? 2 : g.lv === 1 ? 1 : 0, sd: Number(g.sd) | 0, host: '', names: [], players: 0, mine: false };
     e.players++; e.names.push(cleanText(g.n, 16) || 'Wanderer');
     if (g.h) e.host = cleanText(g.n, 16) || 'Wanderer';
     if (p.isMe) e.mine = true;
@@ -1957,7 +1971,7 @@ async function mpJoin(code, lv, sd) {
       if (!found) await new Promise((r) => setTimeout(r, 250));
     }
     if (!found) { g.leave().catch(() => {}); return 'Nobody is playing in that room right now. Check the code, and make sure the host is still in the game.'; }
-    lv = found.lv === 3 ? 3 : found.lv === 2 ? 2 : found.lv === 1 ? 1 : 0; sd = found.sd | 0;
+    lv = found.lv === 2 ? 2 : found.lv === 1 ? 1 : 0; sd = found.sd | 0;
   }
   if (teardown) teardown(); teardown = null;
   boot({ level: lv, seed: sd, mp: { code, host: false }, autostart: true, audio: true });
@@ -2284,9 +2298,10 @@ const okNum = (v, a, b, d = 0) => (typeof v === 'number' && isFinite(v) ? clamp(
 // a code can come from anywhere, so only the fields and shapes this game writes get through
 function cleanProgress(p) {
   const out = { level1: true, seen: {}, runs: [], lastRun: 0, cash: 0, ups: {}, cards: {}, equip: [], abil: [], lv: {}, loads: [], ld: 0, rolls: 0, daily: null, jump: false, lucky: 0 };
+  if (p && typeof p === 'object') out.cep = (p.cep | 0) === CARD_EP ? CARD_EP : 0;
   if (p && typeof p === 'object' && Array.isArray(p.gu)) out.gu = p.gu.filter((c) => typeof c === 'string' && /^[A-Z0-9]{8}$/.test(c)).slice(-200);
   if (p && typeof p === 'object') { out.rolls = okNum(p.rolls, 0, 3) | 0; if (p.daily && typeof p.daily === 'object' && typeof p.daily.d === 'string' && /^\d{4}-\d\d-\d\d$/.test(p.daily.d) && Array.isArray(p.daily.b)) out.daily = { d: p.daily.d, b: p.daily.b.filter((k) => typeof k === 'string' && okKey(k)).slice(0, 3) }; }
-  if (p && typeof p === 'object') { out.ep = p.ep === SAVE_EP ? SAVE_EP : 0; out.maxLv = okNum(p.maxLv, 0, 3) | 0; out.jump = !!p.jump; out.lucky = okNum(p.lucky, 0, 1e6) | 0; for (const k of ['sprint', 'dash', 'slide', 'swim']) out[k] = !!p[k]; out.abGot = {}; if (p.abGot && typeof p.abGot === 'object') for (const k of Object.keys(p.abGot)) if (okKey(k)) out.abGot[k] = 1; }
+  if (p && typeof p === 'object') { out.ep = p.ep === SAVE_EP ? SAVE_EP : 0; out.maxLv = okNum(p.maxLv, 0, 2) | 0; out.jump = !!p.jump; out.lucky = okNum(p.lucky, 0, 1e6) | 0; for (const k of ['sprint', 'dash', 'slide', 'swim']) out[k] = !!p[k]; out.abGot = {}; if (p.abGot && typeof p.abGot === 'object') for (const k of Object.keys(p.abGot)) if (okKey(k)) out.abGot[k] = 1; }
   if (!p || typeof p !== 'object') return out;
   if (p.seen && typeof p.seen === 'object') for (const [k, v] of Object.entries(p.seen)) if (okKey(k) && typeof v === 'number') out.seen[k] = clamp(v | 0, 0, 3);
   if (Array.isArray(p.runs)) for (const r of p.runs.slice(-80)) { if (!r || typeof r !== 'object' || typeof r.t !== 'number' || !isFinite(r.t) || !(r.lv === 0 || r.lv === 1 || r.lv === 2 || r.lv === 3)) continue; out.runs.push({ lv: r.lv, t: clamp(r.t, 0, 1e7), d: okNum(r.d, 0, 1e5) | 0, at: okNum(r.at, 0, 9e15) }); }
@@ -2486,7 +2501,7 @@ ENTS3.forEach((e) => { KIND[e.id] = 'ritual'; });
 Object.assign(UI_IMG.p, {fleshstealer:'data:image/jpeg;base64,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'});
 function boot(saved) {
 saved = saved || {};
-const LEVEL = saved.level === 3 ? 3 : saved.level === 2 ? 2 : saved.level === 1 ? 1 : 0, LVN = LEVEL, HAUNT = !!saved.haunt, HA = { role: '', ents: new Map(), traps: new Map(), cd: 0, dash: 0, reveal: 0, stuck: 0, pullT: 0, darkT: 0, ghost: false, pwN: 0, pwSeen: -1, pwDone: -1, pwSim: 0, count: 0, look: false, board: '' };
+const LEVEL = saved.level === 2 ? 2 : saved.level === 1 ? 1 : 0, LVN = LEVEL, HAUNT = !!saved.haunt, HA = { role: '', ents: new Map(), traps: new Map(), cd: 0, dash: 0, reveal: 0, stuck: 0, pullT: 0, darkT: 0, ghost: false, pwN: 0, pwSeen: -1, pwDone: -1, pwSim: 0, count: 0, look: false, board: '' };
 const AC_ = new AbortController();
 const listen = (t, ev, fn, opt) => t.addEventListener(ev, fn, Object.assign({ signal: AC_.signal }, opt && typeof opt === 'object' ? opt : {}));
 let alive = true, rafId = 0;
@@ -5609,7 +5624,7 @@ function uiTutStart() {
   return true;
 }
 function uiStart() {
-  upsRefund(); cardsRecalc(); movesGrandfather(); l0SafeStart();
+  upsRefund(); cardsRecalc(); if (!HAUNT) ACCT.ready.then(() => { if (alive) cardsReset(); }); movesGrandfather(); l0SafeStart();
   if (window.__bfnReset && !HAUNT) { window.__bfnReset = false; later(1.2, () => toast('Everyone starts again in v38: levels, moves, cards, tokens and records were all reset. Good luck down there.', 'say', 8)); }
   if (!saved.resumed && !HAUNT) P.hp = hpMax();
   if (!saved.resumed && !HAUNT) { const b = runAdd('startBatt'), f = runAdd('startFizz'); if (b) inv.battery += b; if (f) inv.fizz += f; }
@@ -5644,7 +5659,7 @@ function uiLsGo() {
   if (LEVEL !== 0) switchLevel(0, true); else tryStart();
 }
 function uiLevelSel(n) {
-  const lists = [ENTS0, ENTS1, ENTS2, ENTS3], cats = ['ritual', 'roaming', 'time'], seenOf = (e, lv) => Math.max(progress.seen[e.id] || 0, lv === LEVEL ? status[e.id] || 0 : 0);
+  const lists = [ENTS0, ENTS1, ENTS2], cats = ['ritual', 'roaming', 'time'], seenOf = (e, lv) => Math.max(progress.seen[e.id] || 0, lv === LEVEL ? status[e.id] || 0 : 0);
   setHTML(el('lsList'), lists.map((l, i) => {
     const c = uiCounts(l), cnt = (k) => l.filter((e) => KIND[e.id] === k).length, run = ACCT.run && ACCT.run.active && ACCT.run.level === i;
     const faces = l.filter((e) => !e.secret).map((e) => { const known = seenOf(e, i) >= 2; return `<img src="${known ? UI_IMG.p[e.id] : uiSilhouette(e.id)}" ${known ? '' : `data-sil="${e.id}"`} alt="" title="${known ? escHtml(e.name) : 'Not met yet'}">`; }).join('');
@@ -5737,7 +5752,7 @@ function uiJDetail(id) {
     ${s >= 3 ? `<p class="lore">${e.lore}</p>` : ''}</div>`;
 }
 function renderBestiary2() {
-  const groups = [{ lv: 0, title: 'Level 0 · The Yellow Rooms', list: ENTS0 }, { lv: 1, title: 'Level 1 · Garage and Poolrooms', list: ENTS1 }, { lv: 2, title: 'Level 2 · The Playground', list: ENTS2 }, { lv: 3, title: 'Level 3 · The Concrete Garden', list: ENTS3 }].map((gp) => Object.assign(gp, { list: orderSort(gp.list, gp.lv) }));
+  const groups = [{ lv: 0, title: 'Level 0 · The Yellow Rooms', list: ENTS0 }, { lv: 1, title: 'Level 1 · Garage and Poolrooms', list: ENTS1 }, { lv: 2, title: 'Level 2 · The Playground', list: ENTS2 }].map((gp) => Object.assign(gp, { list: orderSort(gp.list, gp.lv) }));
   setHTML(el('bFilters'), [['all', 'All'], ['ritual', 'Ritual'], ['roaming', 'Roaming'], ['time', 'Time-based']].map(([k, t]) => `<button type="button" data-bf="${k}" class="${UI.bf === k ? 'on' : ''}">${t}</button>`).join(''));
   let total = 0, docd = 0, html = '';
   for (const gp of groups) {
@@ -6024,7 +6039,7 @@ function acWhen(t) {
   return s < 60 ? 'just now' : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} hours ago` : `${Math.round(s / 86400)} days ago`;
 }
 function acTotal() {
-  return ENTS0.length + ENTS1.length + ENTS2.length + ENTS3.length;
+  return ENTS0.length + ENTS1.length + ENTS2.length;
 }
 function renderProfiles(msg, bad) {
   const box = el('acctBox'); if (!box) return;
@@ -7424,10 +7439,10 @@ const CARD_SLOTS = 5, CARD_AB = 2;
 // what the newest cards and abilities are doing right now, this floor
 const AB = { at: {}, q: {}, speedT: 0, invisT: 0, invisAt: null, decoy: null, walls: [], pads: [], padA: null, padUse: {}, shop: null, arrowT: 0, arrowG: null, glow: null, track: null, seq: 0, ev: [], drops: [], took: [], dropN: 0, padN: 0, marks: [], prank: null, blindT: 0, v: new THREE.Vector3() };
 const CARD_RAR = {
-  common: { label: 'Common', n: 1, pct: '75%', bg: '#e9e0c5', ink: '#2a2418', sub: '#5f553d', edge: '#b3a680', inner: 'rgba(42,36,24,0.32)', win: '#d8cca7', icon: '#3a3020', glow: '', hex: 0xe9e0c5 },
-  rare: { label: 'Rare', n: 2, pct: '20%', bg: '#0f2340', ink: '#e8f1ff', sub: '#a9c4e6', edge: '#5aa8ff', inner: 'rgba(140,200,255,0.32)', win: '#173761', icon: '#a6d4ff', glow: 'rgba(120,190,255,0.8)', hex: 0x5aa8ff },
-  legendary: { label: 'Legendary', n: 3, pct: '4%', bg: '#17110a', ink: '#f7e8c4', sub: '#d3b77c', edge: '#e8b34b', inner: 'rgba(232,179,75,0.6)', win: '#271c0b', icon: '#ffd36a', glow: 'rgba(255,200,90,0.85)', hex: 0xffc54a },
-  godly: { label: 'Godly', n: 4, pct: '1%', bg: '#130d1c', ink: '#fff1f7', sub: '#dcc3ea', edge: '#ff7ac6', inner: 'rgba(255,255,255,0.3)', win: '#1e1530', icon: '#ffffff', glow: 'rgba(255,120,200,0.95)', hex: 0xff7ac6 },
+  common: { label: 'Common', n: 1, pct: '85%', bg: '#e9e0c5', ink: '#2a2418', sub: '#5f553d', edge: '#b3a680', inner: 'rgba(42,36,24,0.32)', win: '#d8cca7', icon: '#3a3020', glow: '', hex: 0xe9e0c5 },
+  rare: { label: 'Rare', n: 2, pct: '13%', bg: '#0f2340', ink: '#e8f1ff', sub: '#a9c4e6', edge: '#5aa8ff', inner: 'rgba(140,200,255,0.32)', win: '#173761', icon: '#a6d4ff', glow: 'rgba(120,190,255,0.8)', hex: 0x5aa8ff },
+  legendary: { label: 'Legendary', n: 3, pct: '1.75%', bg: '#17110a', ink: '#f7e8c4', sub: '#d3b77c', edge: '#e8b34b', inner: 'rgba(232,179,75,0.6)', win: '#271c0b', icon: '#ffd36a', glow: 'rgba(255,200,90,0.85)', hex: 0xffc54a },
+  godly: { label: 'Godly', n: 4, pct: '0.25%', bg: '#130d1c', ink: '#fff1f7', sub: '#dcc3ea', edge: '#ff7ac6', inner: 'rgba(255,255,255,0.3)', win: '#1e1530', icon: '#ffffff', glow: 'rgba(255,120,200,0.95)', hex: 0xff7ac6 },
   entity: { label: 'Entity', n: 0, pct: '5%', bg: '#0a110a', ink: '#e2ffd6', sub: '#9fd08a', edge: '#8cff5a', inner: 'rgba(140,255,90,0.32)', win: '#0f1f0f', icon: '#b6ff8a', glow: '', hex: 0x8cff5a },
 };
 const CARD_ORDER = ['common', 'rare', 'legendary', 'godly', 'entity'];
@@ -7595,11 +7610,84 @@ CARDS.forEach((c) => { c.st = CARD_ST[c.id] || 1; if (CARD_TX[c.id]) c.tx = CARD
 ].forEach((c, i) => { c.no = 'No. ' + String(34 + i).padStart(2, '0'); if (!c.text) c.text = c.tx(1); CARDS.push(c); });
 const CARD_BY = Object.fromEntries(CARDS.map((c) => [c.id, c]));
 const isAb = (c) => !!(c && c.kind === 'ab');
+// v43: every card rebalanced. Commons do one thing about 10%, Rares about 25%, Legendaries two strong things, Godlies three,
+// and nothing is free or permanent any more (no endless flashlight, no dash every second). Entity cards are trophies:
+// a real upside that grows with how dangerous the entity is, and only a small catch
+const CARD_BAL = {
+  // Common
+  batt: { fx: { batt: 0.85 }, text: 'Your flashlight drains 15% slower.' },
+  wool: { fx: { dmg: 0.92 }, text: 'Take 8% less damage.' },
+  opener: { add: { fizz: 15 }, text: 'Fizz Water heals 15 more.', tx: (L) => `Fizz Water heals ${15 * L} more.` },
+  knees: { fx: { crouch: 1.25 }, text: 'Crouch-walk 25% faster.' },
+  laces: { fx: { sprint: 1.08 }, text: 'Sprint 8% faster.' },
+  lens: { fx: { flashCd: 0.88 }, text: 'Flash [R] recharges 12% faster.' },
+  stretch: { fx: { dashCd: 0.88 }, text: 'Dash [Q] recharges 12% faster.' },
+  hijump: { r: 'common', l3: false, tx: (L) => `Jump ${12 * L}% higher.`, text: 'Jump 12% higher.' },
+  // Rare
+  lucky: { r: 'rare' },
+  qstep: { fx: { dashCd: 0.75 }, text: 'Dash recharges 25% faster.' },
+  kit: { add: { hpRegen: 0.34 }, text: 'Heal 1 health every 3 seconds.', tx: (L) => `Heal ${L} health every 3 seconds.` },
+  spring: { fx: { dashPow: 1.3 }, text: 'Dash goes 30% further.' },
+  hp20: { st: 3 },
+  jam4: { add: { jam: 0.05 }, st: 6, tx: (L) => `${5 * L}% chance an entity starts switched off for 10 seconds.`, text: '5% chance an entity starts switched off for 10 seconds.' },
+  ab_heal: { cd: 20, text: 'Heal 25 health.' },
+  ab_scare: { r: 'rare' },
+  // Legendary
+  flood: { fx: { stun: 1.6, flashCd: 0.7 }, text: 'Flash stuns 60% longer and recharges 30% faster.' },
+  marathon: { fx: { stam: 0.5, speed: 1.08 }, text: 'Sprinting costs half the stamina, and you move 8% faster.' },
+  ghostwalk: { fx: { noise: 0.5, dashCd: 0.7 }, text: 'Footsteps 50% quieter, and dash recharges 30% faster.' },
+  riot: { fx: { dmg: 0.7 }, add: { hpRegen: 0.25 }, text: 'Take 30% less damage, and heal 1 health every 4 seconds.' },
+  sunlamp: { fx: { batt: 0.4, flashCost: 0.6 }, text: 'Your flashlight drains 60% slower, and Flash costs 40% less.' },
+  slowent: { r: 'legendary', fx: { entSlow: 0.85 }, text: 'Entities move 15% slower.' },
+  ab_invis: { cd: 40, st: 2, tx: (L) => `Invisible for ${5 * L} seconds. Entities lose you.`, text: 'Invisible for 5 seconds. Entities lose you.' },
+  // Godly
+  exitsign: { fx: { speed: 1.12, dmg: 0.7, batt: 0.25 }, text: 'Move 12% faster, take 30% less damage, and your flashlight drains 75% slower.' },
+  noclip: { fx: { dashCd: 0.5, dashPow: 1.6, speed: 1.1 }, text: 'Dash recharges twice as fast and goes 60% further, and you move 10% faster.' },
+  phantom: { fx: { noise: 0.2, stam: 0.4, dmg: 0.8 }, text: 'Footsteps 80% quieter, sprinting costs 60% less, and you take 20% less damage.' },
+  // Entity cards: stronger than before, smaller catches
+  e_stillman: { text: 'Flash stuns twice as long, and recharges 15% faster.', bad: 'Flash costs 10% more battery.', fx: { stun: 2, flashCd: 0.85, flashCost: 1.1 }, add: undefined },
+  e_grinner: { text: 'Your flashlight drains 60% slower, and Flash recharges 15% faster.', bad: 'Take 5% more damage.', fx: { batt: 0.4, flashCd: 0.85, dmg: 1.05 } },
+  e_hound: { text: 'Footsteps 75% quieter, and sprint 10% faster.', bad: 'Flashlight drains 5% faster.', fx: { noise: 0.25, sprint: 1.1, batt: 1.05 } },
+  e_confetti: { text: 'Move 15% faster, and stamina comes back 20% faster.', bad: 'Footsteps 10% louder.', fx: { speed: 1.15, regen: 1.2, noise: 1.1 } },
+  e_knock: { text: 'Dash recharges 35% faster and goes 20% further.', bad: 'Take 5% more damage.', fx: { dashCd: 0.65, dashPow: 1.2, dmg: 1.05 } },
+  e_echo: { text: 'Footsteps 60% quieter, and crouch-walk 30% faster.', bad: 'Stamina comes back 5% slower.', fx: { noise: 0.4, crouch: 1.3, regen: 0.95 } },
+  e_snack: { text: 'Fizz Water heals 50 more, and you start every floor with a bottle.', bad: 'Dash recharges 5% slower.', fx: { dashCd: 1.05 }, add: { fizz: 50, startFizz: 1 } },
+  e_manager: { text: 'Sprinting costs 65% less stamina, you move 18% faster, and take 15% less damage.', bad: 'Footsteps 5% louder.', fx: { stam: 0.35, speed: 1.18, dmg: 0.85, noise: 1.05 } },
+  e_mimic: { text: 'Every blue card token you find counts as three, and you start every floor with an extra battery.', bad: 'Sprinting costs 5% more stamina.', fx: { stam: 1.05 }, add: { token: 2, startBatt: 1 } },
+  e_moth: { text: 'Dash goes 75% further, and Flash recharges 20% faster.', bad: 'Flashlight drains 8% faster.', fx: { dashPow: 1.75, flashCd: 0.8, batt: 1.08 } },
+  e_attendant: { text: 'Stamina comes back 60% faster, and sprinting costs 15% less.', bad: 'Flashlight drains 5% faster.', fx: { regen: 1.6, stam: 0.85, batt: 1.05 } },
+  e_exhaust: { text: 'Sprinting costs half the stamina, and sprint 10% faster.', bad: 'Footsteps 8% louder.', fx: { stam: 0.5, sprint: 1.1, noise: 1.08 } },
+  e_copycat: { text: 'Move 18% faster, and dash recharges 15% faster.', bad: 'Flash recharges 8% slower.', fx: { speed: 1.18, dashCd: 0.85, flashCd: 1.08 } },
+  e_valet: { text: 'Dash recharges 55% faster and goes 45% further.', bad: 'Flash costs 15% more battery.', fx: { dashCd: 0.45, dashPow: 1.45, flashCost: 1.15 } },
+  e_lifeguard: { text: 'Sprint 22% faster, and stamina comes back 25% faster.', bad: 'Footsteps 10% louder.', fx: { sprint: 1.22, regen: 1.25, noise: 1.1 } },
+  e_floatie: { text: 'Heal 1 health every 2 seconds.', bad: 'Move 3% slower.', fx: { speed: 0.97 }, add: { hpRegen: 0.5 } },
+  e_drain: { text: 'Heal 1 health every 2 seconds, and take 15% less damage.', bad: 'Flash recharges 5% slower.', fx: { dmg: 0.85, flashCd: 1.05 }, add: { hpRegen: 0.5 } },
+  e_hopscotch: { text: 'Crouch-walk 60% faster, and footsteps 30% quieter.', bad: 'Take 5% more damage.', fx: { crouch: 1.6, noise: 0.7, dmg: 1.05 } },
+  e_lurker: { text: 'Take 35% less damage, and footsteps 20% quieter.', bad: 'Stamina comes back 5% slower.', fx: { dmg: 0.65, noise: 0.8, regen: 0.95 } },
+  e_tide: { text: 'Stamina comes back 75% faster, and sprinting costs 20% less.', bad: 'Move 3% slower.', fx: { regen: 1.75, stam: 0.8, speed: 0.97 } },
+  e_undertow: { text: 'Take 40% less damage, and heal 1 health every 2 seconds.', bad: 'Move 3% slower.', fx: { dmg: 0.6, speed: 0.97 }, add: { hpRegen: 0.5 } },
+  e_fleshstealer: { text: 'Take 30% less damage, and footsteps 35% quieter.', bad: 'Flashlight drains 5% faster.', fx: { dmg: 0.7, noise: 0.65, batt: 1.05 } },
+  e_sun: { text: 'Your flashlight drains 80% slower, and Flash recharges 15% faster.', bad: 'Take 8% more damage.', fx: { batt: 0.2, flashCd: 0.85, dmg: 1.08 } },
+  e_moon: { text: 'Flash uses no battery and recharges 20% faster.', bad: 'Flash stuns 10% shorter.', fx: { flashCost: 0, flashCd: 0.8, stun: 0.9 } },
+  e_clown: { text: 'Dash recharges 45% faster, and stamina comes back 20% faster.', bad: 'Footsteps 8% louder.', fx: { dashCd: 0.55, regen: 1.2, noise: 1.08 } },
+  e_balloon: { text: 'Dash goes 60% further and recharges 30% faster.', bad: 'Take 5% more damage.', fx: { dashPow: 1.6, dashCd: 0.7, dmg: 1.05 } },
+  e_ring: { text: 'Flash stuns two and a half times as long, and recharges 20% faster.', bad: 'Dash recharges 5% slower.', fx: { stun: 2.5, flashCd: 0.8, dashCd: 1.05 } },
+  e_swing: { text: 'Take 25% less damage, and move 8% faster.', bad: 'Stamina comes back 5% slower.', fx: { dmg: 0.75, speed: 1.08, regen: 0.95 } },
+  e_wow: { text: 'Your flashlight drains 85% slower, Flash recharges 50% faster, and you move 10% faster.', bad: 'Take 5% more damage.', fx: { batt: 0.15, flashCd: 0.5, speed: 1.1, dmg: 1.05 } },
+  // the ability cards Level 3's entities used to give now come from Level 2
+  ab_silent: { gift: 'moon' }, ab_hijump: { gift: 'swing' }, ab_pound: { gift: 'clown' },
+};
+for (const [id, b] of Object.entries(CARD_BAL)) {
+  const c = CARD_BY[id]; if (!c) continue;
+  for (const [k, v] of Object.entries(b)) { if (v === undefined) delete c[k]; else c[k] = v; }
+}
+delete ENT_CARD.tallgrass; delete ENT_CARD.stilt; delete ENT_CARD.groundskeeper;
+Object.assign(ENT_CARD, { moon: 'ab_silent', swing: 'ab_hijump', clown: 'ab_pound' });
 // Entity cards name their entity on every floor, not just the one it lives on
 const CARD_ENT = Object.fromEntries([...ENTS0, ...ENTS1, ...ENTS2, ...ENTS3].map((e) => [e.id, e]));
 // stacking stops somewhere sensible both ways, so nothing makes you untouchable or useless
-const CARD_LIM = { entSlow: [0.5, 1], dmg: [0.2, 2], noise: [0.05, 3], flashCd: [0.25, 3], dashCd: [0.25, 3], stam: [0.15, 3], batt: [0, 3], speed: [0.6, 1.6], sprint: [0.6, 1.5], crouch: [0.6, 2], regen: [0.3, 4], stun: [0.3, 4], dashPow: [0.5, 2.2], flashCost: [0, 3] };
-const CARD_ADDLIM = { hpRegen: 2, fizz: 80, startFizz: 3, startBatt: 3, token: 3, flashes: 2, maxHp: 100, jam: 0.4, slots: 2, luck: 0.5, jump: 0.36 };
+const CARD_LIM = { entSlow: [0.5, 1], dmg: [0.3, 2], noise: [0.05, 3], flashCd: [0.25, 3], dashCd: [0.4, 3], stam: [0.15, 3], batt: [0, 3], speed: [0.6, 1.45], sprint: [0.6, 1.5], crouch: [0.6, 2], regen: [0.3, 4], stun: [0.3, 4], dashPow: [0.5, 2.2], flashCost: [0, 3] };
+const CARD_ADDLIM = { hpRegen: 1.5, fizz: 80, startFizz: 3, startBatt: 3, token: 3, flashes: 2, maxHp: 100, jam: 0.4, slots: 2, luck: 0.5, jump: 0.36 };
 const CFX = { mul: {}, add: {} };
 function cardInv() {
   if (!progress.cards || typeof progress.cards !== 'object' || Array.isArray(progress.cards)) progress.cards = {};
@@ -7672,8 +7760,8 @@ function runInit(s) {
 function cardRand() {
   try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; } catch (e) { return Math.random(); }
 }
-// luck moves the odds up: at +50% luck, Rare 30%, Legendary 8%, Godly 2%
-function cardOdds(lk) { lk = lk == null ? luck() : lk; const g = 1 * (1 + 2 * lk), l = 4 * (1 + 2 * lk), r = 20 * (1 + lk); return { common: 100 - g - l - r, rare: r, legendary: l, godly: g }; }
+// luck moves the odds up: at +50% luck, Rare 19.5%, Legendary 3.5%, Godly 0.5%
+function cardOdds(lk) { lk = lk == null ? luck() : lk; const g = 0.25 * (1 + 2 * lk), l = 1.75 * (1 + 2 * lk), r = 13 * (1 + lk); return { common: 100 - g - l - r, rare: r, legendary: l, godly: g }; }
 function cardRoll(r, lk) {
   const p = (r == null ? cardRand() : r) * 100, o = cardOdds(r == null ? lk : 0);
   return p < o.common ? 'common' : p < o.common + o.rare ? 'rare' : p < 100 - o.godly ? 'legendary' : 'godly';
@@ -8000,7 +8088,7 @@ function cardsScreen(cid) {
   UI.cardMsg = '';
   if (mode === 'shop') {
     const have = tokGet(), left = rollsLeft(), o = cardOdds(), bought = dailyBought();
-    const roll = `<div class="uc-roll"><div><b>Random card</b><span>${ROLL_COST} card tokens for a random card of any rarity, abilities included. ${left} of ${ROLL_MAX} rolls left; escaping a level fills them up again.</span><span class="uc-odds">${luck() ? `Luck +${Math.round(luck() * 100)}% · ` : ''}Common ${o.common.toFixed(0)}% · Rare ${o.rare.toFixed(0)}% · Legendary ${o.legendary.toFixed(0)}% · Godly ${o.godly.toFixed(0)}%</span></div><button type="button" class="btn${left && have >= ROLL_COST ? '' : ' dim'}" data-up="r:x">Roll · <i class="tk b"></i>${ROLL_COST}</button></div>`;
+    const roll = `<div class="uc-roll"><div><b>Random card</b><span>${ROLL_COST} card tokens for a random card of any rarity, abilities included. ${left} of ${ROLL_MAX} rolls left; escaping a level fills them up again.</span><span class="uc-odds">${luck() ? `Luck +${Math.round(luck() * 100)}% · ` : ''}Common ${oddsPct(o.common)} · Rare ${oddsPct(o.rare)} · Legendary ${oddsPct(o.legendary)} · Godly ${oddsPct(o.godly)}</span></div><button type="button" class="btn${left && have >= ROLL_COST ? '' : ' dim'}" data-up="r:x">Roll · <i class="tk b"></i>${ROLL_COST}</button></div>`;
     const buy = dailyCards().map(({ c, cost }) => { const sold = bought.includes(c.id), n = ci[c.id] | 0; return `<div class="uc-daily">${cardHTML(c, { sm: true, count: n, lv: cardLv(c.id) })}<button type="button" class="btn uc-dbuy${sold || have < cost ? ' dim' : ''}" data-up="b:${c.id}">${sold ? 'Bought today' : `Buy · <i class="tk b"></i>${cost}`}</button>${n ? `<span class="uc-have">You have ${n}${(c.st || 1) > cardLv(c.id) ? ', so this one can combine' : ''}</span>` : ''}</div>`; }).join('');
     const sell = CARDS.filter((c) => ci[c.id] > 0).map((c) => { const n = ci[c.id], on = eq.includes(c.id) || ab.includes(c.id), armed = UI.sellArm === c.id; return `<div class="uc-sell">${cardHTML(c, { sm: true, count: n, on, lv: cardLv(c.id) })}<button type="button" class="ghost uc-sellb${armed ? ' armed' : ''}" data-up="s:${c.id}">${armed ? 'Sure? Click again' : `Sell for ${CARD_PRICE[c.r][0]}`}</button></div>`; }).join('');
     box.innerHTML = `${modes}${note}${msg}<div class="uc-head"><h3 class="shop-h">Today's cards</h3><span>The same three for everyone · new ones in ${dailyLeft()}</span></div><div class="uc-dailies">${buy}</div><div class="uc-head"><h3 class="shop-h">Random card</h3></div>${roll}<div class="uc-head"><h3 class="shop-h">Sell</h3><span>${found ? 'Your inventory' : 'Nothing to sell yet'}</span></div><div class="ucards">${sell}</div>`;
@@ -10347,7 +10435,7 @@ function escape(ch) {
   cardsSweep(); if (!HAUNT) { progress.rolls = 0; saveProgress(); } if (!HAUNT) setTimeout(() => { if (alive) luckyRoll(); }, 1400); state = 'won'; sfx.win(); musicStop(); H_.arrow.hidden = true; mpSend({ w: 1 });
   if (document.pointerLockElement) document.exitPointerLock();
   if (LEVEL === 0) progress.level1 = true;
-  if (!HAUNT && LEVEL < 3 && (progress.maxLv | 0) < LEVEL + 1) { progress.maxLv = LEVEL + 1; saveProgress(); requestSave(); }
+  if (!HAUNT && LEVEL < 2 && (progress.maxLv | 0) < LEVEL + 1) { progress.maxLv = LEVEL + 1; saveProgress(); requestSave(); }
   el('winRun').textContent = (ACCT.mode === 'cloud' && ACCT.player ? ACCT.player + ' · ' : '') + recordRun();
   const mm = Math.floor(playTime / 60), ss = Math.floor(playTime % 60);
   el('winH').textContent = LEVEL === 0 ? 'You found the exit.' : LEVEL === 1 ? 'You reached the surface. Almost.' : LEVEL === 3 ? 'The bus doors close behind you.' : 'The party is over.';
@@ -10355,9 +10443,9 @@ function escape(ch) {
     ? 'The door shuts behind you and the hum stops. Then the floor gives way, and you land on cold concrete. Level 1 is waiting.'
     : LEVEL === 1 ? 'The hatch opens onto a bright blue sky. It has brush strokes in it. Somewhere, a tune is playing. Level 2 is waiting.'
     : LEVEL === 3 ? 'The bus pulls away from the garden. Nobody is driving. Through the window the grass closes over the street behind you, as if it was never there.'
-    : 'The door opens onto night air and real stars. No hum. No tune. Then a bus stop you do not remember, and grass growing through the road. Level 3 is waiting.';
+    : 'The door opens onto night air and real stars. No hum. No tune. Just the wind, and a road that goes somewhere real. You made it out of the Backrooms.';
   el('winStats').innerHTML = `<span>Time on tape</span><span>${mm}m ${String(ss).padStart(2, '0')}s</span><span>Entities documented</span><span>${documented()}/${TOTAL}</span>${LEVEL === 0 ? `<span>Secret friend</span><span>${status.quackers === 3 ? 'Quackers' : 'not found'}</span>` : LEVEL === 2 ? `<span>Secret</span><span>${status.wow === 3 ? 'WOW' : 'not found'}</span>` : ''}<span>Times caught</span><span>${deaths}</span><span>Notes read</span><span>${noteRead.filter(Boolean).length}/${NOTES.length}</span>`;
-  el('nextBtn').hidden = LEVEL === 3; el('nextBtn').textContent = `Enter Level ${LEVEL + 1}`;
+  el('nextBtn').hidden = LEVEL >= 2; el('nextBtn').textContent = `Enter Level ${LEVEL + 1}`;
   el('againBtn').textContent = `Replay Level ${LVN}`;
   el('win').hidden = false;
 }
@@ -12002,7 +12090,7 @@ listen(window, 'keydown', (e) => {
   if (state === 'title') {
     if (!el('levelSel').hidden) {
       if (c === 'ArrowLeft' || c === 'ArrowUp') uiLsPick(Math.max(0, UI.lsel - 1));
-      else if (c === 'ArrowRight' || c === 'ArrowDown') uiLsPick(Math.min(3, UI.lsel + 1));
+      else if (c === 'ArrowRight' || c === 'ArrowDown') uiLsPick(Math.min(2, UI.lsel + 1));
       else if (c === 'Enter') uiLsGo();
       else if (c === 'Escape') el('levelSel').hidden = true;
       return;
@@ -12432,7 +12520,7 @@ function showTab(name) {
   document.querySelectorAll('#title .tab').forEach((b) => { const on = b.dataset.tab === grp; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
   document.querySelectorAll('#title [data-sub]').forEach((b) => { const on = b.dataset.sub === name; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   ['play', 'ents', 'runs', 'museum', 'keys', 'ups', 'acct', 'news', 'admin'].forEach((n) => { el('pane-' + n).hidden = n !== name; });
-  if (name === 'news') { try { localStorage.setItem('bfn-news', '42'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
+  if (name === 'news') { try { localStorage.setItem('bfn-news', '43'); } catch (e) {} document.querySelectorAll('.tab-new').forEach((x) => x.remove()); }
   if (name === 'acct') renderProfiles();
   if (name === 'admin') adminRender();
   if (name === 'ups') { const gm = el('giftMsg'); if (gm) gm.textContent = ''; }
@@ -12455,7 +12543,7 @@ function setupTitle() {
   el('lvl0Best').textContent = bestText(0);
   el('lvl1Best').textContent = bestText(1); el('lvl2Best').textContent = bestText(2); el('lvl3Best').textContent = bestText(3);
   showTab(PROF.reopen ? 'acct' : 'play'); PROF.reopen = false;
-  try { if (localStorage.getItem('bfn-news') === '42') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
+  try { if (localStorage.getItem('bfn-news') === '43') document.querySelectorAll('.tab-new').forEach((x) => x.remove()); } catch (e) {}
   renderAccount();
   uiTitle(); uiNudge();
 }
@@ -12463,7 +12551,7 @@ function renderBestiary() {
   renderBestiary2();
 }
 function renderRuns() {
-  el('runsList').innerHTML = [0, 1, 2, 3].map((lv) => {
+  el('runsList').innerHTML = [0, 1, 2].map((lv) => {
     const rs = runsFor(lv).slice(0, 10);
     const rows = rs.map((r, i) => `<tr class="${i === 0 ? 'pb' : ''}${r.at === progress.lastRun ? ' new' : ''}"><td>${i + 1}</td><td class="t">${fmtTime(r.t)}</td><td>${r.d}</td><td>${new Date(r.at).toLocaleDateString()}</td></tr>`).join('');
     const empty = lv >= 1 && !lvOpen(lv) ? `Locked. Escape Level ${lv - 1} first.` : `No runs yet. Escape Level ${lv} to set a time.`;
@@ -13001,7 +13089,7 @@ function abUse(i) {
 AB_FN.ab_speed = () => { AB.speedT = time + 10; tone(300, 0.3, 0.06, { f2: 900, type: 'triangle' }); toast('Sugar Rush: 20% faster for 10 seconds.', 'good', 2.5); return true; };
 AB_FN.ab_heal = () => {
   if (P.hp >= hpMax()) { toast('You are already at full health.', '', 1.8); return false; }
-  P.hp = Math.min(hpMax(), P.hp + 15); sfx.drink(); toast('Pocket Medkit: +15 health.', 'good', 2); return true;
+  P.hp = Math.min(hpMax(), P.hp + 25); sfx.drink(); toast('Pocket Medkit: +25 health.', 'good', 2); return true;
 };
 AB_FN.ab_scare = () => {
   let best = null, bd = 1e9;
@@ -13062,9 +13150,9 @@ function abWall(x, z, ang, dur) {
   AB.walls.push(w); tone(160, 0.3, 0.07, { f2: 320, type: 'square' });
 }
 AB_FN.ab_invis = (L) => {
-  AB.invisT = time + 7 * L; AB.invisAt = { x: P.x, z: P.z };
+  AB.invisT = time + 5 * L; AB.invisAt = { x: P.x, z: P.z };
   if (LEVEL < 2) RM.stun = Math.max(RM.stun || 0, AB.invisT);
-  if (LEVEL === 1) for (const s of FST.list) if (s.mode === 'hunt' && s.target === '') { s.mode = 'patrol'; s.cd = Math.max(s.cd, 7 * L); s.goal = null; }
+  if (LEVEL === 1) for (const s of FST.list) if (s.mode === 'hunt' && s.target === '') { s.mode = 'patrol'; s.cd = Math.max(s.cd, 5 * L); s.goal = null; }
   if (LEVEL === 2 && CP) CP.stun = Math.max(CP.stun || 0, AB.invisT);
   hiss(0.5, 0.1, { type: 'highpass', f: 3000 }); toast(`Vanish: invisible for ${7 * L} seconds.`, 'good', 2.5);
   if (MP.game) mpSend();
@@ -14191,6 +14279,37 @@ function acPidCopy() {
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c.textContent).then(() => done(true), () => done(false)); else done(false);
 }
 
+/* ---------- v43: everyone's cards were swapped for card tokens, once. Moves, levels, the journal and records stay ----------
+   Each card pays what selling it pays (Common 4, Rare 20, Legendary 100, Godly 500, Entity 50), and a card combined up a level
+   counts as the copies that went into it. The ability cards entities give you for beating them are progress, so they stay.
+   It runs after the Claude account has loaded, so cards saved in the account are counted once and never paid twice. */
+const oddsPct = (v) => (Math.round(v * 100) / 100) + '%';
+function cardsReset() {
+  if (HAUNT || (progress.cep | 0) === CARD_EP) return;
+  const inv = progress.cards && typeof progress.cards === 'object' && !Array.isArray(progress.cards) ? progress.cards : {};
+  const lv = progress.lv && typeof progress.lv === 'object' && !Array.isArray(progress.lv) ? progress.lv : {};
+  const keep = {}, keepLv = {}; let pay = 0, n = 0;
+  for (const [id, cnt] of Object.entries(inv)) {
+    const c = CARD_BY[id], k = Math.max(0, cnt | 0); if (!c || !k) continue;
+    if (c.gift) { keep[id] = k; if (lv[id]) keepLv[id] = lv[id]; continue; }
+    const copies = k + Math.max(0, (lv[id] | 0) - 1);
+    pay += copies * ((CARD_PRICE[c.r] || [0])[0] | 0); n += copies;
+  }
+  progress.cards = keep; progress.lv = keepLv;
+  progress.equip = (Array.isArray(progress.equip) ? progress.equip : []).filter((id) => keep[id]);
+  progress.abil = (Array.isArray(progress.abil) ? progress.abil : []).filter((id) => keep[id]);
+  progress.loads = []; progress.ld = 0; progress.cep = CARD_EP;
+  if (pay) tokSet(tokGet() + pay); else { saveProgress(); requestSave(); }
+  cardsRecalc(); try { cardsHud(); } catch (e) {}
+  if (n) {
+    const msg = `Everyone’s cards were reset in v43. Your ${n} card${n > 1 ? 's were' : ' was'} swapped for ${pay} card tokens.`;
+    UI.refundMsg = msg; later(1.5, () => toast(msg, 'good', 9));
+    const up = el('pane-ups'); if (up && !up.hidden) uiShop('upsBox');
+  }
+}
+// the swap runs as soon as the game loads (once the account has loaded), so the title screen and Cards tab already show it
+if (!HAUNT) ACCT.ready.then(() => { if (alive) cardsReset(); });
+
 function mpSend(extra) {
   if (!MP.game) return;
   const flags = (abInvis() ? 64 : 0) | (P.crouch ? 1 : 0) | (lightOn() ? 2 : 0) | (state === 'dead' ? 4 : 0) | (P.sprinting ? 8 : 0) | (P.hidden ? 16 : 0) | (P.speed > 0.3 ? 32 : 0);
@@ -14899,7 +15018,7 @@ const MUSEUM_CAP = { creeper: 'It was on the wall the whole time.', stilt: 'All 
 function renderMuseum() {
   const box = el('museumBox'); if (!box) return;
   wowLoad();
-  const groups = [{ lv: 0, title: 'Level 0 · The Yellow Rooms', list: ENTS0 }, { lv: 1, title: 'Level 1 · Garage & Poolrooms', list: ENTS1 }, { lv: 2, title: 'Level 2 · The Playground', list: ENTS2 }, { lv: 3, title: 'Level 3 · The Concrete Garden', list: ENTS3 }].map((gp) => Object.assign(gp, { list: orderSort(gp.list, gp.lv) }));
+  const groups = [{ lv: 0, title: 'Level 0 · The Yellow Rooms', list: ENTS0 }, { lv: 1, title: 'Level 1 · Garage & Poolrooms', list: ENTS1 }, { lv: 2, title: 'Level 2 · The Playground', list: ENTS2 }].map((gp) => Object.assign(gp, { list: orderSort(gp.list, gp.lv) }));
   let html = '', total = 0, open = 0;
   for (const gp of groups) {
     const list = gp.list.filter((e) => MUSEUM_CAP[e.id]);
